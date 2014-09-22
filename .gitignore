@@ -1,0 +1,15 @@
+/bin
+bin
+/bin/
+
+*.class
+*.log
+*.txt
+*.exe
+
+/target/
+
+.git
+.settings
+.classpath
+.project
