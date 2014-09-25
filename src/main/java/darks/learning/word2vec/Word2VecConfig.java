@@ -16,8 +16,8 @@
  */
 package darks.learning.word2vec;
 
-import darks.learning.common.rand.JavaRandomFunction;
 import darks.learning.common.rand.RandomFunction;
+import darks.learning.common.rand.WordRandomFunction;
 import darks.learning.word2vec.Word2Vec.Word2VecType;
 
 /**
@@ -28,29 +28,35 @@ import darks.learning.word2vec.Word2Vec.Word2VecType;
 public class Word2VecConfig
 {
 	
-	int featureSize = 100;
+	public int featureSize = 100;
 	
-	Word2VecType trainType = Word2VecType.SKIP_GRAM;
+	public Word2VecType trainType = Word2VecType.SKIP_GRAM;
 	
-	int window = 5;
+	public int window = 5;
 	
-	double sample = 1e-3;
+	public double sample = 1e-3;
 	
-	double learnRate = 0.025;
+	public double learnRate = 0.025;
 	
-	int negative = 5;
+	public int negative = 5;
 	
-	boolean useNegativeSampling = true;
+	public boolean useNegativeSampling = true;
 	
-	int negVocabSize = (int) 1e8;
+	public int negVocabSize = (int) 1e8;
 	
-	int maxExp = 6;
+	public int maxExp = 6;
 	
-	int expTableSize = 1000;
+	public int expTableSize = 1000;
 	
-	RandomFunction randomFunction = new JavaRandomFunction();
+	public RandomFunction randomFunction = new WordRandomFunction();
 	
-	boolean useStopwords = true;
+	public boolean useStopwords = true;
+	
+	public WordHandler wordHandler;
+	
+	public int minVocabCount = 5;
+	
+	public int topn;
 	
 	public Word2VecConfig()
 	{
@@ -128,68 +134,18 @@ public class Word2VecConfig
 		this.sample = sample;
 		return this;
 	}
-	
-	
-	public double getSample()
+
+	public Word2VecConfig setWordHandler(WordHandler wordHandler)
 	{
-		return sample;
+		this.wordHandler = wordHandler;
+		return this;
 	}
 
-	public boolean isUseStopwords()
+	public Word2VecConfig setMinVocabCount(int minVocabCount)
 	{
-		return useStopwords;
+		this.minVocabCount = minVocabCount;
+		return this;
 	}
-
-	public int getFeatureSize()
-	{
-		return featureSize;
-	}
-
-	public Word2VecType getTrainType()
-	{
-		return trainType;
-	}
-
-	public int getWindow()
-	{
-		return window;
-	}
-
-	public double getLearnRate()
-	{
-		return learnRate;
-	}
-	
-	public int getNegative()
-	{
-		return negative;
-	}
-
-	public boolean isUseNegativeSampling()
-	{
-		return useNegativeSampling;
-	}
-
-	public int getNegVocabSize()
-	{
-		return negVocabSize;
-	}
-
-	public int getMaxExp()
-	{
-		return maxExp;
-	}
-
-	public int getExpTableSize()
-	{
-		return expTableSize;
-	}
-
-	public RandomFunction getRandomFunction()
-	{
-		return randomFunction;
-	}
-	
 	
 	
 }

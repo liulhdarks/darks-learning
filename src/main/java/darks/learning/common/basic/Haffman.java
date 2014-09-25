@@ -21,6 +21,9 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.TreeSet;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Haffman tree
  * @author Darks.Liu
@@ -29,6 +32,8 @@ import java.util.TreeSet;
 public class Haffman
 {
 
+	private static Logger log = LoggerFactory.getLogger(Haffman.class);
+	
 	private TreeSet<HaffNode> elSet;
 	
 	private Collection<? extends HaffNode> elements;
@@ -87,6 +92,7 @@ public class Haffman
 	
 	private void buildCodePath()
 	{
+		log.debug("Building haffman code path for elements " + elements.size());
 		for (HaffNode node : elements)
 		{
 			LinkedList<HaffNode> nodes = new LinkedList<HaffNode>();
@@ -97,12 +103,20 @@ public class Haffman
 			}
 			node.codeNodes = nodes;
 			int pathSize = nodes.size();
-			node.codePath = new int[pathSize];
-			for (int i = 1; i < pathSize; i++)
+			if (pathSize == 0)
 			{
-				node.codePath[i - 1] = nodes.get(i).code;
+				node.codePath = new int[1];
+				node.codePath[0] = node.code;
 			}
-			node.codePath[pathSize - 1] = node.code;
+			else
+			{
+				node.codePath = new int[pathSize];
+				for (int i = 1; i < pathSize; i++)
+				{
+					node.codePath[i - 1] = nodes.get(i).code;
+				}
+				node.codePath[pathSize - 1] = node.code;
+			}
 		}
 	}
 }

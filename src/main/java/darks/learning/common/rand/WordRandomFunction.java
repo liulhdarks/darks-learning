@@ -14,36 +14,60 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package darks.learning.word2vec.handler;
+package darks.learning.common.rand;
 
-import java.util.List;
-
-import darks.learning.word2vec.Word2Vec;
-import darks.learning.word2vec.WordHandler;
-import darks.learning.word2vec.WordNode;
+import java.util.Random;
 
 /**
- * Word2vec Skip-gram algorithm
+ * Random number by word2vec random
  * 
  * @author Darks.Liu
  *
  */
-public class SkipGramWordHandler extends WordHandler
+public class WordRandomFunction implements RandomFunction
 {
 
-	public SkipGramWordHandler(Word2Vec word3vec)
+	private Random rand = new Random(System.currentTimeMillis());
+	
+	long nextRandom = 5;
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public double randDouble()
 	{
-		super(word3vec);
+		nextRandom = nextRandom * 25214903917L + 11;
+		return (nextRandom & 0xFFFF) / (double) 65536;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void handle(int index, List<WordNode> sentence)
+	public int randInt()
 	{
-		// TODO Auto-generated method stub
-
+		return rand.nextInt();
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int randInt(int max)
+	{
+		return rand.nextInt(max);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public long randLong()
+	{
+		nextRandom = nextRandom * 25214903917L + 11;
+		return nextRandom;
+	}
+	
 
 }

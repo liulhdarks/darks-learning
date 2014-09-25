@@ -14,24 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package darks.learning.common.basic;
+package darks.learning.corpus;
 
-import org.jblas.DoubleMatrix;
-
-public class WeightHaffNode extends HaffNode
+/**
+ * Customize vocabulary filter when loading corpus
+ * 
+ * @author Darks.Liu
+ *
+ */
+public interface CorpusFilter
 {
 
-	public DoubleMatrix weight;
-	
-	public WeightHaffNode()
-	{
-		
-	}
-	
-	public WeightHaffNode(int weightSize)
-	{
-		weight = new DoubleMatrix(weightSize);
-	}
-	
+	/**
+	 * Filter invalid string
+	 * 
+	 * @param string
+	 * @return If return true, String will be filtered.
+	 */
+	public boolean filter(String s);
 	
 }

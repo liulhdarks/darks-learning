@@ -21,8 +21,10 @@ import java.io.File;
 import org.junit.Test;
 
 import darks.learning.corpus.Corpus;
+import darks.learning.corpus.CorpusFilter;
 import darks.learning.corpus.CorpusLoader;
 import darks.learning.word2vec.Word2Vec;
+import darks.learning.word2vec.Word2Vec.Word2VecType;
 
 public class Word2VecTest
 {
@@ -31,10 +33,31 @@ public class Word2VecTest
 	public void testTrain()
 	{
 		CorpusLoader loader = new CorpusLoader();
-		Corpus corpus = loader.loadFromFile(new File(""));
+		loader.addFilter(new CorpusFilter()
+		{
+			@Override
+			public boolean filter(String s)
+			{
+				return s.length() <= 1;
+			}
+		});
+		loader.addStopwords(new File("corpus/dic/lex-stopword.lex"));
+		loader.addStopwords(new File("corpus/dic/lex-stopword1.lex"));
+		Corpus corpus = loader.loadFromFile(new File("corpus/chinese_test.txt"));
 		
 		Word2Vec word2vec = new Word2Vec();
+		word2vec.config.setTrainType(Word2VecType.CBOW)
+						.setFeatureSize(500)
+						.setMinVocabCount(0);
 		word2vec.train(corpus);
+		word2vec.saveModel(new File("test/test.model"));
+	}
+
+	@Test
+	public void testDistance()
+	{
+		Word2Vec word2vec = new Word2Vec();
+		word2vec.loadModel(new File("test/test.model"));
 	}
 	
 }

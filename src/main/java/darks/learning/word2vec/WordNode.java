@@ -24,25 +24,29 @@ import darks.learning.common.rand.RandomFunction;
 public class WordNode extends HaffNode
 {
 
-	public DoubleMatrix i2hWeight;
+	public DoubleMatrix feature;
 
 	public DoubleMatrix i2hWeightNeg;
 	
-	public String value;
+	public String name;
 	
-	public int freq;
-	
-	public WordNode(String value, int freq, Word2VecConfig cfg)
+	public WordNode(String name, DoubleMatrix feature)
 	{
-		this.value = value;
-		this.freq = freq;
+		this.name = name;
+		this.feature = feature;
+	}
+	
+	public WordNode(String name, int freq, Word2VecConfig cfg)
+	{
+		this.name = name;
+		this.value = freq;
 		int featureSize = cfg.featureSize;
-		i2hWeight = new DoubleMatrix(featureSize);
+		feature = new DoubleMatrix(featureSize);
 		i2hWeightNeg = new DoubleMatrix(featureSize);
 		RandomFunction func = cfg.randomFunction;
 		for (int i = 0; i < featureSize; i++)
 		{
-			i2hWeight.put(i, (func.randDouble() - 0.5) / featureSize);
+			feature.put(i, (func.randDouble() - 0.5) / featureSize);
 			i2hWeightNeg.put(i, (func.randDouble() - 0.5) / featureSize);
 		}
 	}

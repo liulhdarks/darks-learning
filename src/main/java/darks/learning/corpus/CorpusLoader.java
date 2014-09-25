@@ -19,6 +19,8 @@ package darks.learning.corpus;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.commons.math3.stat.Frequency;
@@ -40,6 +42,8 @@ public class CorpusLoader
 
 	private StopwordDictionary stopwordDictionary = new StopwordDictionary();
 	
+	private List<CorpusFilter> corpusFilters = new LinkedList<CorpusFilter>();
+	
 	public CorpusLoader()
 	{
 		
@@ -59,7 +63,7 @@ public class CorpusLoader
 		BufferedReader reader = null;
 		try
 		{
-			
+			long totalCount = 0;
 			Frequency wordFreq = new Frequency(String.CASE_INSENSITIVE_ORDER);
 			reader = new BufferedReader(new FileReader(file));
 			String line = null;
@@ -73,14 +77,15 @@ public class CorpusLoader
 				while (token.hasMoreTokens())
 				{
 					String word = token.nextToken().trim();
-					if (stopwordDictionary.contain(word))
+					if (stopwordDictionary.contain(word) || checkFilter(word))
 					{
 						continue;
 					}
+					totalCount++;
 					wordFreq.addValue(word);
 				}
 			}
-			return new Corpus(file, wordFreq, stopwordDictionary);
+			return new Corpus(file, wordFreq, stopwordDictionary, totalCount);
 		}
 		catch (Exception e)
 		{
@@ -91,6 +96,18 @@ public class CorpusLoader
 		{
 			IOUtils.closeStream(reader);
 		}
+	}
+	
+	private boolean checkFilter(String s)
+	{
+		for (CorpusFilter filter : corpusFilters)
+		{
+			if (filter.filter(s))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**
@@ -117,6 +134,47 @@ public class CorpusLoader
 	public boolean containStopword(String word)
 	{
 		return stopwordDictionary.contain(word);
+	}
+	
+	/**
+	 * 添加停用词文件
+	 * @param file 停用词文件
+	 */
+	public void addStopwords(File file)
+	{
+		BufferedReader reader = null;
+		try
+		{
+			reader = new BufferedReader(new FileReader(file));
+			String line = null;
+			while ((line = reader.readLine()) != null)
+			{
+				line = line.trim();
+				if (line.startsWith("#") || "".equals(line))
+				{
+					continue;
+				}
+				addStopword(line);
+			}
+		}
+		catch (Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
+		finally
+		{
+			IOUtils.closeStream(reader);
+		}
+	}
+	
+	/**
+	 * Add corpus filter
+	 * @param filter CorpusFilter
+	 */
+	public CorpusLoader addFilter(CorpusFilter filter)
+	{
+		corpusFilters.add(filter);
+		return this;
 	}
 
 	public StopwordDictionary getStopwordDictionary()

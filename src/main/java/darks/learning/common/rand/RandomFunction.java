@@ -26,8 +26,10 @@ public interface RandomFunction
 	
 	public double randDouble();
 
-	public double randInt();
+	public int randInt();
 
-	public double randInt(int max);
+	public int randInt(int max);
+
+	public long randLong();
 
 }

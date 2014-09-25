@@ -13,3 +13,4 @@ bin
 .settings
 .classpath
 .project
+/test/

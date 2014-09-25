@@ -47,6 +47,8 @@ public class Corpus
 	
 	private StopwordDictionary stopwordDictionary;
 	
+	private long totalVocabCount = 0;
+	
 	public Corpus()
 	{
 		
@@ -58,11 +60,12 @@ public class Corpus
 		this.wordFreq = wordFreq;
 	}
 	
-	public Corpus(File file, Frequency wordFreq, StopwordDictionary stopwordDictionary)
+	public Corpus(File file, Frequency wordFreq, StopwordDictionary stopwordDictionary, long totalVocabCount)
 	{
 		this.file = file;
 		this.wordFreq = wordFreq;
 		this.stopwordDictionary = stopwordDictionary;
+		this.totalVocabCount = totalVocabCount;
 	}
 	
 	/**
@@ -139,6 +142,22 @@ public class Corpus
 	public void setFile(File file)
 	{
 		this.file = file;
+	}
+
+	public long getTotalVocabCount()
+	{
+		return totalVocabCount;
+	}
+
+	public void setTotalVocabCount(long totalVocabCount)
+	{
+		this.totalVocabCount = totalVocabCount;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "Corpus [file=" + file + ", totalVocabCount=" + totalVocabCount + "]";
 	}
 	
 	

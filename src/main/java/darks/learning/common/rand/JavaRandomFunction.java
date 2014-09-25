@@ -18,24 +18,51 @@ package darks.learning.common.rand;
 
 import java.util.Random;
 
+/**
+ * Random number by JDK random
+ * 
+ * @author Darks.Liu
+ *
+ */
 public class JavaRandomFunction implements RandomFunction
 {
 
 	private Random rand = new Random(System.currentTimeMillis());
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public double randDouble()
 	{
 		return rand.nextDouble();
 	}
 
-	public double randInt()
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int randInt()
 	{
 		return rand.nextInt();
 	}
 
-	public double randInt(int max)
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int randInt(int max)
 	{
 		return rand.nextInt(max);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public long randLong()
+	{
+		return rand.nextLong();
 	}
 
 }

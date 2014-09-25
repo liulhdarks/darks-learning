@@ -35,4 +35,20 @@ public class MathTest
 		DoubleMatrix bmatrix = new DoubleMatrix(blas);
 		System.out.println(DoubleMatrix.concatHorizontally(dmatrix, bmatrix));
 	}
+
+	@Test
+	public void testMatrix()
+	{
+		double[] input = { 
+				4, 5, 6
+			};
+		double[] weight = { 
+				1, 2, 3
+			};
+		DoubleMatrix im = new DoubleMatrix(input);
+		DoubleMatrix wm = new DoubleMatrix(weight);
+		System.out.println(im.mul(wm));
+		System.out.println(im.mmul(wm.transpose()));
+		System.out.println(im.dot(wm.transpose()));
+	}
 }

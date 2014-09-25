@@ -17,10 +17,30 @@
 package darks.learning.word2vec;
 
 import java.util.List;
+import java.util.Map;
 
-public interface WordHandler
+public abstract class WordHandler
 {
 
+    protected Word2Vec word3vec;
+	
+    protected Word2VecConfig config;
+	
+    protected double[] expTable;
+    
+    protected Map<String, WordNode> wordNodeMap;
+	
+    protected double learnRate;
+	
+	public WordHandler(Word2Vec word3vec)
+	{
+		this.word3vec = word3vec;
+		config = word3vec.getConfig();
+		expTable = word3vec.getExpTable();
+		learnRate = word3vec.getLearnRate();
+		wordNodeMap = word3vec.getWordNodes();
+	}
+	
 	/**
 	 * Handle word2vec algorithm
 	 * 
@@ -28,6 +48,16 @@ public interface WordHandler
 	 * @param sentence words set in sentence
 	 * @param winScope Random window scope
 	 */
-	public void handle(int index, List<WordNode> sentence, int winScope);
+	public abstract void handle(int index, List<WordNode> sentence);
+
+	public double getLearnRate()
+	{
+		return learnRate;
+	}
+
+	public void setLearnRate(double learnRate)
+	{
+		this.learnRate = learnRate;
+	}
 	
 }
