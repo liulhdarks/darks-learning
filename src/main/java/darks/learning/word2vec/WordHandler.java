@@ -22,8 +22,6 @@ import java.util.Map;
 public abstract class WordHandler
 {
 
-    protected Word2Vec word3vec;
-	
     protected Word2VecConfig config;
 	
     protected double[] expTable;
@@ -34,7 +32,14 @@ public abstract class WordHandler
 	
 	public WordHandler(Word2Vec word3vec)
 	{
-		this.word3vec = word3vec;
+		config = word3vec.getConfig();
+		expTable = word3vec.getExpTable();
+		learnRate = word3vec.getLearnRate();
+		wordNodeMap = word3vec.getWordNodes();
+	}
+	
+	public WordHandler(Word2Vec2 word3vec)
+	{
 		config = word3vec.getConfig();
 		expTable = word3vec.getExpTable();
 		learnRate = word3vec.getLearnRate();

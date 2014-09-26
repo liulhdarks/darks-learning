@@ -21,6 +21,7 @@ import java.util.List;
 import darks.learning.common.basic.HaffNode;
 import darks.learning.common.basic.WeightHaffNode;
 import darks.learning.word2vec.Word2Vec;
+import darks.learning.word2vec.Word2Vec2;
 import darks.learning.word2vec.WordHandler;
 import darks.learning.word2vec.WordNode;
 
@@ -34,9 +35,14 @@ public class CBowWordHandler2 extends WordHandler
 {
 	
 	
-	public CBowWordHandler2(Word2Vec word3vec)
+	public CBowWordHandler2(Word2Vec word2vec)
 	{
-		super(word3vec);
+		super(word2vec);
+	}
+	
+	public CBowWordHandler2(Word2Vec2 word2vec)
+	{
+		super(word2vec);
 	}
 
 	/**

@@ -50,5 +50,7 @@ public class MathTest
 		System.out.println(im.mul(wm));
 		System.out.println(im.mmul(wm.transpose()));
 		System.out.println(im.dot(wm.transpose()));
+		System.out.println(im.dot(wm));
+		System.out.println(im.add(wm));
 	}
 }

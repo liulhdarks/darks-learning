@@ -43,8 +43,8 @@ import org.slf4j.LoggerFactory;
 import darks.learning.common.basic.Haffman;
 import darks.learning.common.utils.IOUtils;
 import darks.learning.corpus.Corpus;
+import darks.learning.word2vec.Word2Vec.Word2VecType;
 import darks.learning.word2vec.handler.CBowWordHandler2;
-import darks.learning.word2vec.handler.SkipGramWordHandler2;
 
 /**
  * Word2vec implement
@@ -52,15 +52,10 @@ import darks.learning.word2vec.handler.SkipGramWordHandler2;
  * @author Darks.Liu
  * 
  */
-public class Word2Vec
+public class Word2Vec2
 {
 
-	private static Logger log = LoggerFactory.getLogger(Word2Vec.class);
-
-	public enum Word2VecType
-	{
-		CBOW, SKIP_GRAM
-	}
+	private static Logger log = LoggerFactory.getLogger(Word2Vec2.class);
 
 	public Word2VecConfig config = new Word2VecConfig();
 
@@ -82,7 +77,7 @@ public class Word2Vec
 	
 	int outCount = 0;
 
-	public Word2Vec()
+	public Word2Vec2()
 	{
 
 	}
@@ -111,12 +106,12 @@ public class Word2Vec
 		while (it.hasNext())
 		{
 			Map.Entry<Comparable<?>, Long> entry = it.next();
-			int freq = entry.getValue().intValue();
+			long freq = entry.getValue();
 			if (freq < config.minVocabCount)
 			{
 				continue;
 			}
-			WordNode node = new WordNode((String) entry.getKey(), freq, config);
+			WordNode node = new WordNode((String) entry.getKey(), (int) freq, config);
 			wordNodes.put(node.name, node);
 		}
 		if (log.isDebugEnabled())
@@ -182,7 +177,7 @@ public class Word2Vec
 			}
 			else
 			{
-				wordHandler = new SkipGramWordHandler2(this);
+				//wordHandler = new SkipGramWordHandler2(this);
 			}
 		}
 	}

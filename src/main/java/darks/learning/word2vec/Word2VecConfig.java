@@ -56,7 +56,7 @@ public class Word2VecConfig
 	
 	public int minVocabCount = 5;
 	
-	public int topn;
+	public int topCount = 10;
 	
 	public Word2VecConfig()
 	{
@@ -144,6 +144,12 @@ public class Word2VecConfig
 	public Word2VecConfig setMinVocabCount(int minVocabCount)
 	{
 		this.minVocabCount = minVocabCount;
+		return this;
+	}
+
+	public Word2VecConfig setTopCount(int topCount)
+	{
+		this.topCount = topCount;
 		return this;
 	}
 	
