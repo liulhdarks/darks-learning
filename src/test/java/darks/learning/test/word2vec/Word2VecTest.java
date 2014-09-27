@@ -17,11 +17,11 @@
 package darks.learning.test.word2vec;
 
 import java.io.File;
-import java.util.Arrays;
 
 import org.junit.Test;
 
 import darks.learning.corpus.Corpus;
+import darks.learning.corpus.CorpusFilter;
 import darks.learning.corpus.CorpusLoader;
 import darks.learning.word2vec.Word2Vec;
 import darks.learning.word2vec.Word2Vec.Word2VecType;
@@ -33,22 +33,22 @@ public class Word2VecTest
 	public void testTrain()
 	{
 		CorpusLoader loader = new CorpusLoader();
-//		loader.addFilter(new CorpusFilter()
-//		{
-//			@Override
-//			public boolean filter(String s)
-//			{
-//				return s.length() <= 1;
-//			}
-//		});
-//		loader.addStopwords(new File("corpus/dic/lex-stopword.lex"));
-//		loader.addStopwords(new File("corpus/dic/lex-stopword1.lex"));
+		loader.addFilter(new CorpusFilter()
+		{
+			@Override
+			public boolean filter(String s)
+			{
+				return s.length() <= 1;
+			}
+		});
+		loader.addStopwords(new File("corpus/dic/lex-stopword.lex"));
+		loader.addStopwords(new File("corpus/dic/lex-stopword1.lex"));
 		Corpus corpus = loader.loadFromFile(new File("corpus/corpus.txt"));
 		
 		Word2Vec word2vec = new Word2Vec();
-		word2vec.config.setTrainType(Word2VecType.SKIP_GRAM)
+		word2vec.config.setTrainType(Word2VecType.CBOW)
 						.setFeatureSize(100)
-						.setMinVocabCount(0);
+						.setMinVocabCount(5);
 		word2vec.train(corpus);
 		word2vec.saveModel(new File("test/test.model"));
 	}
@@ -58,8 +58,8 @@ public class Word2VecTest
 	{
 		Word2Vec vec = new Word2Vec();
 		vec.loadModel(new File("test/test.model"));
-        System.out.println(Arrays.toString(vec.getWordVector("国家队")));
-        System.out.println(Arrays.toString(vec.getWordVector("央视")));
+        System.out.println(vec.getWordVector("国家队").toString());
+        System.out.println(vec.getWordVector("央视").toString());
         System.out.println(vec.distance("央视"));
         System.out.println(vec.distance("学习"));
         System.out.println(vec.distance("研究"));

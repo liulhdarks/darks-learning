@@ -311,13 +311,19 @@ public class Word2Vec
 		return result;
 	}
 	
-	public double[] getWordVector(String word) {
+	/**
+	 * Get specify word's vector
+	 * 
+	 * @param word Specify word
+	 * @return Result vector
+	 */
+	public DoubleMatrix getWordVector(String word) {
 		WordNode node = wordNodes.get(word);
 		if (node == null)
 		{
 			return null;
 		}
-		return node.feature.toArray();
+		return node.feature;
 	}
 
 
@@ -400,33 +406,6 @@ public class Word2Vec
 		finally
 		{
 			IOUtils.closeStream(dis);
-		}
-	}
-	
-	public void saveModel2(File file)
-	{
-		try 
-		{
-			DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(
-					new FileOutputStream(file)));
-			dataOutputStream.writeInt(wordNodes.size());
-			dataOutputStream.writeInt(config.featureSize);
-			double[] syn0 = null;
-			for (Entry<String, WordNode> element : wordNodes.entrySet())
-			{
-				dataOutputStream.writeUTF(element.getKey());
-				syn0 = ((WordNode) element.getValue()).feature.data;
-				for (double d : syn0)
-				{
-					dataOutputStream.writeFloat(((Double) d).floatValue());
-				}
-			}
-			dataOutputStream.flush();
-			dataOutputStream.close();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
 		}
 	}
 	

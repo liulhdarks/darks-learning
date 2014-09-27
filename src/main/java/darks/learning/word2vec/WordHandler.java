@@ -22,13 +22,13 @@ import java.util.Map;
 public abstract class WordHandler
 {
 
-    public Word2VecConfig config;
+    protected Word2VecConfig config;
 	
-    public double[] expTable;
+    protected double[] expTable;
     
-    public Map<String, WordNode> wordNodeMap;
+    protected Map<String, WordNode> wordNodeMap;
 	
-    public double learnRate;
+    protected double learnRate;
     
     public WordHandler()
     {
