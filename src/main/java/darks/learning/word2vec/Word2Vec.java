@@ -20,12 +20,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -43,8 +40,8 @@ import org.slf4j.LoggerFactory;
 import darks.learning.common.basic.Haffman;
 import darks.learning.common.utils.IOUtils;
 import darks.learning.corpus.Corpus;
-import darks.learning.word2vec.handler.CBowWordHandler2;
-import darks.learning.word2vec.handler.SkipGramWordHandler2;
+import darks.learning.word2vec.handler.CBowWordHandler;
+import darks.learning.word2vec.handler.SkipGramWordHandler;
 
 /**
  * Word2vec implement
@@ -80,8 +77,6 @@ public class Word2Vec
 
 	WordHandler wordHandler = null;
 	
-	int outCount = 0;
-
 	public Word2Vec()
 	{
 
@@ -130,22 +125,6 @@ public class Word2Vec
 		{
 			log.debug("Complete to Build haffman tree.");
 		}
-		PrintWriter out = null;
-		try
-		{
-			File file2 = new File("test/tmp.txt");
-			out = new PrintWriter(file2);
-		}
-		catch (FileNotFoundException e)
-		{
-		}
-		for (WordNode neuron : wordNodes.values())
-		{
-			WordNode node = (WordNode) neuron;
-			out.print(node.name + "\t" + node.value + "\t" + node.code + "\t" + Arrays.toString(node.codePath) + "\r\n");
-		}
-		out.flush();
-		out.close();
 	}
 
 	private void createExpTable()
@@ -157,7 +136,7 @@ public class Word2Vec
 		expTable = new double[config.expTableSize];
 		for (int i = 0; i < config.expTableSize; i++)
 		{
-			double exp = FastMath.exp(i / (config.expTableSize * 2 - 1) * config.maxExp);
+			double exp = FastMath.exp((i / (double)config.expTableSize * 2 - 1) * config.maxExp);
 			expTable[i] = exp / (1 + exp);
 		}
 		if (log.isDebugEnabled())
@@ -178,11 +157,11 @@ public class Word2Vec
 		{
 			if (config.trainType == Word2VecType.CBOW)
 			{
-				wordHandler = new CBowWordHandler2(this);
+				wordHandler = new CBowWordHandler(this);
 			}
 			else
 			{
-				wordHandler = new SkipGramWordHandler2(this);
+				wordHandler = new SkipGramWordHandler(this);
 			}
 		}
 	}
@@ -211,9 +190,8 @@ public class Word2Vec
 				lastTrainCount = updateLearnRate(lastTrainCount);
 				executeNeuronNetwork(sentence);
 			}
-			System.out.println("Words in train file: " + actualVocabCount + "/" + totalVocabCount);
-			System.out.println("sucess train over!");
-			System.out.println("out range " + outCount);
+			log.debug("Words in train file: " + actualVocabCount + "/" + totalVocabCount);
+			log.info("Succeed to train word2vec model.");
 		}
 		catch (Exception e)
 		{
@@ -233,9 +211,9 @@ public class Word2Vec
 			log.debug("learnRate:" + learnRate + "\tProgress: "
 					+ (int) (actualVocabCount / (double) (totalVocabCount + 1) * 100) + "%");
 			learnRate = startLearnRate * (1. - actualVocabCount / (double) (totalVocabCount + 1));
-			if (learnRate < startLearnRate * 1e-3)
+			if (learnRate < startLearnRate * 1e-4)
 			{
-				learnRate = startLearnRate * 1e-3;
+				learnRate = startLearnRate * 1e-4;
 			}
 			lastTrainCount = actualVocabCount;
 		}
@@ -263,7 +241,6 @@ public class Word2Vec
 				double nextRandom = config.randomFunction.randDouble();
 				if (rnd < nextRandom)
 				{
-					outCount++;
 					continue;
 				}
 			}

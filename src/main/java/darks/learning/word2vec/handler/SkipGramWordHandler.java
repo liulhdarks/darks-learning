@@ -33,22 +33,9 @@ import darks.learning.word2vec.WordNode;
 public class SkipGramWordHandler extends WordHandler
 {
 
-	public int EXP_TABLE_SIZE = 1000;
-
-	private int MAX_EXP = 6;
-
 	public SkipGramWordHandler(Word2Vec word3vec)
 	{
 		super(word3vec);
-	}
-	
-	private void createExpTable()
-	{
-		for (int i = 0; i < EXP_TABLE_SIZE; i++)
-		{
-			expTable[i] = Math.exp(((i / (double) EXP_TABLE_SIZE * 2 - 1) * MAX_EXP));
-			expTable[i] = expTable[i] / (expTable[i] + 1);
-		}
 	}
 
 	/**
@@ -90,13 +77,13 @@ public class SkipGramWordHandler extends WordHandler
 				{
 					f += we.feature.data[j] * out.weight.data[j];
 				}
-				if (f <= -MAX_EXP || f >= MAX_EXP)
+				if (f <= -maxExp || f >= maxExp)
 				{
 					continue;
 				}
 				else
 				{
-					f = (f + MAX_EXP) * (EXP_TABLE_SIZE / MAX_EXP / 2);
+					f = (f + maxExp) * (expTableSize / maxExp / 2);
 					f = expTable[(int) f];
 				}
 				// 'g' is the gradient multiplied by the learning rate

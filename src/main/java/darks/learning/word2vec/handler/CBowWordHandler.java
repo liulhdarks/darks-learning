@@ -34,7 +34,11 @@ import darks.learning.word2vec.WordNode;
  */
 public class CBowWordHandler extends WordHandler
 {
-	
+
+    
+    public CBowWordHandler()
+    {
+    }
 	
 	public CBowWordHandler(Word2Vec word3vec)
 	{

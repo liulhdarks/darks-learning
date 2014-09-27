@@ -22,23 +22,19 @@ import java.util.Map;
 public abstract class WordHandler
 {
 
-    protected Word2VecConfig config;
+    public Word2VecConfig config;
 	
-    protected double[] expTable;
+    public double[] expTable;
     
-    protected Map<String, WordNode> wordNodeMap;
+    public Map<String, WordNode> wordNodeMap;
 	
-    protected double learnRate;
+    public double learnRate;
+    
+    public WordHandler()
+    {
+    }
 	
 	public WordHandler(Word2Vec word3vec)
-	{
-		config = word3vec.getConfig();
-		expTable = word3vec.getExpTable();
-		learnRate = word3vec.getLearnRate();
-		wordNodeMap = word3vec.getWordNodes();
-	}
-	
-	public WordHandler(Word2Vec2 word3vec)
 	{
 		config = word3vec.getConfig();
 		expTable = word3vec.getExpTable();

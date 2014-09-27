@@ -35,19 +35,30 @@ public class WordNode extends HaffNode
 		this.name = name;
 		this.feature = feature;
 	}
+    
+    public WordNode(String name, int freq, Word2VecConfig cfg)
+    {
+        this(name, freq, cfg.featureSize, cfg.randomFunction);
+    }
 	
-	public WordNode(String name, int freq, Word2VecConfig cfg)
+	public WordNode(String name, int freq, int featureSize, RandomFunction func)
 	{
 		this.name = name;
 		this.value = freq;
-		int featureSize = cfg.featureSize;
 		feature = new DoubleMatrix(featureSize);
 		i2hWeightNeg = new DoubleMatrix(featureSize);
-		RandomFunction func = cfg.randomFunction;
 		for (int i = 0; i < featureSize; i++)
 		{
 			feature.put(i, (func.randDouble() - 0.5) / featureSize);
 			i2hWeightNeg.put(i, (func.randDouble() - 0.5) / featureSize);
 		}
 	}
+
+    @Override
+    public String toString()
+    {
+        return name;
+    }
+	
+	
 }
