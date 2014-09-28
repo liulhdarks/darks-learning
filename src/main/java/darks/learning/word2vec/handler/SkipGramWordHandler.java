@@ -18,6 +18,8 @@ package darks.learning.word2vec.handler;
 
 import java.util.List;
 
+import org.jblas.DoubleMatrix;
+
 import darks.learning.common.basic.HaffNode;
 import darks.learning.common.basic.WeightHaffNode;
 import darks.learning.word2vec.Word2Vec;
@@ -44,67 +46,65 @@ public class SkipGramWordHandler extends WordHandler
 	@Override
 	public void handle(int index, List<WordNode> sentence)
 	{
+		long nextRandom = config.randomFunction.randLong();
+		int scope = (int) nextRandom % config.window;
+		int maxScope = config.window * 2 + 1 - scope;
+		int size = sentence.size();
+		DoubleMatrix error = new DoubleMatrix(config.featureSize);
+		inputToHidden(index, scope, maxScope, size, sentence, error);
+	}
+
+
+	//input -> hidden
+	private void inputToHidden(int index, int scope, int maxScope, int size, 
+			List<WordNode> sentence, DoubleMatrix error)
+	{
+		WordNode word = sentence.get(index);
+		int c = 0;
+		for (int i = scope; i < maxScope; i++)
+		{
+			if (i == config.window)
+			{
+				continue;
+			}
+			c = index - config.window + i;
+			if (c < 0 || c >= size)
+			{
+				continue;
+			}
+			WordNode curWord = sentence.get(c);
+			if (curWord == null)
+			{
+				continue;
+			}
+			if (config.hierarchicalSoftmax)
+			{
+				hierarchySoftmax(word, error, curWord.feature);
+			}
+			negaticeSampling(curWord, error, sentence);
+			curWord.feature.addi(error);
+		}
+	}
+	
+	private void hierarchySoftmax(WordNode word, DoubleMatrix error, DoubleMatrix input)
+	{
+		List<HaffNode> neuronNodes = word.codeNodes;
+		int nodeSize = neuronNodes.size();
 		int maxExp = config.maxExp;
 		int expTableSize = config.expTableSize;
-		long nextRandom = config.randomFunction.randLong();
-		int b = (int) nextRandom % config.window;
-		WordNode word = sentence.get(index);
-		int a, c = 0;
-		int window = config.window;
-		int layerSize = config.featureSize;
-		for (a = b; a < window * 2 + 1 - b; a++)
+		for (int i = 0; i < nodeSize; i++)
 		{
-			if (a == window)
-			{
+			WeightHaffNode neuronNode = (WeightHaffNode) neuronNodes.get(i);
+			double f = input.dot(neuronNode.weight);
+			if (f <= -maxExp)
 				continue;
-			}
-			c = index - window + a;
-			if (c < 0 || c >= sentence.size())
-			{
+			else if (f >= maxExp)
 				continue;
-			}
-
-			double[] neu1e = new double[layerSize];// 误差项
-			// HIERARCHICAL SOFTMAX
-			List<HaffNode> neurons = word.codeNodes;
-			WordNode we = sentence.get(c);
-			for (int i = 0; i < neurons.size(); i++)
-			{
-				WeightHaffNode out = (WeightHaffNode) neurons.get(i);
-				double f = 0;
-				// Propagate hidden -> output
-				for (int j = 0; j < layerSize; j++)
-				{
-					f += we.feature.data[j] * out.weight.data[j];
-				}
-				if (f <= -maxExp || f >= maxExp)
-				{
-					continue;
-				}
-				else
-				{
-					f = (f + maxExp) * (expTableSize / maxExp / 2);
-					f = expTable[(int) f];
-				}
-				// 'g' is the gradient multiplied by the learning rate
-				double g = (1 - word.codePath[i] - f) * learnRate;
-				// Propagate errors output -> hidden
-				for (c = 0; c < layerSize; c++)
-				{
-					neu1e[c] += g * out.weight.data[c];
-				}
-				// Learn weights hidden -> output
-				for (c = 0; c < layerSize; c++)
-				{
-					out.weight.data[c] += g * we.feature.data[c];
-				}
-			}
-
-			// Learn weights input -> hidden
-			for (int j = 0; j < layerSize; j++)
-			{
-				we.feature.data[j] += neu1e[j];
-			}
+			else
+				f = expTable[(int) ((f + maxExp) * (expTableSize / maxExp / 2))];
+			double g = (1 - word.codePath[i] - f) * learnRate;
+			error.addi(neuronNode.weight.mul(g));
+			neuronNode.weight.addi(input.mul(g));
 		}
 	}
 }

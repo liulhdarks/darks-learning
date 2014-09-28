@@ -35,10 +35,6 @@ import darks.learning.word2vec.WordNode;
 public class CBowWordHandler extends WordHandler
 {
 
-    
-    public CBowWordHandler()
-    {
-    }
 	
 	public CBowWordHandler(Word2Vec word3vec)
 	{
@@ -59,7 +55,11 @@ public class CBowWordHandler extends WordHandler
 		DoubleMatrix input = new DoubleMatrix(config.featureSize);
 		inputToHidden(index, scope, maxScope, size, sentence, input);
 		WordNode word = sentence.get(index);
-		hierarchySoftmax(word, error, input);
+		if (config.hierarchicalSoftmax)
+		{
+			hierarchySoftmax(word, error, input);
+		}
+		negaticeSampling(word, error, sentence);
 		updateInput(index, scope, maxScope, size, sentence, error);
 	}
 	

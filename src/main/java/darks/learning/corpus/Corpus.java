@@ -22,10 +22,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.apache.commons.math3.stat.Frequency;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import darks.learning.common.utils.FreqCount;
 import darks.learning.common.utils.IOUtils;
 import darks.learning.exceptions.CorpusException;
 
@@ -41,7 +41,7 @@ public class Corpus
 	
 	private File file;
 	
-	private Frequency wordFreq;
+	private FreqCount<String> wordFreq;
 	
 	private BufferedReader reader;
 	
@@ -54,13 +54,13 @@ public class Corpus
 		
 	}
 	
-	public Corpus(File file, Frequency wordFreq)
+	public Corpus(File file, FreqCount<String> wordFreq)
 	{
 		this.file = file;
 		this.wordFreq = wordFreq;
 	}
 	
-	public Corpus(File file, Frequency wordFreq, StopwordDictionary stopwordDictionary, long totalVocabCount)
+	public Corpus(File file, FreqCount<String> wordFreq, StopwordDictionary stopwordDictionary, long totalVocabCount)
 	{
 		this.file = file;
 		this.wordFreq = wordFreq;
@@ -114,12 +114,12 @@ public class Corpus
 		this.reader = reader;
 	}
 
-	public Frequency getWordFreq()
+	public FreqCount<String> getWordFreq()
 	{
 		return wordFreq;
 	}
 
-	public void setWordFreq(Frequency wordFreq)
+	public void setWordFreq(FreqCount<String> wordFreq)
 	{
 		this.wordFreq = wordFreq;
 	}

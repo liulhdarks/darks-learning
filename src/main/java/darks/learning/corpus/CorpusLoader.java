@@ -23,10 +23,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.apache.commons.math3.stat.Frequency;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import darks.learning.common.utils.FreqCount;
 import darks.learning.common.utils.IOUtils;
 import darks.learning.exceptions.CorpusException;
 
@@ -64,7 +64,7 @@ public class CorpusLoader
 		try
 		{
 			long totalCount = 0;
-			Frequency wordFreq = new Frequency(String.CASE_INSENSITIVE_ORDER);
+			FreqCount<String> wordFreq = new FreqCount<String>();
 			reader = new BufferedReader(new FileReader(file));
 			String line = null;
 			while ((line = reader.readLine()) != null)

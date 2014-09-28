@@ -40,6 +40,8 @@ public class Word2VecConfig
 	
 	public int negative = 5;
 	
+	public boolean hierarchicalSoftmax = true;
+	
 	public boolean useNegativeSampling = true;
 	
 	public int negVocabSize = (int) 1e8;
@@ -57,6 +59,8 @@ public class Word2VecConfig
 	public int minVocabCount = 5;
 	
 	public int topCount = 10;
+	
+	public int unigramTableSize = (int)1e8;
 	
 	public Word2VecConfig()
 	{
@@ -150,6 +154,18 @@ public class Word2VecConfig
 	public Word2VecConfig setTopCount(int topCount)
 	{
 		this.topCount = topCount;
+		return this;
+	}
+
+	public Word2VecConfig setUnigramTableSize(int unigramTableSize)
+	{
+		this.unigramTableSize = unigramTableSize;
+		return this;
+	}
+
+	public Word2VecConfig setHierarchicalSoftmax(boolean hierarchicalSoftmax)
+	{
+		this.hierarchicalSoftmax = hierarchicalSoftmax;
 		return this;
 	}
 	

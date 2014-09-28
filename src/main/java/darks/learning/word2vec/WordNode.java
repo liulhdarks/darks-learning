@@ -16,6 +16,8 @@
  */
 package darks.learning.word2vec;
 
+import java.util.Random;
+
 import org.jblas.DoubleMatrix;
 
 import darks.learning.common.basic.HaffNode;
@@ -26,9 +28,11 @@ public class WordNode extends HaffNode
 
 	public DoubleMatrix feature;
 
-	public DoubleMatrix i2hWeightNeg;
+	public DoubleMatrix weightNeg;
 	
 	public String name;
+	
+	private static Random rand = new Random(System.currentTimeMillis());
 	
 	public WordNode(String name, DoubleMatrix feature)
 	{
@@ -46,11 +50,11 @@ public class WordNode extends HaffNode
 		this.name = name;
 		this.value = freq;
 		feature = new DoubleMatrix(featureSize);
-		i2hWeightNeg = new DoubleMatrix(featureSize);
+		weightNeg = new DoubleMatrix(featureSize);
 		for (int i = 0; i < featureSize; i++)
 		{
-			feature.put(i, (func.randDouble() - 0.5) / featureSize);
-			i2hWeightNeg.put(i, (func.randDouble() - 0.5) / featureSize);
+			feature.put(i, (rand.nextDouble() - 0.5) / featureSize);
+			weightNeg.put(i, (rand.nextDouble() - 0.5) / featureSize);
 		}
 	}
 

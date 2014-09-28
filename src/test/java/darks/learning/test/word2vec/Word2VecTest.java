@@ -48,7 +48,8 @@ public class Word2VecTest
 		Word2Vec word2vec = new Word2Vec();
 		word2vec.config.setTrainType(Word2VecType.CBOW)
 						.setFeatureSize(100)
-						.setMinVocabCount(5);
+						.setMinVocabCount(0)
+						.setNegative(5);
 		word2vec.train(corpus);
 		word2vec.saveModel(new File("test/test.model"));
 	}
@@ -60,11 +61,13 @@ public class Word2VecTest
 		vec.loadModel(new File("test/test.model"));
         System.out.println(vec.getWordVector("国家队").toString());
         System.out.println(vec.getWordVector("央视").toString());
-        System.out.println(vec.distance("央视"));
-        System.out.println(vec.distance("学习"));
-        System.out.println(vec.distance("研究"));
-        System.out.println(vec.distance("国家队"));
-        System.out.println(vec.distance("五行阵"));
+		System.out.println(vec.distance("计算机"));
+		System.out.println(vec.distance("学习"));
+		System.out.println(vec.distance("研究"));
+		System.out.println(vec.distance("服务器"));
+		System.out.println(vec.distance("毛泽东"));
+		System.out.println(vec.distance("飞机"));
+		System.out.println(vec.distance("国家"));
 		double sim = vec.distance("计算机", "电脑");
 		System.out.println(sim);
 	}

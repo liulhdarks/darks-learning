@@ -62,6 +62,8 @@ public class Word2Vec
 	public Word2VecConfig config = new Word2VecConfig();
 
 	private Map<String, WordNode> wordNodes = new HashMap<String, WordNode>();
+	
+	private WordNode[] unigramTable = null;
 
 	private long totalVocabCount = 0;
 
@@ -91,7 +93,6 @@ public class Word2Vec
 	{
 		log.info("Start to train word2vec corpus.");
 		long st = System.currentTimeMillis();
-		createExpTable();
 		buildWordNodes(corpus);
 		initTrainer();
 		startTrainer(corpus);
@@ -102,16 +103,16 @@ public class Word2Vec
 	private void buildWordNodes(Corpus corpus)
 	{
 		totalVocabCount = corpus.getTotalVocabCount();
-		Iterator<Map.Entry<Comparable<?>, Long>> it = corpus.getWordFreq().entrySetIterator();
+		Iterator<Map.Entry<String, Long>> it = corpus.getWordFreq().entrySetIterator();
 		while (it.hasNext())
 		{
-			Map.Entry<Comparable<?>, Long> entry = it.next();
+			Map.Entry<String, Long> entry = it.next();
 			int freq = entry.getValue().intValue();
 			if (freq < config.minVocabCount)
 			{
 				continue;
 			}
-			WordNode node = new WordNode((String) entry.getKey(), freq, config);
+			WordNode node = new WordNode(entry.getKey(), freq, config);
 			wordNodes.put(node.name, node);
 		}
 		if (log.isDebugEnabled())
@@ -133,20 +134,60 @@ public class Word2Vec
 		{
 			return;
 		}
+		if (log.isDebugEnabled())
+		{
+			log.debug("Create exp table size " + config.expTableSize);
+		}
 		expTable = new double[config.expTableSize];
 		for (int i = 0; i < config.expTableSize; i++)
 		{
 			double exp = FastMath.exp((i / (double)config.expTableSize * 2 - 1) * config.maxExp);
 			expTable[i] = exp / (1 + exp);
 		}
+	}
+	
+	private void createUnigramTable()
+	{
+		if (config.negative <= 0 || config.unigramTableSize <= 0)
+		{
+			return;
+		}
 		if (log.isDebugEnabled())
 		{
-			log.debug("Create exp table size " + expTable.length);
+			log.debug("Create unigram table size " + config.unigramTableSize);
+		}
+		int tableSize = config.unigramTableSize;
+		unigramTable = new WordNode[tableSize];
+		WordNode[] vocabs = new WordNode[wordNodes.size()];
+		wordNodes.values().toArray(vocabs);
+		int vocabSize = vocabs.length;
+		double pow = 0.75;
+		double totalPower = 0;
+		for (WordNode vocab : vocabs)
+		{
+			totalPower += FastMath.pow(vocab.value, pow);
+		}
+		double dl = FastMath.pow(vocabs[0].value, pow) / totalPower;
+		int index = 0;
+		for (int i = 0; i < tableSize; i++)
+		{
+			unigramTable[i] = vocabs[index];
+			if (i / (double)tableSize > dl)
+			{
+				index++;
+				dl += FastMath.pow(vocabs[index].value, pow) / totalPower;
+			}
+			if (index >= vocabSize)
+			{
+				index = vocabSize - 1;
+			}
 		}
 	}
 
 	private void initTrainer()
 	{
+		createExpTable();
+		createUnigramTable();
 		learnRate = config.learnRate;
 		startLearnRate = learnRate;
 		if (config.wordHandler != null)
@@ -469,4 +510,10 @@ public class Word2Vec
 		return wordNodes;
 	}
 
+	public WordNode[] getUnigramTable()
+	{
+		return unigramTable;
+	}
+
+	
 }
