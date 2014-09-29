@@ -68,7 +68,8 @@ public class RegressionTest
 		ModelSet modelSet = ModelLoader.load(input, output);
 		Regression reg = new LogisticRegression();
 		reg.config.setLearnRate(0.001)
-		.setMaxIteratorCount(100000);
+		.setMaxIteratorCount(100000)
+		.setRandomGradient(true);
 		reg.train(modelSet);
 		DoubleMatrix result = reg.predict(new DoubleMatrix(test_X));
 		System.out.println(result);

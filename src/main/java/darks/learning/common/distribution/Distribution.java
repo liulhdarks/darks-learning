@@ -41,6 +41,6 @@ public abstract class Distribution
 	 * @param high high bits
 	 * @return Distribution value
 	 */
-	public abstract double generate(double low, double high);
+	public abstract double generate(double lower, double upper);
 	
 }

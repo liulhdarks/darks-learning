@@ -16,6 +16,9 @@
  */
 package darks.learning.regression;
 
+import darks.learning.common.rand.JavaRandomFunction;
+import darks.learning.common.rand.RandomFunction;
+
 /**
  * Regression model configuration
  * 
@@ -32,6 +35,8 @@ public class RegressionConfig
 	public double minError = 0.00001;
 	
 	public boolean randomGradient = false;
+	
+	public RandomFunction randomFunction = new JavaRandomFunction();
 	
 	public RegressionConfig()
 	{
@@ -66,6 +71,10 @@ public class RegressionConfig
 		this.randomGradient = randomGradient;
 		return this;
 	}
-	
+
+	public void setRandomFunction(RandomFunction randomFunction)
+	{
+		this.randomFunction = randomFunction;
+	}
 	
 }

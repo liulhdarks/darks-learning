@@ -38,9 +38,10 @@ public class UniformDistribution extends Distribution
 	 * {@inheritDoc}
 	 */
 	@Override
-	public double generate(double low, double high)
+	public double generate(double lower, double upper)
 	{
-		return random.nextDouble();
+		double u = random.nextDouble();
+		return lower * (1 - u) + upper * u;
 	}
 
 }

@@ -24,26 +24,22 @@ package darks.learning.common.distribution;
 public class NormalDistribution extends Distribution
 {
 	
-	static final double DEFAULT_MEAN = 0;
-	
-	static final double DEFAULT_VARIANCE = 1;
-
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public double generate()
 	{
-		return random.nextGaussian() * DEFAULT_VARIANCE + DEFAULT_MEAN;
+		return random.nextGaussian();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public double generate(double low, double high)
+	public double generate(double lower, double upper)
 	{
-		return random.nextGaussian() * high + low;
+		return random.nextGaussian() * upper + lower;
 	}
 
 }

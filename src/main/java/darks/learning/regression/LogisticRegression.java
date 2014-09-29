@@ -68,7 +68,7 @@ public class LogisticRegression extends Regression
 	{
 		if (config.randomGradient)
 		{
-			weight = DoubleMatrix.ones(input.columns);
+			weight = DoubleMatrix.ones(input.columns, 1);
 		}
 		else
 		{
@@ -97,7 +97,13 @@ public class LogisticRegression extends Regression
 	
 	private void randomGradientDescent(DoubleMatrix input, DoubleMatrix output)
 	{
-		
+		int rows = input.rows;
+		for (int i = 0; i < rows; i++)
+		{
+			int index = config.randomFunction.randInt(rows);
+			DoubleMatrix rowMatrix = input.getRow(index);
+			gradientDescent(rowMatrix, output.getRow(index));
+		}
 	}
 	
 	private double calcuateLogLikelihook(DoubleMatrix input, DoubleMatrix output)
