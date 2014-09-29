@@ -6,6 +6,8 @@ import org.apache.commons.math3.linear.SingularValueDecomposition;
 import org.jblas.DoubleMatrix;
 import org.junit.Test;
 
+import darks.learning.common.utils.MatrixHelper;
+
 public class MathTest
 {
 
@@ -52,5 +54,23 @@ public class MathTest
 		System.out.println(im.dot(wm.transpose()));
 		System.out.println(im.dot(wm));
 		System.out.println(im.add(wm));
+	}
+
+	@Test
+	public void testMatrixMul()
+	{
+		double[][] input = { 
+				{1, 2, 3},
+				{3, 4, 5}
+			};
+		double[][] weight = { 
+				{0.1},
+				{0.2},
+				{0.3}
+			};
+		DoubleMatrix im = new DoubleMatrix(input);
+		DoubleMatrix wm = new DoubleMatrix(weight);
+		//System.out.println(im.mul(wm));
+		System.out.println(MatrixHelper.sigmoid(im.mmul(wm)));
 	}
 }

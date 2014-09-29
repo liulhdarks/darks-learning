@@ -35,6 +35,28 @@ public class ModelLoader
 	{
 
 	}
+	
+	public static ModelSet load(double[][] input, double[][] output)
+	{
+		if (input == null || input.length == 0 || output == null || output.length < 2)
+		{
+			return null;
+		}
+		DoubleMatrix matrix = new DoubleMatrix(input);
+		DoubleMatrix label = new DoubleMatrix(output);
+		return new ModelSet(matrix, label);
+	}
+	
+	public static ModelSet load(double[][] input, double[] output)
+	{
+		if (input == null || input.length == 0 || output == null)
+		{
+			return null;
+		}
+		DoubleMatrix matrix = new DoubleMatrix(input);
+		DoubleMatrix label = new DoubleMatrix(output);
+		return new ModelSet(matrix, label);
+	}
 
 	/**
 	 * Load model set from specify file

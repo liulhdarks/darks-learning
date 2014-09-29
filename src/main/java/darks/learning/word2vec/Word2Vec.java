@@ -54,6 +54,11 @@ public class Word2Vec
 
 	private static Logger log = LoggerFactory.getLogger(Word2Vec.class);
 
+	/**
+	 * Word2vec algorithm type.Such as CBOW or Skip-gram
+	 * @author Darks.Liu
+	 *
+	 */
 	public enum Word2VecType
 	{
 		CBOW, SKIP_GRAM
@@ -325,7 +330,18 @@ public class Word2Vec
 	 */
 	public Set<WordEntry> distance(String word)
 	{
-		int resultSize = FastMath.min(config.topCount, wordNodes.size());
+		return distance(word, config.topCount);
+	}
+	/**
+	 * Calculate specify word's nearest or relate words
+	 * 
+	 * @param word Specify word
+	 * @param topCount Result size
+	 * @return Nearest or relate words
+	 */
+	public Set<WordEntry> distance(String word, int topCount)
+	{
+		int resultSize = FastMath.min(topCount, wordNodes.size());
 		TreeSet<WordEntry> result = new TreeSet<WordEntry>();
 		WordNode node = wordNodes.get(word);
 		if (node != null)

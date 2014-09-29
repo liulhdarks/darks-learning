@@ -44,19 +44,15 @@ public class Word2VecConfig
 	
 	public boolean useNegativeSampling = true;
 	
-	public int negVocabSize = (int) 1e8;
-	
 	public int maxExp = 6;
 	
 	public int expTableSize = 1000;
 	
 	public RandomFunction randomFunction = new WordRandomFunction();
 	
-	public boolean useStopwords = true;
-	
 	public WordHandler wordHandler;
 	
-	public int minVocabCount = 5;
+	public int minVocabCount = 1;
 	
 	public int topCount = 10;
 	
@@ -67,103 +63,167 @@ public class Word2VecConfig
 		
 	}
 
+	/**
+	 * Set learn feature size each word.Default 100
+	 * @param featureSize Feature size
+	 * @return this
+	 */
 	public Word2VecConfig setFeatureSize(int featureSize)
 	{
 		this.featureSize = featureSize;
 		return this;
 	}
 
+	/**
+	 * Set train type.{@linkplain darks.learning.word2vec.Word2Vec.Word2VecType Word2VecType}.
+	 * Default SKIP_GRAM
+	 * @param trainType Train type
+	 * @return this
+	 */
 	public Word2VecConfig setTrainType(Word2VecType trainType)
 	{
 		this.trainType = trainType;
 		return this;
 	}
 
+	/**
+	 * Set context window size for gram.Default 5
+	 * @param window Context window size
+	 * @return this
+	 */
 	public Word2VecConfig setWindow(int window)
 	{
 		this.window = window;
 		return this;
 	}
 
+	/**
+	 * Set learn rate which will be updated when training dynamically.Default 0.025
+	 * @param learnRate Learn reate
+	 * @return this
+	 */
 	public Word2VecConfig setLearnRate(double learnRate)
 	{
 		this.learnRate = learnRate;
 		return this;
 	}
 
+	/**
+	 * Set negative sampling size. if it's less than 1, it won't do negative sampling.Default 5.
+	 * @param negative Negative sampling size
+	 * @return this
+	 */
 	public Word2VecConfig setNegative(int negative)
 	{
 		this.negative = negative;
 		return this;
 	}
 
+	/**
+	 * Enable using negative sampling algorithm.Default true
+	 * @param useNegativeSampling If true, negative sampling algorithm will be used.
+	 * @return this
+	 */
 	public Word2VecConfig setUseNegativeSampling(boolean useNegativeSampling)
 	{
 		this.useNegativeSampling = useNegativeSampling;
 		return this;
 	}
 
-	public Word2VecConfig setNegVocabSize(int negVocabSize)
-	{
-		this.negVocabSize = negVocabSize;
-		return this;
-	}
-
+	/**
+	 * Set exp maximum value.Default 6
+	 * @param maxExp Maximum exp value
+	 * @return this
+	 */
 	public Word2VecConfig setMaxExp(int maxExp)
 	{
 		this.maxExp = maxExp;
 		return this;
 	}
 
+	/**
+	 * Set exp function table maximum size.Default 1000
+	 * @param maxExp Maximum exp table size
+	 * @return this
+	 */
 	public Word2VecConfig setExpTableSize(int expTableSize)
 	{
 		this.expTableSize = expTableSize;
 		return this;
 	}
 
+	/**
+	 * Random function.Default {@linkplain darks.learning.common.rand.WordRandomFunction WordRandomFunction}
+	 * @param randomFunction Random function
+	 * @return this
+	 */
 	public Word2VecConfig setRandomFunction(RandomFunction randomFunction)
 	{
 		this.randomFunction = randomFunction;
 		return this;
 	}
 
-	public Word2VecConfig setUseStopwords(boolean useStopwords)
-	{
-		this.useStopwords = useStopwords;
-		return this;
-	}
-
+	/**
+	 * Set sub sample rate.Default 1e-3
+	 * @param sample Sub sample rate
+	 * @return this
+	 */
 	public Word2VecConfig setSample(double sample)
 	{
 		this.sample = sample;
 		return this;
 	}
 
+	/**
+	 * Customize word algorithm.Default null.
+	 * @param wordHandler Word algorithm handler
+	 * @return this
+	 */
 	public Word2VecConfig setWordHandler(WordHandler wordHandler)
 	{
 		this.wordHandler = wordHandler;
 		return this;
 	}
 
+	/**
+	 * Set minimum vocabulary frequency value.Default 1
+	 * @param minVocabCount Minimum vocabulary frequency
+	 * @return thiss
+	 */
 	public Word2VecConfig setMinVocabCount(int minVocabCount)
 	{
 		this.minVocabCount = minVocabCount;
 		return this;
 	}
 
+	/**
+	 * Distance result top count
+	 * @param topCount Result top count
+	 * @return this
+	 */
 	public Word2VecConfig setTopCount(int topCount)
 	{
 		this.topCount = topCount;
 		return this;
 	}
 
+	/**
+	 * Set negative sampling vocabulary table size.Default 1e8
+	 * @param negVocabSize Vocabulary table size
+	 * @return this
+	 */
 	public Word2VecConfig setUnigramTableSize(int unigramTableSize)
 	{
 		this.unigramTableSize = unigramTableSize;
 		return this;
 	}
 
-	public Word2VecConfig setHierarchicalSoftmax(boolean hierarchicalSoftmax)
+	/**
+	 * Enable using hierarchical softmax.Default true
+	 * @param hierarchicalSoftmax Default true
+	 * @return this
+	 */
+	public Word2VecConfig enableHierarchicalSoftmax(boolean hierarchicalSoftmax)
 	{
 		this.hierarchicalSoftmax = hierarchicalSoftmax;
 		return this;
