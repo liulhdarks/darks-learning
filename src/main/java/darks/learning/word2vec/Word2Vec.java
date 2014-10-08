@@ -40,8 +40,6 @@ import org.slf4j.LoggerFactory;
 import darks.learning.common.basic.Haffman;
 import darks.learning.common.utils.IOUtils;
 import darks.learning.corpus.Corpus;
-import darks.learning.word2vec.handler.CBowWordHandler;
-import darks.learning.word2vec.handler.SkipGramWordHandler;
 
 /**
  * Word2vec implement

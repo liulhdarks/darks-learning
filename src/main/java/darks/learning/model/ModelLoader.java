@@ -53,9 +53,14 @@ public class ModelLoader
 		{
 			return null;
 		}
+		int maxIndex = (int)(new DoubleMatrix(output)).max();
 		DoubleMatrix matrix = new DoubleMatrix(input);
-		DoubleMatrix label = new DoubleMatrix(output);
-		return new ModelSet(matrix, label);
+		DoubleMatrix labels = new DoubleMatrix(output.length, maxIndex + 1);
+		for (int i = 0; i < output.length; i++)
+		{
+			labels.put(i, (int)output[i], 1.);
+		}
+		return new ModelSet(matrix, labels);
 	}
 
 	/**

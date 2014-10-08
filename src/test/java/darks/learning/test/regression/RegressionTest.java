@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import darks.learning.model.ModelLoader;
 import darks.learning.model.ModelSet;
+import darks.learning.neuron.activate.Activations;
 import darks.learning.regression.LogisticRegression;
 import darks.learning.regression.Regression;
 
@@ -30,49 +31,56 @@ public class RegressionTest
 	@Test
 	public void testLogisticRegression()
 	{
-//		double[][] input = new double[][]{
-//				{3, 8},{5, 8},{7, 6},{8, 9},
-//				{9, 6},{3, 9},{4, 7},{2, 6},
-//				
-//				{1, 3},{3, 2},{4, 1},{8, 4}, 
-//				{3, 3},{4, 3},{9, 2},{6, 1},
-//		};
-//		double[][] output = new double[][]{
-//				{1, 0},{1, 0},{1, 0},{1, 0},
-//				{1, 0},{1, 0},{1, 0},{1, 0},
-//				
-//				{0, 1},{0, 1},{0, 1},{0, 1},
-//				{0, 1},{0, 1},{0, 1},{0, 1},
-//		};
 		
-		double[][] input = {
-				{1, 1, 1, 0, 0, 0},
-				{1, 0, 1, 0, 0, 0},
-				{1, 1, 1, 0, 0, 0},
-				{0, 0, 1, 1, 1, 0},
-				{0, 0, 1, 1, 0, 0},
-				{0, 0, 1, 1, 1, 0}
+		double[][] trainX = {
+				{0, 1, 1, 0, 0, 0, 0, 0, 0},
+				{1, 0, 1, 0, 0, 0, 0, 0, 0},
+				{1, 1, 1, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 1, 1, 1, 0, 0, 0},
+				{0, 0, 0, 1, 1, 0, 0, 0, 0},
+				{0, 0, 0, 1, 0, 1, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 1, 1, 1},
+				{0, 0, 0, 0, 0, 0, 1, 1, 0},
+				{0, 0, 0, 0, 0, 0, 1, 0, 1},
 			};
 			
 		double[] output = {
+				0, 0, 0,
 				1, 1, 1,
-				0, 0, 0
+				2, 2, 2
 			}; 
 		
+//		double[][] output = {
+//				{1, 0, 0},
+//				{1, 0, 0},
+//				{1, 0, 0},
+//				{0, 0, 1},
+//				{0, 0, 1},
+//				{0, 0, 1},
+//				{0, 1, 0},
+//				{0, 1, 0},
+//				{0, 1, 0},
+//			}; 
+		
 		// test data
-		double[][] test_X = {
-			{1, 0, 1, 0, 0, 0},
-			{0, 0, 1, 1, 1, 0},
-			{1, 0, 1, 1, 1, 0},
+		double[][] testX = {
+			{1, 0, 1, 0, 0, 0, 0, 0, 0},
+			{1, 1, 1, 0, 0, 0, 1, 0, 0},
+			{0, 0, 1, 1, 0, 1, 0, 0, 0},
+			{1, 0, 0, 1, 1, 1, 0, 0, 0},
+			{0, 0, 0, 1, 0, 0, 1, 1, 0},
+			{0, 0, 0, 0, 0, 1, 0, 1, 1},
 		};
-		ModelSet modelSet = ModelLoader.load(input, output);
+		ModelSet modelSet = ModelLoader.load(trainX, output);
 		Regression reg = new LogisticRegression();
 		reg.config.setLearnRate(0.001)
-		.setMaxIteratorCount(100000)
-		.setRandomGradient(true);
+					.setMaxIteratorCount(100000)
+					.setRandomGradient(false)
+					.setNormalized(true)
+					.setActivateFunction(Activations.sigmoid());
 		reg.train(modelSet);
-		DoubleMatrix result = reg.predict(new DoubleMatrix(test_X));
-		System.out.println(result);
+		DoubleMatrix result = reg.predict(new DoubleMatrix(testX));
+		System.out.println(result.toString().replace(";", "\n"));
 	}
 	
 }

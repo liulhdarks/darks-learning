@@ -28,35 +28,35 @@ import darks.learning.word2vec.Word2Vec.Word2VecType;
 public class Word2VecConfig
 {
 	
-	public int featureSize = 100;
+	int featureSize = 100;
 	
-	public Word2VecType trainType = Word2VecType.SKIP_GRAM;
+	Word2VecType trainType = Word2VecType.SKIP_GRAM;
 	
-	public int window = 5;
+	int window = 5;
 	
-	public double sample = 1e-3;
+	double sample = 1e-3;
 	
-	public double learnRate = 0.025;
+	double learnRate = 0.025;
 	
-	public int negative = 5;
+	int negative = 5;
 	
-	public boolean hierarchicalSoftmax = true;
+	boolean hierarchicalSoftmax = true;
 	
-	public boolean useNegativeSampling = true;
+	boolean useNegativeSampling = true;
 	
-	public int maxExp = 6;
+	int maxExp = 6;
 	
-	public int expTableSize = 1000;
+	int expTableSize = 1000;
 	
-	public RandomFunction randomFunction = new WordRandomFunction();
+	RandomFunction randomFunction = new WordRandomFunction();
 	
-	public WordHandler wordHandler;
+	WordHandler wordHandler;
 	
-	public int minVocabCount = 1;
+	int minVocabCount = 1;
 	
-	public int topCount = 10;
+	int topCount = 10;
 	
-	public int unigramTableSize = (int)1e8;
+	int unigramTableSize = (int)1e8;
 	
 	public Word2VecConfig()
 	{

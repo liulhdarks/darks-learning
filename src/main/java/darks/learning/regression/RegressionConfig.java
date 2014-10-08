@@ -16,8 +16,11 @@
  */
 package darks.learning.regression;
 
-import darks.learning.common.rand.JavaRandomFunction;
 import darks.learning.common.rand.RandomFunction;
+import darks.learning.neuron.LossFunction;
+import darks.learning.neuron.NeuronNetworkConfig;
+import darks.learning.neuron.activate.ActivateFunction;
+
 
 /**
  * Regression model configuration
@@ -25,18 +28,16 @@ import darks.learning.common.rand.RandomFunction;
  * @author Darks.Liu
  *
  */
-public class RegressionConfig
+public class RegressionConfig extends NeuronNetworkConfig
 {
 
-	public double learnRate;
+	double learnRate;
 	
-	public int maxIteratorCount = 500;
+	int maxIteratorCount = 500;
 	
-	public double minError = 0.00001;
+	double minError = 0.00001;
 	
-	public boolean randomGradient = false;
-	
-	public RandomFunction randomFunction = new JavaRandomFunction();
+	boolean randomGradient = false;
 	
 	public RegressionConfig()
 	{
@@ -71,10 +72,29 @@ public class RegressionConfig
 		this.randomGradient = randomGradient;
 		return this;
 	}
+	
 
-	public void setRandomFunction(RandomFunction randomFunction)
+	public RegressionConfig setRandomFunction(RandomFunction randomFunction)
 	{
 		this.randomFunction = randomFunction;
+		return this;
 	}
-	
+
+	public RegressionConfig setActivateFunction(ActivateFunction activateFunction)
+	{
+		this.activateFunction = activateFunction;
+		return this;
+	}
+
+	public RegressionConfig setLossFunction(LossFunction lossFunction)
+	{
+		this.lossFunction = lossFunction;
+		return this;
+	}
+
+	public RegressionConfig setNormalized(boolean normalized)
+	{
+		this.normalized = normalized;
+		return this;
+	}
 }

@@ -20,8 +20,6 @@ import org.jblas.DoubleMatrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import darks.learning.common.utils.MatrixHelper;
-
 /**
  * Logistic regression
  * 
@@ -34,6 +32,8 @@ public class LogisticRegression extends Regression
 	private static Logger log = LoggerFactory.getLogger(LogisticRegression.class);
 	
 	DoubleMatrix weight = null;
+	
+	DoubleMatrix bias = null;
 	
 	double learnRate;
 	
@@ -50,7 +50,7 @@ public class LogisticRegression extends Regression
 	{
 		double startLearnRate = config.learnRate;
 		learnRate = startLearnRate;
-		initWeight(input);
+		initWeight(input, output);
 		int iterCount = config.maxIteratorCount;
 		for (int i = 1; i <= iterCount; i++)
 		{
@@ -64,16 +64,10 @@ public class LogisticRegression extends Regression
 		}
 	}
 	
-	private void initWeight(DoubleMatrix input)
+	private void initWeight(DoubleMatrix input, DoubleMatrix output)
 	{
-		if (config.randomGradient)
-		{
-			weight = DoubleMatrix.ones(input.columns, 1);
-		}
-		else
-		{
-			weight = DoubleMatrix.ones(input.columns, 1);
-		}
+		weight = DoubleMatrix.rand(input.columns, output.columns);//DoubleMatrix.ones(input.columns, 1);
+		bias = DoubleMatrix.zeros(1, output.columns);
 	}
 	
 	private void iterator(DoubleMatrix input, DoubleMatrix output)
@@ -90,9 +84,18 @@ public class LogisticRegression extends Regression
 	
 	private void gradientDescent(DoubleMatrix input, DoubleMatrix output)
 	{
-		DoubleMatrix f = MatrixHelper.sigmoid(input.mmul(weight));
+		DoubleMatrix f = config.activateFunction.activate(input.mmul(weight).addRowVector(bias));
 		DoubleMatrix error = f.sub(output);
-		weight.subi(input.transpose().mmul(error).mul(learnRate).div(input.rows));
+		DoubleMatrix theta = error.mul(learnRate);
+		DoubleMatrix delta = input.transpose().mmul(theta);
+		theta = theta.columnSums();
+		if (config.normalized)
+		{
+			delta.divi(input.rows);
+			theta.divi(input.rows);
+		}
+		weight.subi(delta);
+		bias.subi(theta);
 	}
 	
 	private void randomGradientDescent(DoubleMatrix input, DoubleMatrix output)
@@ -108,13 +111,11 @@ public class LogisticRegression extends Regression
 	
 	private double calcuateLogLikelihook(DoubleMatrix input, DoubleMatrix output)
 	{
-		int m = output.rows;
-		DoubleMatrix ones = DoubleMatrix.ones(output.rows, output.columns);
-		DoubleMatrix f = MatrixHelper.sigmoid(input.mmul(weight));
-		DoubleMatrix a = output.mmul(MatrixHelper.log(f).transpose());
-		DoubleMatrix b = ones.sub(output).mmul(MatrixHelper.log(ones.sub(f)).transpose());
-		DoubleMatrix ret = a.add(b);
-		return ret.sum() * (1.0 / m);
+		DoubleMatrix f = config.activateFunction.activate(input.mmul(weight));
+		config.lossFunction.setActiveValue(f);
+		config.lossFunction.setInput(input);
+		config.lossFunction.setOutput(output);
+		return config.lossFunction.getLossValue();
 	}
 
 	/**
@@ -123,7 +124,7 @@ public class LogisticRegression extends Regression
 	@Override
 	public DoubleMatrix predict(DoubleMatrix input)
 	{
-		return MatrixHelper.sigmoid(input.mmul(weight));
+		return config.activateFunction.activate(input.mmul(weight));
 	}
 
 }

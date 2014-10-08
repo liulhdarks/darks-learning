@@ -41,19 +41,27 @@ public class MathTest
 	@Test
 	public void testMatrix()
 	{
-		double[] input = { 
-				4, 5, 6
+		double[][] input = { 
+				{1, 1, 0, 1},
+				{1, 0, 1, 1},
+				{1, 1, 1, 1},
 			};
-		double[] weight = { 
-				1, 2, 3
+		double[][] weight = { 
+				{1, 0, 0},
+				{1, 1, 0},
+				{0, 1, 1},
+				{1, 0, 1},
+			};
+		double[][] output = { 
+				{1, 0, 0},
+				{0, 1, 0},
+				{0, 0, 1},
 			};
 		DoubleMatrix im = new DoubleMatrix(input);
 		DoubleMatrix wm = new DoubleMatrix(weight);
-		System.out.println(im.mul(wm));
-		System.out.println(im.mmul(wm.transpose()));
-		System.out.println(im.dot(wm.transpose()));
-		System.out.println(im.dot(wm));
-		System.out.println(im.add(wm));
+		DoubleMatrix outm = new DoubleMatrix(output);
+		System.out.println(im.mmul(wm));
+		
 	}
 
 	@Test
@@ -72,5 +80,21 @@ public class MathTest
 		DoubleMatrix wm = new DoubleMatrix(weight);
 		//System.out.println(im.mul(wm));
 		System.out.println(MatrixHelper.sigmoid(im.mmul(wm)));
+	}
+
+	@Test
+	public void testMatrixSubAdd()
+	{
+		double[][] input = { 
+				{1, 2, 3},
+				{3, 4, 5}
+			};
+		double[] bias = { 
+				1, 2, 1
+			};
+		DoubleMatrix im = new DoubleMatrix(input);
+		DoubleMatrix wm = new DoubleMatrix(bias);
+		//System.out.println(im.mul(wm));
+		System.out.println(wm.sub(im.columnMeans()));
 	}
 }
