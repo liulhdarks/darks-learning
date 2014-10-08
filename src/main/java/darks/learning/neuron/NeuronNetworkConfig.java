@@ -35,7 +35,7 @@ public class NeuronNetworkConfig
 	
 	public ActivateFunction activateFunction = Activations.sigmoid();
 	
-	public LossFunction lossFunction = LossFunction.lossFunc(LossFunction.NEG_LOGLIKELIHOOD_LOSS, this);
+	public LossFunction lossFunction = null;
 	
 	public boolean normalized = false;
 

@@ -28,10 +28,10 @@ import darks.learning.neuron.activate.Activations;
  * @author Darks.Liu
  *
  */
-public class LogisticRegression extends Regression
+public class SoftmaxRegression extends Regression
 {
 	
-	private static Logger log = LoggerFactory.getLogger(LogisticRegression.class);
+	private static Logger log = LoggerFactory.getLogger(SoftmaxRegression.class);
 	
 	DoubleMatrix weight = null;
 	
@@ -39,9 +39,9 @@ public class LogisticRegression extends Regression
 	
 	double learnRate;
 	
-	public LogisticRegression()
+	public SoftmaxRegression()
 	{
-		config.setActivateFunction(Activations.sigmoid());
+		config.setActivateFunction(Activations.softmax());
 	}
 
 	/**
@@ -58,18 +58,18 @@ public class LogisticRegression extends Regression
 		{
 			learnRate = startLearnRate + (1 / (double)(i + 3));
 			iterator(input, output);
-			double likelihook = calcuateLogLikelihook(input, output);
+			double costValue = calcuateLossValue(input, output);
 			if (log.isDebugEnabled() && i % 1000 == 0)
 			{
-				log.debug("Iterator:" + i + " cost:" + likelihook + " lr:" + learnRate);
+				log.debug("Iterator:" + i + " cost:" + costValue + " lr:" + learnRate);
 			}
 		}
 	}
 	
 	private void initWeight(DoubleMatrix input, DoubleMatrix output)
 	{
-		weight = DoubleMatrix.ones(input.columns, 1);
-		bias = DoubleMatrix.ones(1, 1);
+		weight = DoubleMatrix.rand(input.columns, output.columns);
+		bias = DoubleMatrix.zeros(1, output.columns);
 	}
 	
 	private void iterator(DoubleMatrix input, DoubleMatrix output)
@@ -111,7 +111,7 @@ public class LogisticRegression extends Regression
 		}
 	}
 	
-	private double calcuateLogLikelihook(DoubleMatrix input, DoubleMatrix output)
+	private double calcuateLossValue(DoubleMatrix input, DoubleMatrix output)
 	{
 		DoubleMatrix f = config.activateFunction.activate(input.mmul(weight));
 		config.lossFunction.setActiveValue(f);

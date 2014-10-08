@@ -41,7 +41,7 @@ public class RegressionConfig extends NeuronNetworkConfig
 	
 	public RegressionConfig()
 	{
-		
+		lossFunction = LossFunction.lossFunc(LossFunction.NEG_LOGLIKELIHOOD_LOSS, this);
 	}
 
 	/**

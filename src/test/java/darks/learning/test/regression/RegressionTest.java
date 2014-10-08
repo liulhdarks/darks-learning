@@ -24,12 +24,50 @@ import darks.learning.model.ModelSet;
 import darks.learning.neuron.activate.Activations;
 import darks.learning.regression.LogisticRegression;
 import darks.learning.regression.Regression;
+import darks.learning.regression.SoftmaxRegression;
 
 public class RegressionTest
 {
 
 	@Test
 	public void testLogisticRegression()
+	{
+		
+		double[][] trainX = {
+				{0, 1, 1, 0, 0, 0},
+				{1, 0, 1, 0, 0, 0},
+				{1, 1, 1, 0, 0, 0},
+				{0, 0, 0, 1, 1, 1},
+				{0, 0, 0, 1, 1, 0},
+				{0, 0, 0, 1, 0, 1}
+			};
+			
+		double[] output = {
+				0, 0, 0,
+				1, 1, 1
+			}; 
+		
+		// test data
+		double[][] testX = {
+			{1, 0, 1, 0, 0, 0},
+			{1, 1, 1, 0, 0, 0},
+			{0, 0, 1, 1, 0, 1},
+			{1, 0, 0, 1, 1, 1}
+		};
+		ModelSet modelSet = ModelLoader.load(trainX, output);
+		Regression reg = new LogisticRegression();
+		reg.config.setLearnRate(0.001)
+					.setMaxIteratorCount(100000)
+					.setRandomGradient(false)
+					.setNormalized(true);
+		reg.train(modelSet);
+		DoubleMatrix result = reg.predict(new DoubleMatrix(testX));
+		System.out.println(result.toString().replace(";", "\n"));
+	}
+	
+
+	@Test
+	public void testSoftmaxRegression()
 	{
 		
 		double[][] trainX = {
@@ -44,7 +82,7 @@ public class RegressionTest
 				{0, 0, 0, 0, 0, 0, 1, 0, 1},
 			};
 			
-		double[] output = {
+		int[] output = {
 				0, 0, 0,
 				1, 1, 1,
 				2, 2, 2
@@ -72,12 +110,11 @@ public class RegressionTest
 			{0, 0, 0, 0, 0, 1, 0, 1, 1},
 		};
 		ModelSet modelSet = ModelLoader.load(trainX, output);
-		Regression reg = new LogisticRegression();
+		Regression reg = new SoftmaxRegression();
 		reg.config.setLearnRate(0.001)
 					.setMaxIteratorCount(100000)
 					.setRandomGradient(false)
-					.setNormalized(true)
-					.setActivateFunction(Activations.sigmoid());
+					.setNormalized(true);
 		reg.train(modelSet);
 		DoubleMatrix result = reg.predict(new DoubleMatrix(testX));
 		System.out.println(result.toString().replace(";", "\n"));
