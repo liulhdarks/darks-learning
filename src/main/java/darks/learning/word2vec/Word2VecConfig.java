@@ -87,7 +87,7 @@ public class Word2VecConfig
 	}
 
 	/**
-	 * Set context window size for gram.Default 5
+	 * Set context window size for gram.Default 5.Suggest 5 for cbow and 10 for skip-gram.
 	 * @param window Context window size
 	 * @return this
 	 */
@@ -164,7 +164,7 @@ public class Word2VecConfig
 	}
 
 	/**
-	 * Set sub sample rate.Default 1e-3
+	 * Set sub sample rate.Default 1e-3.Suggest between 1e-5 and 1e-3.
 	 * @param sample Sub sample rate
 	 * @return this
 	 */

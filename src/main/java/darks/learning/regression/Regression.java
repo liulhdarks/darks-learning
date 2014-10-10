@@ -29,6 +29,12 @@ public abstract class Regression
 {
 	
 	public RegressionConfig config = new RegressionConfig();
+	
+	DoubleMatrix weight = null;
+	
+	DoubleMatrix bias = null;
+	
+	double learnRate;
 
 	/**
 	 * Train model set
@@ -55,5 +61,21 @@ public abstract class Regression
 	 * @return Result label matrix
 	 */
 	public abstract DoubleMatrix predict(DoubleMatrix input);
+	
+	protected void gradientDescent(DoubleMatrix input, DoubleMatrix output)
+	{
+		DoubleMatrix f = config.activateFunction.activate(input.mmul(weight).addRowVector(bias));
+		DoubleMatrix error = output.sub(f);
+		DoubleMatrix theta = error.mul(learnRate);
+		DoubleMatrix delta = input.transpose().mmul(theta);
+		theta = theta.columnSums();
+		if (config.normalized)
+		{
+			delta.divi(input.rows);
+			theta.divi(input.rows);
+		}
+		weight.addi(delta);
+		bias.addi(theta);
+	}
 	
 }

@@ -141,8 +141,8 @@ public class Word2Vec
 		{
 			log.debug("Create exp table size " + config.expTableSize);
 		}
-		expTable = new double[config.expTableSize];
-		for (int i = 0; i < config.expTableSize; i++)
+		expTable = new double[config.expTableSize + 1];
+		for (int i = 0; i <= config.expTableSize; i++)
 		{
 			double exp = FastMath.exp((i / (double)config.expTableSize * 2 - 1) * config.maxExp);
 			expTable[i] = exp / (1 + exp);

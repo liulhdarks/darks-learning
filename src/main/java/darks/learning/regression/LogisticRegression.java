@@ -33,12 +33,6 @@ public class LogisticRegression extends Regression
 	
 	private static Logger log = LoggerFactory.getLogger(LogisticRegression.class);
 	
-	DoubleMatrix weight = null;
-	
-	DoubleMatrix bias = null;
-	
-	double learnRate;
-	
 	public LogisticRegression()
 	{
 		config.setActivateFunction(Activations.sigmoid());
@@ -82,22 +76,6 @@ public class LogisticRegression extends Regression
 		{
 			gradientDescent(input, output);
 		}
-	}
-	
-	private void gradientDescent(DoubleMatrix input, DoubleMatrix output)
-	{
-		DoubleMatrix f = config.activateFunction.activate(input.mmul(weight).addRowVector(bias));
-		DoubleMatrix error = f.sub(output);
-		DoubleMatrix theta = error.mul(learnRate);
-		DoubleMatrix delta = input.transpose().mmul(theta);
-		theta = theta.columnSums();
-		if (config.normalized)
-		{
-			delta.divi(input.rows);
-			theta.divi(input.rows);
-		}
-		weight.subi(delta);
-		bias.subi(theta);
 	}
 	
 	private void randomGradientDescent(DoubleMatrix input, DoubleMatrix output)

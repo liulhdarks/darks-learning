@@ -21,7 +21,6 @@ import org.junit.Test;
 
 import darks.learning.model.ModelLoader;
 import darks.learning.model.ModelSet;
-import darks.learning.neuron.activate.Activations;
 import darks.learning.regression.LogisticRegression;
 import darks.learning.regression.Regression;
 import darks.learning.regression.SoftmaxRegression;
