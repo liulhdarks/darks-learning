@@ -19,13 +19,14 @@ package darks.learning.regression;
 import org.jblas.DoubleMatrix;
 
 import darks.learning.model.ModelSet;
+import darks.learning.neuron.SupervisedLearning;
 
 /**
  * Regression model
  * @author Darks.Liu
  *
  */
-public abstract class Regression
+public abstract class Regression implements SupervisedLearning
 {
 	
 	public RegressionConfig config = new RegressionConfig();
@@ -45,14 +46,6 @@ public abstract class Regression
 	{
 		train(modelSet.getInput(), modelSet.getOutput());
 	}
-
-	/**
-	 * Train model set
-	 * 
-	 * @param input Model input
-	 * @param output Model output
-	 */
-	public abstract void train(DoubleMatrix input, DoubleMatrix output);
 	
 	/**
 	 * Predict model result by input matrix

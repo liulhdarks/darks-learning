@@ -16,9 +16,11 @@ package darks.learning.common.utils;
 import org.jblas.DoubleMatrix;
 import org.jblas.MatrixFunctions;
 
+import darks.learning.common.distribution.Distributions;
+import darks.learning.common.rand.RandomFunction;
+
 public class MatrixHelper
 {
-	
 
 	public static DoubleMatrix log(DoubleMatrix mt)
 	{
@@ -51,11 +53,38 @@ public class MatrixHelper
 		return DoubleMatrix.ones(mt.rows, mt.columns).sub(mt);
 	}
 
-	public static DoubleMatrix softmax(DoubleMatrix input)
+	public static DoubleMatrix softmax(DoubleMatrix mt)
 	{
-		DoubleMatrix max = input.rowMaxs();
-		DoubleMatrix diff = MatrixFunctions.exp(input.subColumnVector(max));
+		DoubleMatrix max = mt.rowMaxs();
+		DoubleMatrix diff = MatrixFunctions.exp(mt.subColumnVector(max));
 		diff.diviColumnVector(diff.rowSums());
 		return diff;
+	}
+
+	public static DoubleMatrix gaussion(int rows, int columns)
+	{
+		return gaussioni(new DoubleMatrix(rows, columns));
+	}
+
+	public static DoubleMatrix gaussioni(DoubleMatrix mt)
+	{
+		for (int i = 0; i < mt.rows; i++)
+		{
+			for (int j = 0; j < mt.columns; j++)
+			{
+				mt.put(i, j, Distributions.normal());
+			}
+		}
+		return mt;
+	}
+
+	public static DoubleMatrix binomial(DoubleMatrix p, RandomFunction rng)
+	{
+		DoubleMatrix ret = new DoubleMatrix(p.rows, p.columns);
+		for (int i = 0; i < ret.length; i++)
+		{
+			ret.put(i, (rng.randDouble() < p.get(i) ? 1 : 0));
+		}
+		return ret;
 	}
 }

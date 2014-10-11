@@ -65,4 +65,10 @@ public class JavaRandomFunction implements RandomFunction
 		return rand.nextLong();
 	}
 
+	@Override
+	public double randGaussian()
+	{
+		return rand.nextGaussian();
+	}
+
 }

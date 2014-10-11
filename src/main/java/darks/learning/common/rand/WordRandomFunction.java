@@ -68,6 +68,12 @@ public class WordRandomFunction implements RandomFunction
 		nextRandom = nextRandom * 25214903917L + 11;
 		return nextRandom;
 	}
-	
+
+
+	@Override
+	public double randGaussian()
+	{
+		return rand.nextGaussian();
+	}
 
 }

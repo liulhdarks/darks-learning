@@ -32,4 +32,6 @@ public interface RandomFunction
 
 	public long randLong();
 
+	public double randGaussian();
+
 }

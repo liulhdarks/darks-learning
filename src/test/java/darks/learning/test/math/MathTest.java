@@ -59,7 +59,7 @@ public class MathTest
 			};
 		DoubleMatrix im = new DoubleMatrix(input);
 		DoubleMatrix wm = new DoubleMatrix(weight);
-		DoubleMatrix outm = new DoubleMatrix(output);
+//		DoubleMatrix outm = new DoubleMatrix(output);
 		System.out.println(im.mmul(wm));
 		
 	}

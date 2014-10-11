@@ -14,41 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package darks.learning.neuron.activate;
+package darks.learning.neuron;
 
+import org.jblas.DoubleMatrix;
 
-
-public abstract class AbstractActivateFunction implements ActivateFunction
+/**
+ * Supervised machine learning
+ * 
+ * @author Darks.Liu
+ *
+ */
+public interface SupervisedLearning
 {
 
 	/**
-	 * {@inheritDoc}
+	 * Train model set
+	 * 
+	 * @param input Model input
+	 * @param output Model output
 	 */
-	@Override
-	public String name()
-	{
-		return getClass().getName();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString()
-	{
-		return name();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean equals(Object other)
-	{
-		if (other == null)
-		{
-			return false;
-		}
-		return other.getClass().getName().equals(name());
-	}
+	public void train(DoubleMatrix input, DoubleMatrix output);
+	
 }
