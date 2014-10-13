@@ -16,10 +16,11 @@
  */
 package darks.learning.regression;
 
+import darks.learning.LearningConfig;
 import darks.learning.common.rand.RandomFunction;
 import darks.learning.neuron.LossFunction;
-import darks.learning.neuron.NeuronNetworkConfig;
 import darks.learning.neuron.activate.ActivateFunction;
+import darks.learning.neuron.activate.Activations;
 
 
 /**
@@ -28,7 +29,7 @@ import darks.learning.neuron.activate.ActivateFunction;
  * @author Darks.Liu
  *
  */
-public class RegressionConfig extends NeuronNetworkConfig
+public class RegressionConfig extends LearningConfig
 {
 
 	double learnRate;
@@ -38,6 +39,10 @@ public class RegressionConfig extends NeuronNetworkConfig
 	double minError = 0.00001;
 	
 	boolean randomGradient = false;
+	
+	public ActivateFunction activateFunction = Activations.sigmoid();
+	
+	public LossFunction lossFunction = null;
 	
 	public RegressionConfig()
 	{

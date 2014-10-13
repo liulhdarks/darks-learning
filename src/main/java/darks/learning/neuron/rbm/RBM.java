@@ -17,14 +17,16 @@
 package darks.learning.neuron.rbm;
 
 import static darks.learning.common.utils.MatrixHelper.sigmoid;
-import static darks.learning.common.utils.MatrixHelper.softmax;
+
 import org.jblas.DoubleMatrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import darks.learning.UnsupervisedLearning;
 import darks.learning.common.utils.MatrixHelper;
 import darks.learning.exceptions.LearningException;
-import darks.learning.neuron.UnsupervisedLearning;
+import darks.learning.neuron.AbstractNeuronNetwork;
+import darks.learning.neuron.gradient.GradientUpdater;
 import darks.learning.neuron.rbm.RBMConfig.LayoutType;
 
 /**
@@ -33,23 +35,11 @@ import darks.learning.neuron.rbm.RBMConfig.LayoutType;
  * @author Darks.Liu
  *
  */
-public class RBM implements UnsupervisedLearning
+public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning
 {
 	private static final Logger log = LoggerFactory.getLogger(RBM.class);
 
 	public RBMConfig config = new RBMConfig();
-	
-	DoubleMatrix weights;
-	
-	DoubleMatrix vBias;
-	
-	DoubleMatrix hBias;
-	
-	DoubleMatrix hInput;
-	
-	DoubleMatrix vInput;
-	
-	DoubleMatrix initVInput;
 	
 	long startTime;
 	
@@ -61,21 +51,41 @@ public class RBM implements UnsupervisedLearning
 	{
 		initialize(input);
 		int iterCount = config.maxIterateCount;
-		int epoch = 0;
-		while (iterCount == 0 || epoch < iterCount)
+		int numIterate = 1;
+		double lastLoss = 0;
+		double eps = 1.0e-10;
+		double tolerance = 0.00001;
+		while (iterCount == 0 || numIterate < iterCount)
 		{
-			gibbsSampling(input);
+			iterate(input, numIterate);
+			double loss = getLossValue();
+			if (numIterate > 1)
+			{
+				if (2.0 * Math.abs(loss - lastLoss) <= tolerance * (Math.abs(loss) + Math.abs(lastLoss) + eps)) {
+	                log.info ("Gradient Ascent: Value difference " + Math.abs(loss - lastLoss) +" below " +
+	                        "tolerance; saying converged.");
+	                break;
+	            }
+			}
+			lastLoss = loss;
+			if (log.isDebugEnabled())
+			{
+				log.debug("RBM finish iteration number " + numIterate + " score:" + getLossValue());
+			}
 			if (!checkIterateTime())
 			{
 				break;
 			}
+			numIterate++;
 		}
 	}
 	
 	private void initialize(DoubleMatrix input)
 	{
+		initialize(config);
+		gradUpdater = new GradientUpdater(config);
 		startTime = System.currentTimeMillis();
-		initVInput = input;
+		vInput = input;
 		int vSize = config.visibleSize <= 0 ? input.columns : config.visibleSize;
 		int hSize = config.hiddenSize;
 		weights = DoubleMatrix.randn(vSize, hSize);
@@ -113,27 +123,28 @@ public class RBM implements UnsupervisedLearning
 		}
 	}
 	
-	private void gibbsSampling(DoubleMatrix input)
+	private void iterate(DoubleMatrix input, int numIterate)
 	{
+		gradUpdater.setBatchSize(input.rows);
 		PropPair hProp1 = sampleHiddenByVisible(input);
 		PropPair hPropn = hProp1;
 		PropPair vPropn = null;
-		int k = 1;
+		int k = config.gibbsCount;
 		for (int i = 0; i < k; i++)
 		{
 		    vPropn = sampleVisibleByHidden(hPropn.sample);
 		    hPropn = sampleHiddenByVisible(vPropn.sample);
 		}
-		DoubleMatrix wGradient = input.transpose().mmul(hProp1.sample)
+		DoubleMatrix wGradient = input.transpose().mmul(hProp1.prob)
 		            .sub(vPropn.sample.transpose().mmul(hPropn.prob));
-		DoubleMatrix hGradient = hProp1.sample.sub(hPropn.prob);
-        DoubleMatrix vGradient = input.sub(vPropn.sample);
-        wGradient.muli(config.learnRate).divi(input.rows);
-        hGradient.muli(config.learnRate).divi(input.rows);
-        vGradient.muli(config.learnRate).divi(input.rows);
-        weights.addi(wGradient);
-        hBias.addi(hGradient);
-        vBias.addi(vGradient);
+		DoubleMatrix hGradient = hProp1.sample.sub(hPropn.prob).columnMeans();
+        DoubleMatrix vGradient = input.sub(vPropn.sample).columnMeans();
+       
+        gradUpdater.updateGradient(wGradient, vGradient, hGradient);
+        
+        weights.addi(gradUpdater.getwGradient());
+        hBias.addi(gradUpdater.gethGradient());
+        vBias.addi(gradUpdater.getvGradient());
 	}
 	
 	private PropPair sampleHiddenByVisible(DoubleMatrix v)
@@ -183,7 +194,7 @@ public class RBM implements UnsupervisedLearning
 	private DoubleMatrix propForward(DoubleMatrix v)
 	{
 		DoubleMatrix preProb = v.mmul(weights);
-		if (config.convatBias)
+		if (config.concatBias)
 		{
 			preProb = DoubleMatrix.concatHorizontally(preProb, hBias);
 		}
@@ -212,8 +223,8 @@ public class RBM implements UnsupervisedLearning
     
     private DoubleMatrix propBackward(DoubleMatrix h)
     {
-        DoubleMatrix preProb = h.mmul(weights);
-        if (config.convatBias)
+        DoubleMatrix preProb = h.mmul(weights.transpose());
+        if (config.concatBias)
         {
             preProb = DoubleMatrix.concatHorizontally(preProb, vBias);
         }

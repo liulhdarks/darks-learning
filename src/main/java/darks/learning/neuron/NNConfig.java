@@ -16,53 +16,53 @@
  */
 package darks.learning.neuron;
 
-import darks.learning.common.rand.JavaRandomFunction;
+import darks.learning.LearningConfig;
 import darks.learning.common.rand.RandomFunction;
-import darks.learning.neuron.activate.ActivateFunction;
-import darks.learning.neuron.activate.Activations;
 
-/**
- * Neuron network basic configuration
- * 
- * @author Darks.Liu
- *
- */
-public class NeuronNetworkConfig
+public class NNConfig extends LearningConfig
 {
 
+	public double learnRate = 0.001;
 	
-	public RandomFunction randomFunction = new JavaRandomFunction();
-	
-	public ActivateFunction activateFunction = Activations.sigmoid();
-	
-	public LossFunction lossFunction = null;
-	
-	public boolean normalized = false;
+	public double momentum = 0;
 
+	public Integer maxIterateCount = 0;
+	
+	public Integer maxIterateTime = 0;
+	
+	public NNConfig setLearnRate(double learnRate)
+	{
+		this.learnRate = learnRate;
+		return this;
+	}
 
-	public NeuronNetworkConfig setRandomFunction(RandomFunction randomFunction)
+	public NNConfig setRandomFunction(RandomFunction randomFunction)
 	{
 		this.randomFunction = randomFunction;
 		return this;
 	}
 
-	public NeuronNetworkConfig setActivateFunction(ActivateFunction activateFunction)
+	public NNConfig setMaxIterateCount(Integer maxIterateCount)
 	{
-		this.activateFunction = activateFunction;
+		this.maxIterateCount = maxIterateCount;
 		return this;
 	}
 
-	public NeuronNetworkConfig setLossFunction(LossFunction lossFunction)
+	public NNConfig setMaxIterateTime(Integer maxIterateTime)
 	{
-		this.lossFunction = lossFunction;
+		this.maxIterateTime = maxIterateTime;
 		return this;
 	}
 
-	public NeuronNetworkConfig setNormalized(boolean normalized)
+	public NNConfig setMomentum(double momentum)
+	{
+		this.momentum = momentum;
+		return this;
+	}
+
+	public NNConfig setNormalized(boolean normalized)
 	{
 		this.normalized = normalized;
 		return this;
 	}
-	
-	
 }

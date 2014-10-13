@@ -14,24 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package darks.learning.neuron;
+package darks.learning.test.rbm;
 
 import org.jblas.DoubleMatrix;
+import org.junit.Test;
 
-/**
- * Unsupervised machine learning
- * 
- * @author Darks.Liu
- *
- */
-public interface UnsupervisedLearning
+import darks.learning.neuron.rbm.RBM;
+
+public class RBMTest
 {
 
-	/**
-	 * Train model set
-	 * 
-	 * @param input Model input
-	 */
-	public void train(DoubleMatrix input);
+	@Test
+	public void testRBM()
+	{
+		double[][] trainX = {
+				{0, 1, 1, 0, 0, 0},
+				{0, 0, 1, 0, 0, 0},
+				{0, 1, 0, 0, 0, 0},
+				{1, 0, 1, 0, 0, 0},
+				{1, 1, 0, 0, 0, 0},
+				{1, 1, 1, 0, 0, 0},
+				{0, 0, 0, 1, 1, 1},
+				{0, 0, 0, 1, 1, 0},
+				{0, 0, 0, 1, 0, 1},
+				{0, 0, 0, 0, 1, 1},
+				{0, 0, 0, 0, 1, 0},
+				{0, 0, 0, 1, 0, 0}
+			};
+		
+		RBM rbm = new RBM();
+		rbm.config.setHiddenSize(10).setMaxIterateCount(10000);
+		rbm.train(new DoubleMatrix(trainX));
+	}
 	
 }

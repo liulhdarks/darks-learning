@@ -21,6 +21,8 @@ import static darks.learning.common.utils.MatrixHelper.oneMinus;
 
 import org.jblas.DoubleMatrix;
 
+import darks.learning.LearningConfig;
+
 /**
  * Loss function
  * 
@@ -49,16 +51,16 @@ public class LossFunction
 	
 	private DoubleMatrix activeValue;
 	
-	private NeuronNetworkConfig config;
+	private LearningConfig config;
 	
-	private LossFunction(int lossType, NeuronNetworkConfig config)
+	private LossFunction(int lossType, LearningConfig config)
 	{
 		this.lossType = lossType;
 		this.config = config;
 	}
 	
 	private LossFunction(int lossType, DoubleMatrix input, 
-			DoubleMatrix output, DoubleMatrix activeValue, NeuronNetworkConfig config)
+			DoubleMatrix output, DoubleMatrix activeValue, LearningConfig config)
 	{
 		this.lossType = lossType;
 		this.input = input;
@@ -67,13 +69,13 @@ public class LossFunction
 		this.config = config;
 	}
 	
-	public static LossFunction lossFunc(int lossType, NeuronNetworkConfig config)
+	public static LossFunction lossFunc(int lossType, LearningConfig config)
 	{
 		return new LossFunction(lossType, config);
 	}
 	
 	public static LossFunction lossFunc(int lossType, DoubleMatrix input, 
-			DoubleMatrix output, DoubleMatrix activeVal, NeuronNetworkConfig config)
+			DoubleMatrix output, DoubleMatrix activeVal, LearningConfig config)
 	{
 		return new LossFunction(lossType, input, output, activeVal, config);
 	}

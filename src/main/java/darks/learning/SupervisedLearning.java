@@ -14,15 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package darks.learning.neuron.gradient;
+package darks.learning;
+
+import org.jblas.DoubleMatrix;
 
 /**
- * Gradient algorithm interface
+ * Supervised machine learning
  * 
  * @author Darks.Liu
  *
  */
-public interface Gradient
+public interface SupervisedLearning
 {
 
+	/**
+	 * Train model set
+	 * 
+	 * @param input Model input
+	 * @param output Model output
+	 */
+	public void train(DoubleMatrix input, DoubleMatrix output);
+	
 }

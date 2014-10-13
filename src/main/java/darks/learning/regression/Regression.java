@@ -18,8 +18,8 @@ package darks.learning.regression;
 
 import org.jblas.DoubleMatrix;
 
+import darks.learning.SupervisedLearning;
 import darks.learning.model.ModelSet;
-import darks.learning.neuron.SupervisedLearning;
 
 /**
  * Regression model

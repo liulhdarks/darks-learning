@@ -14,25 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package darks.learning.neuron;
+package darks.learning;
 
-import org.jblas.DoubleMatrix;
+import darks.learning.common.rand.JavaRandomFunction;
+import darks.learning.common.rand.RandomFunction;
 
 /**
- * Supervised machine learning
+ * Learning algorithm basic configuration
  * 
  * @author Darks.Liu
  *
  */
-public interface SupervisedLearning
+public abstract class LearningConfig
 {
 
-	/**
-	 * Train model set
-	 * 
-	 * @param input Model input
-	 * @param output Model output
-	 */
-	public void train(DoubleMatrix input, DoubleMatrix output);
+	
+	public RandomFunction randomFunction = new JavaRandomFunction();
+	
+	public boolean normalized = false;
 	
 }

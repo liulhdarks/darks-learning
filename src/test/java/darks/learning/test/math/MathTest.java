@@ -72,14 +72,14 @@ public class MathTest
 				{3, 4, 5}
 			};
 		double[][] weight = { 
-				{0.1},
-				{0.2},
-				{0.3}
+				{1, 2, 3, 4},
+				{1, 2, 3, 4},
+				{1, 2, 3, 4}
 			};
 		DoubleMatrix im = new DoubleMatrix(input);
 		DoubleMatrix wm = new DoubleMatrix(weight);
 		//System.out.println(im.mul(wm));
-		System.out.println(MatrixHelper.sigmoid(im.mmul(wm)));
+		System.out.println(im.mmul(wm));
 	}
 
 	@Test

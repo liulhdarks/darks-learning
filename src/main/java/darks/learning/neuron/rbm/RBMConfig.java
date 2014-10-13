@@ -16,8 +16,8 @@
  */
 package darks.learning.neuron.rbm;
 
-import darks.learning.common.rand.JavaRandomFunction;
-import darks.learning.common.rand.RandomFunction;
+import darks.learning.neuron.NNConfig;
+
 
 /**
  * Restricted boltzmann machine algorithm configuration
@@ -25,7 +25,7 @@ import darks.learning.common.rand.RandomFunction;
  * @author Darks.Liu
  *
  */
-public class RBMConfig
+public class RBMConfig extends NNConfig
 {
 	
 	public class LayoutType
@@ -38,18 +38,6 @@ public class RBMConfig
 		
 		public static final int SOFTMAX = 3;
 	}
-
-	public double learnRate = 0.001;
-	
-	public RandomFunction randomFunction = new JavaRandomFunction();
-	
-	public Integer maxIterateCount = 0;
-	
-	public Integer maxIterateTime = 0;
-	
-	public double momentum = 0.2;
-	
-	public boolean normalizeInputRows = true;
 	
 	public int visibleSize;
 	
@@ -59,43 +47,9 @@ public class RBMConfig
 	
 	public int hiddenType = LayoutType.BINARY;
 	
-	public boolean convatBias = false;
-
-	public RBMConfig setLearnRate(double learnRate)
-	{
-		this.learnRate = learnRate;
-		return this;
-	}
-
-	public RBMConfig setRandomFunction(RandomFunction randomFunction)
-	{
-		this.randomFunction = randomFunction;
-		return this;
-	}
-
-	public RBMConfig setMaxIterateCount(Integer maxIterateCount)
-	{
-		this.maxIterateCount = maxIterateCount;
-		return this;
-	}
-
-	public RBMConfig setMaxIterateTime(Integer maxIterateTime)
-	{
-		this.maxIterateTime = maxIterateTime;
-		return this;
-	}
-
-	public RBMConfig setMomentum(double momentum)
-	{
-		this.momentum = momentum;
-		return this;
-	}
-
-	public RBMConfig setNormalizeInputRows(boolean normalizeInputRows)
-	{
-		this.normalizeInputRows = normalizeInputRows;
-		return this;
-	}
+	public boolean concatBias = false;
+	
+	public int gibbsCount = 1;
 
 	public RBMConfig setVisibleSize(int visibleSize)
 	{
@@ -128,9 +82,15 @@ public class RBMConfig
 		return this;
 	}
 
-	public RBMConfig setConvatBias(boolean convatBias)
+	public RBMConfig setConcatBias(boolean concatBias)
 	{
-		this.convatBias = convatBias;
+		this.concatBias = concatBias;
+		return this;
+	}
+
+	public RBMConfig setGibbsCount(int gibbsCount)
+	{
+		this.gibbsCount = gibbsCount;
 		return this;
 	}
 	
