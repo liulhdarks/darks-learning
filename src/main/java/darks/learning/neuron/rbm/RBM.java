@@ -115,8 +115,25 @@ public class RBM implements UnsupervisedLearning
 	
 	private void gibbsSampling(DoubleMatrix input)
 	{
-		PropPair prop1 = sampleHiddenByVisible(input);
-		sampleVisibleByHidden();
+		PropPair hProp1 = sampleHiddenByVisible(input);
+		PropPair hPropn = hProp1;
+		PropPair vPropn = null;
+		int k = 1;
+		for (int i = 0; i < k; i++)
+		{
+		    vPropn = sampleVisibleByHidden(hPropn.sample);
+		    hPropn = sampleHiddenByVisible(vPropn.sample);
+		}
+		DoubleMatrix wGradient = input.transpose().mmul(hProp1.sample)
+		            .sub(vPropn.sample.transpose().mmul(hPropn.prob));
+		DoubleMatrix hGradient = hProp1.sample.sub(hPropn.prob);
+        DoubleMatrix vGradient = input.sub(vPropn.sample);
+        wGradient.muli(config.learnRate).divi(input.rows);
+        hGradient.muli(config.learnRate).divi(input.rows);
+        vGradient.muli(config.learnRate).divi(input.rows);
+        weights.addi(wGradient);
+        hBias.addi(hGradient);
+        vBias.addi(vGradient);
 	}
 	
 	private PropPair sampleHiddenByVisible(DoubleMatrix v)
@@ -142,13 +159,14 @@ public class RBM implements UnsupervisedLearning
 		return null;
 	}
 	
-	private void sampleVisibleByHidden()
+	private PropPair sampleVisibleByHidden(DoubleMatrix h)
 	{
+	    DoubleMatrix v2Prob = propBackward(h);
 		switch (config.visibleType)
 		{
 		case LayoutType.BINARY:
-			
-			break;
+            DoubleMatrix v2Sample = MatrixHelper.binomial(v2Prob, config.randomFunction);
+            return new PropPair(v2Prob, v2Sample);
 		case LayoutType.GAUSSION:
 			
 			break;
@@ -159,6 +177,7 @@ public class RBM implements UnsupervisedLearning
 			
 			break;
 		}
+        return null;
 	}
 	
 	private DoubleMatrix propForward(DoubleMatrix v)
@@ -190,6 +209,36 @@ public class RBM implements UnsupervisedLearning
 			throw new LearningException("RBM's hidden type " + config.hiddenType + " is invalid.");
 		}
 	}
+    
+    private DoubleMatrix propBackward(DoubleMatrix h)
+    {
+        DoubleMatrix preProb = h.mmul(weights);
+        if (config.convatBias)
+        {
+            preProb = DoubleMatrix.concatHorizontally(preProb, vBias);
+        }
+        else
+        {
+            preProb.addiRowVector(vBias);
+        }
+        switch (config.visibleType)
+        {
+        case LayoutType.BINARY:
+            return sigmoid(preProb);
+            
+        case LayoutType.GAUSSION:
+
+            return null;
+        case LayoutType.RECTIFIED:
+
+            return null;
+        case LayoutType.SOFTMAX:
+            
+            return null;
+        default:
+            throw new LearningException("RBM's visible type " + config.hiddenType + " is invalid.");
+        }
+    }
 	
 	private boolean checkIterateTime()
 	{
