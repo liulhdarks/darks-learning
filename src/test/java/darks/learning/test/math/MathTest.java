@@ -96,5 +96,7 @@ public class MathTest
 		DoubleMatrix wm = new DoubleMatrix(bias);
 		//System.out.println(im.mul(wm));
 		System.out.println(wm.sub(im.columnMeans()));
+		System.out.println(im.rowSums());
+		System.out.println(im.columnSums());
 	}
 }

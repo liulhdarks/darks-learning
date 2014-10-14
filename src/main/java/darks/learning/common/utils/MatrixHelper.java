@@ -13,6 +13,8 @@
  */
 package darks.learning.common.utils;
 
+import org.apache.commons.math3.stat.StatUtils;
+import org.apache.commons.math3.util.FastMath;
 import org.jblas.DoubleMatrix;
 import org.jblas.MatrixFunctions;
 
@@ -30,6 +32,11 @@ public class MatrixHelper
 	public static DoubleMatrix exp(DoubleMatrix mt)
 	{
 		return MatrixFunctions.exp(mt);
+	}
+
+	public static DoubleMatrix sqrt(DoubleMatrix mt)
+	{
+		return MatrixFunctions.sqrt(mt);
 	}
 
 	public static DoubleMatrix tanh(DoubleMatrix mt)
@@ -78,12 +85,62 @@ public class MatrixHelper
 		return mt;
 	}
 
+	public static DoubleMatrix gaussion(DoubleMatrix mean, double sd)
+	{
+		DoubleMatrix result = new DoubleMatrix(mean.rows, mean.columns);
+		for (int i = 0; i < result.rows; i++)
+		{
+			for (int j = 0; j < result.columns; j++)
+			{
+				result.put(i, j, Distributions.normal(mean.get(i, j), FastMath.sqrt(sd)));
+			}
+		}
+		return result;
+	}
+
+	public static DoubleMatrix gaussion(DoubleMatrix mean, DoubleMatrix variance)
+	{
+		DoubleMatrix std = sqrt(variance);
+		for (int i = 0; i < variance.length; i++)
+		{
+			if (variance.get(i) <= 0)
+			{
+				variance.put(i, 1e-4);
+			}
+		}
+
+		DoubleMatrix result = new DoubleMatrix(mean.rows, mean.columns);
+		for (int i = 0; i < result.rows; i++)
+		{
+			for (int j = 0; j < result.columns; j++)
+			{
+				result.put(i, j, Distributions.normal(mean.get(i, j), std.get(j)));
+			}
+		}
+		return result;
+	}
+
 	public static DoubleMatrix binomial(DoubleMatrix p, RandomFunction rng)
 	{
 		DoubleMatrix ret = new DoubleMatrix(p.rows, p.columns);
 		for (int i = 0; i < ret.length; i++)
 		{
 			ret.put(i, (rng.randDouble() < p.get(i) ? 1 : 0));
+		}
+		return ret;
+	}
+
+	public static DoubleMatrix columnVariance(DoubleMatrix input)
+	{
+		DoubleMatrix columnMeans = input.columnMeans();
+		DoubleMatrix ret = new DoubleMatrix(1, columnMeans.columns);
+		for (int i = 0; i < ret.columns; i++)
+		{
+			DoubleMatrix column = input.getColumn(i);
+			double variance = StatUtils.variance(column.toArray(), columnMeans.get(i));
+			if (variance == 0)
+				variance = 1e-6;
+			ret.put(i, variance);
 		}
 		return ret;
 	}

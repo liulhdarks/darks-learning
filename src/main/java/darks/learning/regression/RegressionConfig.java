@@ -18,7 +18,7 @@ package darks.learning.regression;
 
 import darks.learning.LearningConfig;
 import darks.learning.common.rand.RandomFunction;
-import darks.learning.neuron.LossFunction;
+import darks.learning.lossfunc.LossFunction;
 import darks.learning.neuron.activate.ActivateFunction;
 import darks.learning.neuron.activate.Activations;
 
@@ -42,11 +42,9 @@ public class RegressionConfig extends LearningConfig
 	
 	public ActivateFunction activateFunction = Activations.sigmoid();
 	
-	public LossFunction lossFunction = null;
-	
 	public RegressionConfig()
 	{
-		lossFunction = LossFunction.lossFunc(LossFunction.NEG_LOGLIKELIHOOD_LOSS, this);
+		lossFunction = LossFunction.lossFunc(LossFunction.LOGLIKELIHOOD_LOSS, this);
 	}
 
 	/**

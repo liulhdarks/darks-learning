@@ -26,9 +26,9 @@ import darks.learning.neuron.NNConfig;
  * @author Darks.Liu
  *
  */
-public class GradientUpdater
+public abstract class GradientComputer
 {
-
+	
 	int batchSize;
 	
 	DoubleMatrix wGradient;
@@ -39,42 +39,20 @@ public class GradientUpdater
 	
 	NNConfig config;
 	
-	public GradientUpdater(NNConfig config)
+	public GradientComputer(NNConfig config)
 	{
 		this.config = config;
 	}
 	
-	public void updateGradient(DoubleMatrix wGrad, DoubleMatrix vGrad, DoubleMatrix hGrad)
-	{
-		wGrad.muli(config.learnRate);
-		hGrad.muli(config.learnRate);
-        vGrad.muli(config.learnRate);
-        
-        double momentum = config.momentum;
-        if (momentum > 0 && wGradient != null)
-        {
-        	wGrad.addi(wGradient.mul(momentum).add(wGrad.mul(1 - momentum)));
-        }
-        if (momentum > 0 && vGradient != null)
-        {
-        	vGrad.addi(vGradient.mul(momentum).add(vGrad.mul(1 - momentum)));
-        }
-        if (momentum > 0 && hGradient != null)
-        {
-        	hGrad.addi(hGradient.mul(momentum).add(hGrad.mul(1 - momentum)));
-        }
-        
-        if (config.normalized)
-        {
-        	wGrad.divi(batchSize);
-        	hGrad.divi(batchSize);
-        	vGrad.divi(batchSize);
-        }
-        
-        wGradient = wGrad;
-        vGradient = vGrad;
-        hGradient = hGrad;
-	}
+	/**
+	 * Compute gradient values
+	 * 
+	 * @param wGrad Weights gradient
+	 * @param vGrad Visible bias gradient
+	 * @param hGrad Hidden bias gradient
+	 */
+	public abstract void computeGradient(DoubleMatrix wGrad, DoubleMatrix vGrad, DoubleMatrix hGrad);
+
 
 	public DoubleMatrix getwGradient()
 	{
@@ -95,6 +73,4 @@ public class GradientUpdater
 	{
 		this.batchSize = batchSize;
 	}
-	
-	
 }

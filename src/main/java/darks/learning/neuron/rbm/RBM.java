@@ -16,17 +16,22 @@
  */
 package darks.learning.neuron.rbm;
 
+import static darks.learning.common.utils.MatrixHelper.binomial;
+import static darks.learning.common.utils.MatrixHelper.columnVariance;
+import static darks.learning.common.utils.MatrixHelper.gaussion;
 import static darks.learning.common.utils.MatrixHelper.sigmoid;
+import static darks.learning.common.utils.MatrixHelper.softmax;
 
 import org.jblas.DoubleMatrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.learning.UnsupervisedLearning;
-import darks.learning.common.utils.MatrixHelper;
 import darks.learning.exceptions.LearningException;
 import darks.learning.neuron.AbstractNeuronNetwork;
-import darks.learning.neuron.gradient.GradientUpdater;
+import darks.learning.neuron.ReConstructon;
+import darks.learning.neuron.gradient.GradientComputer;
+import darks.learning.neuron.gradient.NNGradientComputer;
 import darks.learning.neuron.rbm.RBMConfig.LayoutType;
 
 /**
@@ -35,7 +40,7 @@ import darks.learning.neuron.rbm.RBMConfig.LayoutType;
  * @author Darks.Liu
  *
  */
-public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning
+public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning, ReConstructon
 {
 	private static final Logger log = LoggerFactory.getLogger(RBM.class);
 
@@ -53,24 +58,25 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning
 		int iterCount = config.maxIterateCount;
 		int numIterate = 1;
 		double lastLoss = 0;
-		double eps = 1.0e-10;
-		double tolerance = 0.00001;
+	    if(config.visibleType == LayoutType.GAUSSION)
+            this.sigma = columnVariance(input).divi(input.rows);
 		while (iterCount == 0 || numIterate < iterCount)
 		{
-			iterate(input, numIterate);
+			iterate(numIterate);
 			double loss = getLossValue();
 			if (numIterate > 1)
 			{
-				if (2.0 * Math.abs(loss - lastLoss) <= tolerance * (Math.abs(loss) + Math.abs(lastLoss) + eps)) {
+				if (2.0 * Math.abs(loss - lastLoss) <= tolerance * (Math.abs(loss) + Math.abs(lastLoss) + eps)) 
+				{
 	                log.info ("Gradient Ascent: Value difference " + Math.abs(loss - lastLoss) +" below " +
-	                        "tolerance; saying converged.");
+	                        "tolerance; arriving converged.");
 	                break;
 	            }
 			}
 			lastLoss = loss;
 			if (log.isDebugEnabled())
 			{
-				log.debug("RBM finish iteration number " + numIterate + " score:" + getLossValue());
+				log.debug("RBM finish iteration number " + numIterate + " score:" + loss);
 			}
 			if (!checkIterateTime())
 			{
@@ -83,7 +89,7 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning
 	private void initialize(DoubleMatrix input)
 	{
 		initialize(config);
-		gradUpdater = new GradientUpdater(config);
+		gradComputer = new NNGradientComputer(config);
 		startTime = System.currentTimeMillis();
 		vInput = input;
 		int vSize = config.visibleSize <= 0 ? input.columns : config.visibleSize;
@@ -123,14 +129,27 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning
 		}
 	}
 	
-	private void iterate(DoubleMatrix input, int numIterate)
+	private void iterate(int numIterate)
 	{
-		gradUpdater.setBatchSize(input.rows);
+		GradientComputer grad = getGradient();
+		System.out.println(weights);
+        weights.addi(grad.getwGradient());
+        hBias.addi(grad.gethGradient());
+        vBias.addi(grad.getvGradient());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public GradientComputer getGradient(DoubleMatrix input)
+	{
+		gradComputer.setBatchSize(input.rows);
 		PropPair hProp1 = sampleHiddenByVisible(input);
 		PropPair hPropn = hProp1;
 		PropPair vPropn = null;
-		int k = config.gibbsCount;
-		for (int i = 0; i < k; i++)
+		int gibbsCount = config.gibbsCount;
+		for (int i = 0; i < gibbsCount; i++)
 		{
 		    vPropn = sampleVisibleByHidden(hPropn.sample);
 		    hPropn = sampleHiddenByVisible(vPropn.sample);
@@ -140,59 +159,64 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning
 		DoubleMatrix hGradient = hProp1.sample.sub(hPropn.prob).columnMeans();
         DoubleMatrix vGradient = input.sub(vPropn.sample).columnMeans();
        
-        gradUpdater.updateGradient(wGradient, vGradient, hGradient);
-        
-        weights.addi(gradUpdater.getwGradient());
-        hBias.addi(gradUpdater.gethGradient());
-        vBias.addi(gradUpdater.getvGradient());
+        gradComputer.computeGradient(wGradient, vGradient, hGradient);
+		return gradComputer;
 	}
-	
+
 	private PropPair sampleHiddenByVisible(DoubleMatrix v)
 	{
 		DoubleMatrix h1Prob = propForward(v);
+		DoubleMatrix h1Sample = null;
 		switch (config.hiddenType)
 		{
 		case LayoutType.BINARY:
-			DoubleMatrix h1Sample = MatrixHelper.binomial(h1Prob, config.randomFunction);
-			return new PropPair(h1Prob, h1Sample);
+			h1Sample = binomial(h1Prob, config.randomFunction);
+			break;
 		case LayoutType.GAUSSION:
-			
+            this.hiddenSigma = columnVariance(h1Prob);
+            h1Sample =  h1Prob.addi(gaussion(h1Prob, this.hiddenSigma));
 			break;
 		case LayoutType.RECTIFIED:
 			
 			break;
 		case LayoutType.SOFTMAX:
-			
+			h1Sample = softmax(h1Prob);
 			break;
 		default:
 			break;
 		}
-		return null;
+		return new PropPair(h1Prob, h1Sample);
 	}
 	
 	private PropPair sampleVisibleByHidden(DoubleMatrix h)
 	{
 	    DoubleMatrix v2Prob = propBackward(h);
+	    DoubleMatrix v2Sample = null;
 		switch (config.visibleType)
 		{
 		case LayoutType.BINARY:
-            DoubleMatrix v2Sample = MatrixHelper.binomial(v2Prob, config.randomFunction);
-            return new PropPair(v2Prob, v2Sample);
+            v2Sample = binomial(v2Prob, config.randomFunction);
+            break;
 		case LayoutType.GAUSSION:
-			
+			v2Sample = v2Prob.add(DoubleMatrix.randn(v2Prob.rows, v2Prob.columns));
 			break;
 		case LayoutType.RECTIFIED:
 			
 			break;
 		case LayoutType.SOFTMAX:
-			
+			v2Sample = softmax(v2Prob);
 			break;
 		}
-        return null;
+		return new PropPair(v2Prob, v2Sample);
 	}
 	
 	private DoubleMatrix propForward(DoubleMatrix v)
 	{
+		if(config.visibleType == LayoutType.GAUSSION)
+		{
+            this.sigma = columnVariance(v).divi(vInput.rows);
+		}
+		
 		DoubleMatrix preProb = v.mmul(weights);
 		if (config.concatBias)
 		{
@@ -208,14 +232,14 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning
 			return sigmoid(preProb);
 			
 		case LayoutType.GAUSSION:
-
-			return null;
+			preProb.addi(preProb.add(DoubleMatrix.randn(preProb.rows, preProb.columns)));
+            return preProb;
+            
 		case LayoutType.RECTIFIED:
 
 			return null;
 		case LayoutType.SOFTMAX:
-			
-			return null;
+			return softmax(preProb);
 		default:
 			throw new LearningException("RBM's hidden type " + config.hiddenType + " is invalid.");
 		}
@@ -238,14 +262,15 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning
             return sigmoid(preProb);
             
         case LayoutType.GAUSSION:
-
-            return null;
+        	preProb.addi(gaussion(preProb, 1.0));
+            return preProb;
+            
         case LayoutType.RECTIFIED:
 
             return null;
         case LayoutType.SOFTMAX:
-            
-            return null;
+			return softmax(preProb);
+			
         default:
             throw new LearningException("RBM's visible type " + config.hiddenType + " is invalid.");
         }
@@ -274,5 +299,14 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning
 			this.sample = sample;
 		}
 		
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public DoubleMatrix reconstruct(DoubleMatrix input)
+	{
+		return propBackward(propForward(input));
 	}
 }

@@ -52,7 +52,7 @@ public class LogisticRegression extends Regression
 		{
 			learnRate = startLearnRate + (1 / (double)(i + 3));
 			iterator(input, output);
-			double likelihook = calcuateLogLikelihook(input, output);
+			double likelihook = calcuateLossValue(input, output);
 			if (log.isDebugEnabled() && i % 1000 == 0)
 			{
 				log.debug("Iterator:" + i + " cost:" + likelihook + " lr:" + learnRate);
@@ -89,13 +89,13 @@ public class LogisticRegression extends Regression
 		}
 	}
 	
-	private double calcuateLogLikelihook(DoubleMatrix input, DoubleMatrix output)
+	private double calcuateLossValue(DoubleMatrix input, DoubleMatrix output)
 	{
 		DoubleMatrix f = config.activateFunction.activate(input.mmul(weight));
 		config.lossFunction.setActiveValue(f);
 		config.lossFunction.setInput(input);
 		config.lossFunction.setOutput(output);
-		return config.lossFunction.getLossValue();
+		return -config.lossFunction.getLossValue();
 	}
 
 	/**

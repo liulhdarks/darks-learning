@@ -95,7 +95,7 @@ public class SoftmaxRegression extends Regression
 		config.lossFunction.setActiveValue(f);
 		config.lossFunction.setInput(input);
 		config.lossFunction.setOutput(output);
-		return config.lossFunction.getLossValue();
+		return -config.lossFunction.getLossValue();
 	}
 
 	/**

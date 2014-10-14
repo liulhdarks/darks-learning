@@ -14,33 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package darks.learning.common.distribution;
+package darks.learning.neuron;
+
+import org.jblas.DoubleMatrix;
 
 /**
- * Generate specify distribute values
+ * Reconstruct result
+ * 
  * @author Darks.Liu
  *
  */
-public class Distributions
+public interface ReConstructon
 {
 	
-	private static Distribution uniformDistribution = new UniformDistribution();
-	
-	private static Distribution normalDistribution = new NormalDistribution();
+	public DoubleMatrix reconstruct();
 
-	public static double uniform()
-	{
-		return uniformDistribution.generate();
-	}
-	
-	public static double normal()
-	{
-		return normalDistribution.generate();
-	}
-	
-	public static double normal(double mean, double sd)
-	{
-		return normalDistribution.generate(mean, sd);
-	}
+	public DoubleMatrix reconstruct(DoubleMatrix input);
 	
 }

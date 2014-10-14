@@ -16,13 +16,9 @@
  */
 package darks.learning.neuron;
 
-import static darks.learning.common.utils.MatrixHelper.log;
-import static darks.learning.common.utils.MatrixHelper.sigmoid;
-import static darks.learning.common.utils.MatrixHelper.oneMinus;
-
 import org.jblas.DoubleMatrix;
 
-import darks.learning.neuron.gradient.GradientUpdater;
+import darks.learning.neuron.gradient.GradientComputer;
 
 /**
  * Abstract neuronm network
@@ -30,10 +26,10 @@ import darks.learning.neuron.gradient.GradientUpdater;
  * @author Darks.Liu
  *
  */
-public abstract class AbstractNeuronNetwork
+public abstract class AbstractNeuronNetwork implements ReConstructon
 {
 
-	protected GradientUpdater gradUpdater;
+	protected GradientComputer gradComputer;
 	
 	protected DoubleMatrix weights;
 	
@@ -43,7 +39,17 @@ public abstract class AbstractNeuronNetwork
 	
 	protected DoubleMatrix vInput;
 	
+	protected DoubleMatrix sigma;
+	
+	protected DoubleMatrix hiddenSigma;
+	
 	private NNConfig cfg;
+
+	protected double eps = 1.0e-10;
+	
+	protected double tolerance = 1.0e-5;
+	
+	
 	
 	public void initialize(NNConfig cfg)
 	{
@@ -52,19 +58,45 @@ public abstract class AbstractNeuronNetwork
 	
 	public double getLossValue()
 	{
-		DoubleMatrix preHProb = vInput.mmul(weights).addRowVector(hBias);
-		DoubleMatrix sigHidden = sigmoid(preHProb);
-		
-		DoubleMatrix preVProb = sigHidden.mmul(weights.transpose()).addRowVector(vBias);
-		DoubleMatrix sigVisible = sigmoid(preVProb);
-		
-		double likelihood = vInput.mul(log(sigVisible)).add(
-                oneMinus(vInput).mul(log(oneMinus(sigVisible))))
-                .rowSums().mean();
-		if (cfg.normalized)
-		{
-			likelihood /= vInput.rows;
-		}
-		return likelihood;
+		cfg.lossFunction.setInput(vInput);
+		cfg.lossFunction.setReConstructon(this);
+		return cfg.lossFunction.getLossValue();
+	}
+
+	/**
+	 * Get gradient through current input values
+	 * 
+	 * @return GradientComputer
+	 */
+	public GradientComputer getGradient()
+	{
+		return getGradient(vInput);
+	}
+
+	/**
+	 * Get gradient through specify input values
+	 * 
+	 * @param input Specify input values
+	 * @return GradientComputer
+	 */
+	public abstract GradientComputer getGradient(DoubleMatrix input);
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public DoubleMatrix reconstruct()
+	{
+		return reconstruct(vInput);
+	}
+	
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public DoubleMatrix reconstruct(DoubleMatrix input)
+	{
+		return null;
 	}
 }

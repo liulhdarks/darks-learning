@@ -14,33 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package darks.learning.common.distribution;
+package darks.learning.lossfunc;
+
+import static darks.learning.common.utils.MatrixHelper.pow;
+
+import org.jblas.DoubleMatrix;
+
+import darks.learning.LearningConfig;
 
 /**
- * Generate specify distribute values
+ * Loss function
+ * 
  * @author Darks.Liu
  *
  */
-public class Distributions
+public class SquaredLoss extends LossFunction
 {
 	
-	private static Distribution uniformDistribution = new UniformDistribution();
 	
-	private static Distribution normalDistribution = new NormalDistribution();
-
-	public static double uniform()
+	
+	public SquaredLoss(LearningConfig config)
 	{
-		return uniformDistribution.generate();
+		super(config);
 	}
 	
-	public static double normal()
+	@Override
+	public double getLossValue()
 	{
-		return normalDistribution.generate();
+		DoubleMatrix target = reConstructon.reconstruct(input);
+		DoubleMatrix diff = pow(target.sub(input), 2);
+		return diff.columnSums().sum() / input.rows;
 	}
 	
-	public static double normal(double mean, double sd)
-	{
-		return normalDistribution.generate(mean, sd);
-	}
 	
 }
+

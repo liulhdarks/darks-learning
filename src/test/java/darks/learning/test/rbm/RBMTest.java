@@ -19,7 +19,9 @@ package darks.learning.test.rbm;
 import org.jblas.DoubleMatrix;
 import org.junit.Test;
 
+import darks.learning.lossfunc.LossFunction;
 import darks.learning.neuron.rbm.RBM;
+import darks.learning.neuron.rbm.RBMConfig.LayoutType;
 
 public class RBMTest
 {
@@ -43,8 +45,22 @@ public class RBMTest
 			};
 		
 		RBM rbm = new RBM();
-		rbm.config.setHiddenSize(10).setMaxIterateCount(10000);
+		rbm.config.setHiddenSize(10)
+				.setMaxIterateCount(100)
+				.setMomentum(0.1)
+				.setLossType(LossFunction.LOGLIKELIHOOD_LOSS)
+				.setGibbsCount(1)
+				.setLayoutType(LayoutType.GAUSSION);
 		rbm.train(new DoubleMatrix(trainX));
+		
+		double[][] testX = {
+				{0, 1, 1, 0, 0, 0},
+				{0, 0, 1, 0, 0, 0},
+				{0, 0, 0, 0, 1, 1},
+				{0, 0, 0, 1, 0, 1}
+			};
+		DoubleMatrix ret = rbm.reconstruct(new DoubleMatrix(testX));
+		System.out.println(ret.toString().replace(";", "\n"));
 	}
 	
 }

@@ -16,6 +16,8 @@
  */
 package darks.learning.neuron.rbm;
 
+import darks.learning.common.rand.RandomFunction;
+import darks.learning.lossfunc.LossFunction;
 import darks.learning.neuron.NNConfig;
 
 
@@ -50,6 +52,11 @@ public class RBMConfig extends NNConfig
 	public boolean concatBias = false;
 	
 	public int gibbsCount = 1;
+	
+	public RBMConfig()
+	{
+		lossFunction = LossFunction.lossFunc(LossFunction.RECONSTRUCTION_CROSSENTROPY, this);
+	}
 
 	public RBMConfig setVisibleSize(int visibleSize)
 	{
@@ -91,6 +98,48 @@ public class RBMConfig extends NNConfig
 	public RBMConfig setGibbsCount(int gibbsCount)
 	{
 		this.gibbsCount = gibbsCount;
+		return this;
+	}
+
+	public RBMConfig setLossType(int lossType)
+	{
+		this.lossFunction = LossFunction.lossFunc(lossType, this);
+		return this;
+	}
+	
+	public RBMConfig setLearnRate(double learnRate)
+	{
+		this.learnRate = learnRate;
+		return this;
+	}
+
+	public RBMConfig setRandomFunction(RandomFunction randomFunction)
+	{
+		this.randomFunction = randomFunction;
+		return this;
+	}
+
+	public RBMConfig setMaxIterateCount(Integer maxIterateCount)
+	{
+		this.maxIterateCount = maxIterateCount;
+		return this;
+	}
+
+	public RBMConfig setMaxIterateTime(Integer maxIterateTime)
+	{
+		this.maxIterateTime = maxIterateTime;
+		return this;
+	}
+
+	public RBMConfig setMomentum(double momentum)
+	{
+		this.momentum = momentum;
+		return this;
+	}
+
+	public RBMConfig setNormalized(boolean normalized)
+	{
+		this.normalized = normalized;
 		return this;
 	}
 	
