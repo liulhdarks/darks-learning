@@ -19,6 +19,7 @@ package darks.learning.neuron.rbm;
 import darks.learning.common.rand.RandomFunction;
 import darks.learning.lossfunc.LossFunction;
 import darks.learning.neuron.NNConfig;
+import darks.learning.optimize.LearningOptimizer.OptimizeType;
 
 
 /**
@@ -142,7 +143,18 @@ public class RBMConfig extends NNConfig
 		this.normalized = normalized;
 		return this;
 	}
-	
+
+	public RBMConfig setUseAdaGrad(boolean useAdaGrad)
+	{
+		this.useAdaGrad = useAdaGrad;
+		return this;
+	}
+
+	public RBMConfig setOptimizeType(OptimizeType optimizeType)
+	{
+		this.optimizeType = optimizeType;
+		return this;
+	}
 	
 	
 }

@@ -31,7 +31,6 @@ import darks.learning.exceptions.LearningException;
 import darks.learning.neuron.AbstractNeuronNetwork;
 import darks.learning.neuron.ReConstructon;
 import darks.learning.neuron.gradient.GradientComputer;
-import darks.learning.neuron.gradient.NNGradientComputer;
 import darks.learning.neuron.rbm.RBMConfig.LayoutType;
 
 /**
@@ -45,9 +44,7 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning, 
 	private static final Logger log = LoggerFactory.getLogger(RBM.class);
 
 	public RBMConfig config = new RBMConfig();
-	
-	long startTime;
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -55,42 +52,15 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning, 
 	public void train(DoubleMatrix input)
 	{
 		initialize(input);
-		int iterCount = config.maxIterateCount;
-		int numIterate = 1;
-		double lastLoss = 0;
-	    if(config.visibleType == LayoutType.GAUSSION)
-            this.sigma = columnVariance(input).divi(input.rows);
-		while (iterCount == 0 || numIterate < iterCount)
+		if (optimizer != null)
 		{
-			iterate(numIterate);
-			double loss = getLossValue();
-			if (numIterate > 1)
-			{
-				if (2.0 * Math.abs(loss - lastLoss) <= tolerance * (Math.abs(loss) + Math.abs(lastLoss) + eps)) 
-				{
-	                log.info ("Gradient Ascent: Value difference " + Math.abs(loss - lastLoss) +" below " +
-	                        "tolerance; arriving converged.");
-	                break;
-	            }
-			}
-			lastLoss = loss;
-			if (log.isDebugEnabled())
-			{
-				log.debug("RBM finish iteration number " + numIterate + " score:" + loss);
-			}
-			if (!checkIterateTime())
-			{
-				break;
-			}
-			numIterate++;
+			optimizer.optimize();
 		}
 	}
 	
 	private void initialize(DoubleMatrix input)
 	{
 		initialize(config);
-		gradComputer = new NNGradientComputer(config);
-		startTime = System.currentTimeMillis();
 		vInput = input;
 		int vSize = config.visibleSize <= 0 ? input.columns : config.visibleSize;
 		int hSize = config.hiddenSize;
@@ -98,6 +68,11 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning, 
 		vBias = DoubleMatrix.rand(vSize);
 		hBias = DoubleMatrix.zeros(hSize);
 		fillBias(input);
+	    if(config.visibleType == LayoutType.GAUSSION)
+	    {
+            this.sigma = columnVariance(input).divi(input.rows);
+	    }
+		log.info("Initialize RBM visible:" + vSize + " hidden:" + hSize + " weights:" + weights.length);
 	}
 	
 	private void fillBias(DoubleMatrix input)
@@ -127,15 +102,6 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning, 
 				vBias.put(i, Math.log(p / (1 - p)));
 			}
 		}
-	}
-	
-	private void iterate(int numIterate)
-	{
-		GradientComputer grad = getGradient();
-		System.out.println(weights);
-        weights.addi(grad.getwGradient());
-        hBias.addi(grad.gethGradient());
-        vBias.addi(grad.getvGradient());
 	}
 
 	/**
@@ -275,17 +241,6 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning, 
             throw new LearningException("RBM's visible type " + config.hiddenType + " is invalid.");
         }
     }
-	
-	private boolean checkIterateTime()
-	{
-		if (config.maxIterateTime > 0 
-				&& System.currentTimeMillis() - startTime >= config.maxIterateTime)
-		{
-			return false;
-		}
-		return true;
-	}
-	
 	
 	class PropPair
 	{

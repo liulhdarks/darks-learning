@@ -43,6 +43,11 @@ public abstract class LossFunction
 	
 	public static final int RECONSTRUCTION_CROSSENTROPY = 3;
 	
+	/**
+	 * Minimum squared error loss function
+	 */
+	public static final int MSE = 4;
+	
 	protected DoubleMatrix hBias;
 	
 	protected DoubleMatrix vBias;
@@ -75,6 +80,8 @@ public abstract class LossFunction
 		{
 		case SQUARED_LOSS:
 			return new SquaredLoss(config);
+		case MSE:
+			return new MSELoss(config);
 		case LOGLIKELIHOOD_LOSS:
 			return new Loglikelihood(config);
 		case RECONSTRUCTION_CROSSENTROPY:

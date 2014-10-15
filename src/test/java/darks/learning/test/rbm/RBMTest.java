@@ -45,12 +45,13 @@ public class RBMTest
 			};
 		
 		RBM rbm = new RBM();
-		rbm.config.setHiddenSize(10)
-				.setMaxIterateCount(100)
+		rbm.config.setHiddenSize(32)
+				.setMaxIterateCount(1000)
 				.setMomentum(0.1)
 				.setLossType(LossFunction.LOGLIKELIHOOD_LOSS)
 				.setGibbsCount(1)
-				.setLayoutType(LayoutType.GAUSSION);
+				.setLayoutType(LayoutType.BINARY)
+				.setUseAdaGrad(true);
 		rbm.train(new DoubleMatrix(trainX));
 		
 		double[][] testX = {

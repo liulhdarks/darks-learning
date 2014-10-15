@@ -29,6 +29,11 @@ public class MatrixHelper
 		return MatrixFunctions.log(mt);
 	}
 
+	public static DoubleMatrix abs(DoubleMatrix mt)
+	{
+		return MatrixFunctions.abs(mt);
+	}
+
 	public static DoubleMatrix exp(DoubleMatrix mt)
 	{
 		return MatrixFunctions.exp(mt);

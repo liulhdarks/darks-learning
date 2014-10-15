@@ -18,6 +18,7 @@ package darks.learning.neuron;
 
 import darks.learning.LearningConfig;
 import darks.learning.common.rand.RandomFunction;
+import darks.learning.optimize.LearningOptimizer.OptimizeType;
 
 public class NNConfig extends LearningConfig
 {
@@ -29,6 +30,10 @@ public class NNConfig extends LearningConfig
 	public Integer maxIterateCount = 0;
 	
 	public Integer maxIterateTime = 0;
+	
+	public boolean useAdaGrad = true;
+	
+	public OptimizeType optimizeType = OptimizeType.NONE;
 	
 	public NNConfig setLearnRate(double learnRate)
 	{
@@ -65,4 +70,18 @@ public class NNConfig extends LearningConfig
 		this.normalized = normalized;
 		return this;
 	}
+
+	public NNConfig setUseAdaGrad(boolean useAdaGrad)
+	{
+		this.useAdaGrad = useAdaGrad;
+		return this;
+	}
+
+	public NNConfig setOptimizeType(OptimizeType optimizeType)
+	{
+		this.optimizeType = optimizeType;
+		return this;
+	}
+	
+	
 }

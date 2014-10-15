@@ -38,11 +38,21 @@ public class NNGradientComputer extends GradientComputer
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void computeGradient(DoubleMatrix wGrad, DoubleMatrix vGrad, DoubleMatrix hGrad)
+	public void computeGradient(DoubleMatrix wGrad, DoubleMatrix vBiasGrad, DoubleMatrix hBiasGrad)
 	{
-		wGrad.muli(config.learnRate);
-		hGrad.muli(config.learnRate);
-        vGrad.muli(config.learnRate);
+		if (config.useAdaGrad)
+		{
+			buildAdaGrad(wGrad, vBiasGrad, hBiasGrad);
+			wGrad.muli(wAdaGrad.getLearnRates(wGrad));
+			hBiasGrad = hBiasGrad.mul(hBiasAdaGrad.getLearnRates(hBiasGrad));
+			vBiasGrad = vBiasGrad.mul(vBiasAdaGrad.getLearnRates(vBiasGrad));
+		}
+		else
+		{
+			wGrad.muli(config.learnRate);
+			hBiasGrad = hBiasGrad.mul(config.learnRate);
+			vBiasGrad = vBiasGrad.mul(config.learnRate);
+		}
         
         double momentum = config.momentum;
         if (momentum > 0 && wGradient != null)
@@ -51,23 +61,23 @@ public class NNGradientComputer extends GradientComputer
         }
         if (momentum > 0 && vGradient != null)
         {
-        	vGrad.addi(vGradient.mul(momentum).add(vGrad.mul(1 - momentum)));
+        	vBiasGrad.addi(vGradient.mul(momentum).add(vBiasGrad.mul(1 - momentum)));
         }
         if (momentum > 0 && hGradient != null)
         {
-        	hGrad.addi(hGradient.mul(momentum).add(hGrad.mul(1 - momentum)));
+        	hBiasGrad.addi(hGradient.mul(momentum).add(hBiasGrad.mul(1 - momentum)));
         }
         
         if (config.normalized)
         {
         	wGrad.divi(batchSize);
-        	hGrad.divi(batchSize);
-        	vGrad.divi(batchSize);
+        	hBiasGrad.divi(batchSize);
+        	vBiasGrad.divi(batchSize);
         }
         
         wGradient = wGrad;
-        vGradient = vGrad;
-        hGradient = hGrad;
+        vGradient = vBiasGrad;
+        hGradient = hBiasGrad;
 	}
 	
 	
