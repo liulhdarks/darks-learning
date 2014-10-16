@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.learning.neuron.AbstractNeuronNetwork;
-import darks.learning.neuron.gradient.GradientComputer;
 import darks.learning.optimize.linesearch.BisectionSearch;
 import darks.learning.optimize.linesearch.LineSearch;
 
@@ -46,6 +45,7 @@ public class LineSearchOptimizer extends AbstractNeuronNetworkOptimizer
 	public LineSearchOptimizer(AbstractNeuronNetwork network)
 	{
 		super(network);
+		log.debug("Initialize line search optimizer.");
 		lineSearcher = new BisectionSearch(network);
 	}
 

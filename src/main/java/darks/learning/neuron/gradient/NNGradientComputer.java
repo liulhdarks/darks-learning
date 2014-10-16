@@ -40,6 +40,9 @@ public class NNGradientComputer extends GradientComputer
 	@Override
 	public void computeGradient(DoubleMatrix wGrad, DoubleMatrix vBiasGrad, DoubleMatrix hBiasGrad)
 	{
+		wOriginGradient = wGrad.dup();
+		vOriginGradient = vBiasGrad.dup();
+		hOriginGradient = hBiasGrad.dup();
 		if (config.useAdaGrad)
 		{
 			buildAdaGrad(wGrad, vBiasGrad, hBiasGrad);
@@ -49,9 +52,9 @@ public class NNGradientComputer extends GradientComputer
 		}
 		else
 		{
-			wGrad.muli(config.learnRate);
-			hBiasGrad = hBiasGrad.mul(config.learnRate);
-			vBiasGrad = vBiasGrad.mul(config.learnRate);
+			wGrad.muli(learnRate);
+			hBiasGrad = hBiasGrad.mul(learnRate);
+			vBiasGrad = vBiasGrad.mul(learnRate);
 		}
         
         double momentum = config.momentum;
@@ -74,7 +77,7 @@ public class NNGradientComputer extends GradientComputer
         	hBiasGrad.divi(batchSize);
         	vBiasGrad.divi(batchSize);
         }
-        
+
         wGradient = wGrad;
         vGradient = vBiasGrad;
         hGradient = hBiasGrad;

@@ -16,6 +16,9 @@
  */
 package darks.learning.neuron;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.jblas.DoubleMatrix;
 
 import darks.learning.exceptions.LearningException;
@@ -153,6 +156,49 @@ public abstract class AbstractNeuronNetwork implements ReConstructon
 			throw new LearningException("Cannot find optimize type " + cfg.optimizeType);
 		}
 	}
+	
+	public Map<String, Object> backup()
+	{
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("weights", weights.dup());
+		result.put("vbias", vBias.dup());
+		result.put("hbias", hBias.dup());
+		if (gradComputer != null)
+		{
+			result.put("wgrad", gradComputer.getwGradient() == null ? null : gradComputer.getwGradient().dup());
+			result.put("vgrad", gradComputer.getvGradient() == null ? null : gradComputer.getvGradient().dup());
+			result.put("hgrad", gradComputer.gethGradient() == null ? null : gradComputer.gethGradient().dup());
+		}
+		return result;
+	}
+	
+	public void restore(Map<String, Object> pack)
+	{
+		Object W = pack.get("weights");
+		if (W != null)
+		{
+			weights = ((DoubleMatrix)W).dup();
+		}
+		Object vbias = pack.get("vbias");
+		if (vbias != null)
+		{
+			vBias = ((DoubleMatrix)vbias).dup();
+		}
+		Object hbias = pack.get("hbias");
+		if (hbias != null)
+		{
+			hBias = ((DoubleMatrix)hbias).dup();
+		}
+		if (gradComputer != null)
+		{
+			Object grad = pack.get("wgrad");
+			gradComputer.setwGradient(grad == null ? null : ((DoubleMatrix)grad).dup());
+			grad = pack.get("vgrad");
+			gradComputer.setvGradient(grad == null ? null : ((DoubleMatrix)grad).dup());
+			grad = pack.get("hgrad");
+			gradComputer.sethGradient(grad == null ? null : ((DoubleMatrix)grad).dup());
+		}
+	}
 
 	public NNConfig config()
 	{
@@ -217,7 +263,25 @@ public abstract class AbstractNeuronNetwork implements ReConstructon
 	{
 		this.vInput = vInput;
 	}
-	
-	
+
+	public void setLearnRate(double learnRate)
+	{
+		if (gradComputer != null)
+		{
+			gradComputer.setLearnRate(learnRate);
+		}
+	}
+
+	public double getLearnRate()
+	{
+		if (gradComputer != null)
+		{
+			return gradComputer.getLearnRate();
+		}
+		else
+		{
+			return cfg.learnRate;
+		}
+	}
 	
 }

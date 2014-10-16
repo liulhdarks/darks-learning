@@ -6,8 +6,6 @@ import org.apache.commons.math3.linear.SingularValueDecomposition;
 import org.jblas.DoubleMatrix;
 import org.junit.Test;
 
-import darks.learning.common.utils.MatrixHelper;
-
 public class MathTest
 {
 
@@ -52,11 +50,11 @@ public class MathTest
 				{0, 1, 1},
 				{1, 0, 1},
 			};
-		double[][] output = { 
-				{1, 0, 0},
-				{0, 1, 0},
-				{0, 0, 1},
-			};
+//		double[][] output = { 
+//				{1, 0, 0},
+//				{0, 1, 0},
+//				{0, 0, 1},
+//			};
 		DoubleMatrix im = new DoubleMatrix(input);
 		DoubleMatrix wm = new DoubleMatrix(weight);
 //		DoubleMatrix outm = new DoubleMatrix(output);

@@ -20,6 +20,12 @@ import org.jblas.DoubleMatrix;
 
 import darks.learning.neuron.AbstractNeuronNetwork;
 
+/**
+ * Line search algorithm
+ * 
+ * @author Darks.Liu
+ *
+ */
 public abstract class LineSearch
 {
 
@@ -32,5 +38,13 @@ public abstract class LineSearch
 		this.network = network;
 	}
 	
+	/**
+	 * Optimize learning step
+	 * 
+	 * @param x Input x
+	 * @param numIterate Iteration number
+	 * @param initStep Initialize step value
+	 * @return New step value
+	 */
 	public abstract double optimize(DoubleMatrix x, int numIterate, double initStep);
 }

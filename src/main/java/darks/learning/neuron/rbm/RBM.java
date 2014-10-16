@@ -182,7 +182,7 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning, 
 		{
             this.sigma = columnVariance(v).divi(vInput.rows);
 		}
-		
+
 		DoubleMatrix preProb = v.mmul(weights);
 		if (config.concatBias)
 		{

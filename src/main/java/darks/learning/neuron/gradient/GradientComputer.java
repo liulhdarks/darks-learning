@@ -35,6 +35,12 @@ public abstract class GradientComputer
 	
 	int batchSize;
 	
+	DoubleMatrix wOriginGradient;
+	
+	DoubleMatrix vOriginGradient;
+	
+	DoubleMatrix hOriginGradient;
+	
 	DoubleMatrix wGradient;
 	
 	DoubleMatrix vGradient;
@@ -51,9 +57,28 @@ public abstract class GradientComputer
 	
 	double numIterate;
 	
+	double learnRate;
+	
 	public GradientComputer(NNConfig config)
 	{
 		this.config = config;
+		learnRate = config.learnRate;
+	}
+	
+	/**
+	 * Compute gradient values
+	 */
+	public void computeGradient()
+	{
+		computeGradient(wGradient, vGradient, hGradient);
+	}
+	
+	/**
+	 * Compute gradient values
+	 */
+	public void computeOriginGradient()
+	{
+		computeGradient(wOriginGradient, vOriginGradient, hOriginGradient);
 	}
 	
 	/**
@@ -88,6 +113,28 @@ public abstract class GradientComputer
 			}
 		}
 	}
+	
+	public void changeGrad()
+	{
+		DoubleMatrix tmp = wOriginGradient;
+		wOriginGradient = wGradient;
+		wGradient = tmp;
+		
+		tmp = vOriginGradient;
+		vOriginGradient = vGradient;
+		vGradient = tmp;
+		
+		tmp = hOriginGradient;
+		hOriginGradient = hGradient;
+		hGradient = tmp;
+	}
+	
+	public void override()
+	{
+		wGradient = wOriginGradient.dup();
+		vGradient = vOriginGradient.dup();
+		hGradient = hOriginGradient.dup();
+	}
 
 	public DoubleMatrix getwGradient()
 	{
@@ -117,6 +164,46 @@ public abstract class GradientComputer
 	public void setNumIterate(double numIterate)
 	{
 		this.numIterate = numIterate;
+	}
+
+	public double getLearnRate()
+	{
+		return learnRate;
+	}
+
+	public void setLearnRate(double learnRate)
+	{
+		this.learnRate = learnRate;
+	}
+
+	public DoubleMatrix getwOriginGradient()
+	{
+		return wOriginGradient;
+	}
+
+	public DoubleMatrix getvOriginGradient()
+	{
+		return vOriginGradient;
+	}
+
+	public DoubleMatrix gethOriginGradient()
+	{
+		return hOriginGradient;
+	}
+
+	public void setwGradient(DoubleMatrix wGradient)
+	{
+		this.wGradient = wGradient;
+	}
+
+	public void setvGradient(DoubleMatrix vGradient)
+	{
+		this.vGradient = vGradient;
+	}
+
+	public void sethGradient(DoubleMatrix hGradient)
+	{
+		this.hGradient = hGradient;
 	}
 	
 	

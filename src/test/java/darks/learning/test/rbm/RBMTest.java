@@ -22,6 +22,7 @@ import org.junit.Test;
 import darks.learning.lossfunc.LossFunction;
 import darks.learning.neuron.rbm.RBM;
 import darks.learning.neuron.rbm.RBMConfig.LayoutType;
+import darks.learning.optimize.LearningOptimizer.OptimizeType;
 
 public class RBMTest
 {
@@ -45,13 +46,14 @@ public class RBMTest
 			};
 		
 		RBM rbm = new RBM();
-		rbm.config.setHiddenSize(32)
+		rbm.config.setHiddenSize(64)
 				.setMaxIterateCount(1000)
-				.setMomentum(0.1)
+				.setMomentum(0)
 				.setLossType(LossFunction.LOGLIKELIHOOD_LOSS)
 				.setGibbsCount(1)
 				.setLayoutType(LayoutType.BINARY)
-				.setUseAdaGrad(true);
+				.setUseAdaGrad(false)
+				.setOptimizeType(OptimizeType.LINE_SEARCH);
 		rbm.train(new DoubleMatrix(trainX));
 		
 		double[][] testX = {
