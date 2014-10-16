@@ -22,6 +22,7 @@ import java.util.Map;
 import org.jblas.DoubleMatrix;
 
 import darks.learning.exceptions.LearningException;
+import darks.learning.lossfunc.LossFunction;
 import darks.learning.neuron.gradient.GradientComputer;
 import darks.learning.neuron.gradient.NNGradientComputer;
 import darks.learning.optimize.LearningOptimizer;
@@ -69,7 +70,12 @@ public abstract class AbstractNeuronNetwork implements ReConstructon
 	{
 		cfg.lossFunction.setInput(vInput);
 		cfg.lossFunction.setReConstructon(this);
-		return cfg.lossFunction.getLossValue();
+		double val = cfg.lossFunction.getLossValue();
+		if (cfg.lossType == LossFunction.MSE || cfg.lossType == LossFunction.SQUARED_LOSS)
+		{
+			return -val;
+		}
+		return val;
 	}
 
 	/**

@@ -56,7 +56,7 @@ public class RBMConfig extends NNConfig
 	
 	public RBMConfig()
 	{
-		lossFunction = LossFunction.lossFunc(LossFunction.RECONSTRUCTION_CROSSENTROPY, this);
+		setLossType(LossFunction.RECONSTRUCTION_CROSSENTROPY);
 	}
 
 	public RBMConfig setVisibleSize(int visibleSize)
@@ -104,6 +104,7 @@ public class RBMConfig extends NNConfig
 
 	public RBMConfig setLossType(int lossType)
 	{
+		this.lossType = lossType;
 		this.lossFunction = LossFunction.lossFunc(lossType, this);
 		return this;
 	}

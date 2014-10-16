@@ -36,4 +36,6 @@ public abstract class LearningConfig
 	
 	public LossFunction lossFunction = null;
 	
+	public int lossType;
+	
 }

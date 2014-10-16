@@ -49,7 +49,7 @@ public class RBMTest
 		rbm.config.setHiddenSize(64)
 				.setMaxIterateCount(1000)
 				.setMomentum(0)
-				.setLossType(LossFunction.LOGLIKELIHOOD_LOSS)
+				.setLossType(LossFunction.MSE)
 				.setGibbsCount(1)
 				.setLayoutType(LayoutType.BINARY)
 				.setUseAdaGrad(false)
