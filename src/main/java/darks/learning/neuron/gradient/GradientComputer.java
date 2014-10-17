@@ -114,21 +114,6 @@ public abstract class GradientComputer
 		}
 	}
 	
-	public void changeGrad()
-	{
-		DoubleMatrix tmp = wOriginGradient;
-		wOriginGradient = wGradient;
-		wGradient = tmp;
-		
-		tmp = vOriginGradient;
-		vOriginGradient = vGradient;
-		vGradient = tmp;
-		
-		tmp = hOriginGradient;
-		hOriginGradient = hGradient;
-		hGradient = tmp;
-	}
-	
 	public void override()
 	{
 		wGradient = wOriginGradient.dup();

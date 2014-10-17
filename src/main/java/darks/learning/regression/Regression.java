@@ -20,6 +20,7 @@ import org.jblas.DoubleMatrix;
 
 import darks.learning.SupervisedLearning;
 import darks.learning.model.ModelSet;
+import darks.learning.neuron.gradient.AdaptiveLRGradient;
 
 /**
  * Regression model
@@ -37,6 +38,8 @@ public abstract class Regression implements SupervisedLearning
 	
 	double learnRate;
 
+	AdaptiveLRGradient adaGrad;
+	
 	/**
 	 * Train model set
 	 * 
@@ -47,19 +50,23 @@ public abstract class Regression implements SupervisedLearning
 		train(modelSet.getInput(), modelSet.getOutput());
 	}
 	
-	/**
-	 * Predict model result by input matrix
-	 * 
-	 * @param input Input matrix
-	 * @return Result label matrix
-	 */
-	public abstract DoubleMatrix predict(DoubleMatrix input);
-	
 	protected void gradientDescent(DoubleMatrix input, DoubleMatrix output)
 	{
 		DoubleMatrix f = config.activateFunction.activate(input.mmul(weight).addRowVector(bias));
 		DoubleMatrix error = output.sub(f);
-		DoubleMatrix theta = error.mul(learnRate);
+		DoubleMatrix theta = null;
+		if (config.useAdaGrad)
+		{
+			if (adaGrad == null)
+			{
+				adaGrad = new AdaptiveLRGradient(error.rows, error.columns);
+			}
+			theta = error.mul(adaGrad.getLearnRates(error));
+		}
+		else
+		{
+			theta = error.mul(learnRate);
+		}
 		DoubleMatrix delta = input.transpose().mmul(theta);
 		theta = theta.columnSums();
 		if (config.normalized)

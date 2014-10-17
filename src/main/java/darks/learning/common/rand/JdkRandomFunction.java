@@ -24,10 +24,20 @@ import java.util.Random;
  * @author Darks.Liu
  *
  */
-public class JavaRandomFunction implements RandomFunction
+public class JdkRandomFunction implements RandomFunction
 {
 
 	private Random rand = new Random(System.currentTimeMillis());
+	
+	public JdkRandomFunction()
+	{
+		rand = new Random(System.currentTimeMillis());
+	}
+	
+	public JdkRandomFunction(long seed)
+	{
+		rand = new Random(seed);
+	}
 	
 	/**
 	 * {@inheritDoc}

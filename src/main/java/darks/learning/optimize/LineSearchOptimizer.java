@@ -68,7 +68,7 @@ public class LineSearchOptimizer extends AbstractNeuronNetworkOptimizer
 			{
 				if (2.0 * Math.abs(loss - lastLoss) <= TOLERANCE * (Math.abs(loss) + Math.abs(lastLoss) + EPS)) 
 				{
-	                log.info ("Gradient Ascent: Value difference " + Math.abs(loss - lastLoss) +" below " +
+	                log.info ("LineSearch optimize: Value difference " + Math.abs(loss - lastLoss) +" below " +
 	                        "tolerance; arriving converged.");
 	                break;
 	            }

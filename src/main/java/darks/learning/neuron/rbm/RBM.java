@@ -16,6 +16,8 @@
  */
 package darks.learning.neuron.rbm;
 
+import static darks.learning.common.utils.MatrixHelper.sqrt;
+import static darks.learning.common.utils.MatrixHelper.max;
 import static darks.learning.common.utils.MatrixHelper.binomial;
 import static darks.learning.common.utils.MatrixHelper.columnVariance;
 import static darks.learning.common.utils.MatrixHelper.gaussion;
@@ -51,11 +53,13 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning, 
 	@Override
 	public void train(DoubleMatrix input)
 	{
+		long st = System.currentTimeMillis();
 		initialize(input);
 		if (optimizer != null)
 		{
 			optimizer.optimize();
 		}
+		log.info("Complete to train RBM algorithm.cost " + (System.currentTimeMillis() - st) + "ms");
 	}
 	
 	private void initialize(DoubleMatrix input)
@@ -129,7 +133,7 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning, 
 		return gradComputer;
 	}
 
-	private PropPair sampleHiddenByVisible(DoubleMatrix v)
+	public PropPair sampleHiddenByVisible(DoubleMatrix v)
 	{
 		DoubleMatrix h1Prob = propForward(v);
 		DoubleMatrix h1Sample = null;
@@ -143,7 +147,10 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning, 
             h1Sample =  h1Prob.addi(gaussion(h1Prob, this.hiddenSigma));
 			break;
 		case LayoutType.RECTIFIED:
-			
+			DoubleMatrix sigProb = sigmoid(h1Prob);
+			DoubleMatrix sqrtSig = sqrt(sigProb);
+			h1Sample = h1Prob.addi(gaussion(h1Prob, 1).mul(sqrtSig));
+			max(0.0, h1Sample);
 			break;
 		case LayoutType.SOFTMAX:
 			h1Sample = softmax(h1Prob);
@@ -154,7 +161,7 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning, 
 		return new PropPair(h1Prob, h1Sample);
 	}
 	
-	private PropPair sampleVisibleByHidden(DoubleMatrix h)
+	public PropPair sampleVisibleByHidden(DoubleMatrix h)
 	{
 	    DoubleMatrix v2Prob = propBackward(h);
 	    DoubleMatrix v2Sample = null;
@@ -166,9 +173,6 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning, 
 		case LayoutType.GAUSSION:
 			v2Sample = v2Prob.add(DoubleMatrix.randn(v2Prob.rows, v2Prob.columns));
 			break;
-		case LayoutType.RECTIFIED:
-			
-			break;
 		case LayoutType.SOFTMAX:
 			v2Sample = softmax(v2Prob);
 			break;
@@ -176,7 +180,7 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning, 
 		return new PropPair(v2Prob, v2Sample);
 	}
 	
-	private DoubleMatrix propForward(DoubleMatrix v)
+	public DoubleMatrix propForward(DoubleMatrix v)
 	{
 		if(config.visibleType == LayoutType.GAUSSION)
 		{
@@ -202,8 +206,8 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning, 
             return preProb;
             
 		case LayoutType.RECTIFIED:
-
-			return null;
+			return max(0, preProb);
+			
 		case LayoutType.SOFTMAX:
 			return softmax(preProb);
 		default:
@@ -211,7 +215,7 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning, 
 		}
 	}
     
-    private DoubleMatrix propBackward(DoubleMatrix h)
+	public DoubleMatrix propBackward(DoubleMatrix h)
     {
         DoubleMatrix preProb = h.mmul(weights.transpose());
         if (config.concatBias)
@@ -242,7 +246,7 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning, 
         }
     }
 	
-	class PropPair
+	public static class PropPair
 	{
 		DoubleMatrix prob;
 		
@@ -253,6 +257,27 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning, 
 			this.prob = prob;
 			this.sample = sample;
 		}
+
+		public DoubleMatrix getProb()
+		{
+			return prob;
+		}
+
+		public void setProb(DoubleMatrix prob)
+		{
+			this.prob = prob;
+		}
+
+		public DoubleMatrix getSample()
+		{
+			return sample;
+		}
+
+		public void setSample(DoubleMatrix sample)
+		{
+			this.sample = sample;
+		}
+		
 		
 	}
 

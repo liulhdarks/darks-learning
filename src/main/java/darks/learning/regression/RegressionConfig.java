@@ -40,11 +40,14 @@ public class RegressionConfig extends LearningConfig
 	
 	boolean randomGradient = false;
 	
-	public ActivateFunction activateFunction = Activations.sigmoid();
+	ActivateFunction activateFunction = Activations.sigmoid();
+	
+	boolean useAdaGrad = false;
 	
 	public RegressionConfig()
 	{
-		lossFunction = LossFunction.lossFunc(LossFunction.LOGLIKELIHOOD_LOSS, this);
+		lossType = LossFunction.LOGLIKELIHOOD_LOSS;
+		lossFunction = LossFunction.lossFunc(lossType, this);
 	}
 
 	/**
@@ -95,9 +98,24 @@ public class RegressionConfig extends LearningConfig
 		return this;
 	}
 
+	public RegressionConfig setLossType(int lossType)
+	{
+		this.lossType = lossType;
+		lossFunction = LossFunction.lossFunc(lossType, this);
+		return this;
+	}
+
 	public RegressionConfig setNormalized(boolean normalized)
 	{
 		this.normalized = normalized;
 		return this;
 	}
+
+	public RegressionConfig setUseAdaGrad(boolean useAdaGrad)
+	{
+		this.useAdaGrad = useAdaGrad;
+		return this;
+	}
+	
+	
 }

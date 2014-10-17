@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package darks.learning.test.rbm;
+package darks.learning.test.dbn;
 
 import org.jblas.DoubleMatrix;
 import org.junit.Test;
@@ -23,12 +23,14 @@ import darks.learning.lossfunc.LossFunction;
 import darks.learning.neuron.rbm.RBM;
 import darks.learning.neuron.rbm.RBMConfig.LayoutType;
 import darks.learning.optimize.LearningOptimizer.OptimizeType;
+import darks.learning.regression.Regression;
+import darks.learning.regression.SoftmaxRegression;
 
-public class RBMTest
+public class RBMRegTest
 {
 
 	@Test
-	public void testRBM()
+	public void testRBMWithRegression()
 	{
 		double[][] trainX = {
 				{0, 1, 1, 0, 0, 0},
@@ -45,8 +47,23 @@ public class RBMTest
 				{0, 0, 0, 1, 0, 0}
 			};
 		
-		RBM rbm = new RBM();
-		rbm.config.setHiddenSize(32)
+		double[][] labels = {
+				{1, 0},
+				{1, 0},
+				{1, 0},
+				{1, 0},
+				{1, 0},
+				{1, 0},
+				{0, 1},
+				{0, 1},
+				{0, 1},
+				{0, 1},
+				{0, 1},
+				{0, 1},
+			}; 
+		
+		RBM rbm1 = new RBM();
+		rbm1.config.setHiddenSize(64)
 				.setMaxIterateCount(10000)
 				.setMomentum(0)
 				.setLossType(LossFunction.RECONSTRUCTION_CROSSENTROPY)
@@ -54,16 +71,42 @@ public class RBMTest
 				.setLayoutType(LayoutType.BINARY)
 				.setUseAdaGrad(false)
 				.setOptimizeType(OptimizeType.LINE_SEARCH);
-		rbm.train(new DoubleMatrix(trainX));
+		rbm1.train(new DoubleMatrix(trainX));
+		
+		DoubleMatrix input2 = rbm1.propForward(new DoubleMatrix(trainX));
+		RBM rbm2 = new RBM();
+		rbm2.config.setHiddenSize(128)
+				.setMaxIterateCount(10000)
+				.setMomentum(0)
+				.setLossType(LossFunction.RECONSTRUCTION_CROSSENTROPY)
+				.setGibbsCount(1)
+				.setLayoutType(LayoutType.BINARY)
+				.setUseAdaGrad(false)
+				.setOptimizeType(OptimizeType.LINE_SEARCH);
+		rbm2.train(input2);
+		
+		DoubleMatrix input3 = rbm2.propForward(input2);
+		
+		Regression reg = new SoftmaxRegression();
+		reg.config.setLearnRate(0.001)
+					.setMaxIteratorCount(10000)
+					.setRandomGradient(false)
+					.setNormalized(true);
+		reg.train(input3, new DoubleMatrix(labels));
 		
 		double[][] testX = {
 				{0, 1, 1, 0, 0, 0},
 				{0, 0, 1, 0, 0, 0},
 				{0, 0, 0, 0, 1, 1},
-				{0, 0, 0, 1, 0, 1}
+				{0, 0, 0, 1, 0, 1},
+				{1, 0, 0, 1, 0, 1},
+				{1, 1, 0, 1, 0, 1},
 			};
-		DoubleMatrix ret = rbm.reconstruct(new DoubleMatrix(testX));
-		System.out.println(ret.toString().replace(";", "\n"));
+
+		DoubleMatrix inputReg = rbm1.propForward(new DoubleMatrix(testX));
+		inputReg = rbm2.propForward(inputReg);
+		DoubleMatrix result = reg.predict(inputReg);
+		System.out.println(result.toString().replace(";", "\n"));
 	}
 	
 }

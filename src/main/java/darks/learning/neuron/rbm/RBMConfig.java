@@ -42,17 +42,17 @@ public class RBMConfig extends NNConfig
 		public static final int SOFTMAX = 3;
 	}
 	
-	public int visibleSize;
+	int visibleSize;
 	
-	public int hiddenSize;
+	int hiddenSize;
 	
-	public int visibleType = LayoutType.BINARY;
+	int visibleType = LayoutType.BINARY;
 	
-	public int hiddenType = LayoutType.BINARY;
+	int hiddenType = LayoutType.BINARY;
 	
-	public boolean concatBias = false;
+	boolean concatBias = false;
 	
-	public int gibbsCount = 1;
+	int gibbsCount = 1;
 	
 	public RBMConfig()
 	{

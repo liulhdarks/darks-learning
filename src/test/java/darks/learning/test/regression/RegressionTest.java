@@ -58,7 +58,8 @@ public class RegressionTest
 		reg.config.setLearnRate(0.001)
 					.setMaxIteratorCount(100000)
 					.setRandomGradient(false)
-					.setNormalized(true);
+					.setNormalized(true)
+					.setUseAdaGrad(false);
 		reg.train(modelSet);
 		DoubleMatrix result = reg.predict(new DoubleMatrix(testX));
 		System.out.println(result.toString().replace(";", "\n"));
@@ -111,9 +112,10 @@ public class RegressionTest
 		ModelSet modelSet = ModelLoader.load(trainX, output);
 		Regression reg = new SoftmaxRegression();
 		reg.config.setLearnRate(0.001)
-					.setMaxIteratorCount(100000)
+					.setMaxIteratorCount(500000)
 					.setRandomGradient(false)
-					.setNormalized(true);
+					.setNormalized(true)
+					.setUseAdaGrad(false);
 		reg.train(modelSet);
 		DoubleMatrix result = reg.predict(new DoubleMatrix(testX));
 		System.out.println(result.toString().replace(";", "\n"));

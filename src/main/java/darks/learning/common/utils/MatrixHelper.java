@@ -23,6 +23,12 @@ import darks.learning.common.rand.RandomFunction;
 
 public class MatrixHelper
 {
+	public static DoubleMatrix max(double min, DoubleMatrix matrix)
+	{
+		for (int i = 0; i < matrix.length; i++)
+			matrix.put(i, Math.max(min, matrix.get(i)));
+		return matrix;
+	}
 
 	public static DoubleMatrix log(DoubleMatrix mt)
 	{
@@ -148,5 +154,17 @@ public class MatrixHelper
 			ret.put(i, variance);
 		}
 		return ret;
+	}
+
+	public static DoubleMatrix concatVector(DoubleMatrix target, DoubleMatrix vector)
+	{
+		DoubleMatrix result = new DoubleMatrix(target.rows, target.columns + vector.length);
+		for (int i = 0; i < target.rows; i++)
+		{
+			DoubleMatrix row = target.getRow(i);
+			row = DoubleMatrix.concatHorizontally(row, vector.transpose());
+			result.putRow(i, row);
+		}
+		return result;
 	}
 }

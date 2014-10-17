@@ -44,18 +44,22 @@ public class LogisticRegression extends Regression
 	@Override
 	public void train(DoubleMatrix input, DoubleMatrix output)
 	{
+		log.info("Training logistic regression.");
 		double startLearnRate = config.learnRate;
 		learnRate = startLearnRate;
 		initWeight(input, output);
 		int iterCount = config.maxIteratorCount;
 		for (int i = 1; i <= iterCount; i++)
 		{
-			learnRate = startLearnRate + (1 / (double)(i + 3));
+			if (!config.useAdaGrad)
+			{
+				learnRate = startLearnRate + (1 / (double)(i + 3));
+			}
 			iterator(input, output);
-			double likelihook = calcuateLossValue(input, output);
+			double costValue = calcuateLossValue(input, output);
 			if (log.isDebugEnabled() && i % 1000 == 0)
 			{
-				log.debug("Iterator:" + i + " cost:" + likelihook + " lr:" + learnRate);
+				log.debug("Iterator:" + i + " cost:" + costValue + " lr:" + (config.useAdaGrad ? "Adagrad" : learnRate));
 			}
 		}
 	}

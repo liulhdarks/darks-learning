@@ -16,7 +16,7 @@
  */
 package darks.learning;
 
-import darks.learning.common.rand.JavaRandomFunction;
+import darks.learning.common.rand.JdkRandomFunction;
 import darks.learning.common.rand.RandomFunction;
 import darks.learning.lossfunc.LossFunction;
 
@@ -30,7 +30,7 @@ public abstract class LearningConfig
 {
 
 	
-	public RandomFunction randomFunction = new JavaRandomFunction();
+	public RandomFunction randomFunction = new JdkRandomFunction();
 	
 	public boolean normalized = false;
 	

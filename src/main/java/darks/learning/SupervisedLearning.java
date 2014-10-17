@@ -35,4 +35,13 @@ public interface SupervisedLearning
 	 */
 	public void train(DoubleMatrix input, DoubleMatrix output);
 	
+	
+	
+	/**
+	 * Predict model result by input matrix
+	 * 
+	 * @param input Input matrix
+	 * @return Result label matrix
+	 */
+	public DoubleMatrix predict(DoubleMatrix input);
 }
