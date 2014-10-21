@@ -14,50 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package darks.learning.test.dbn;
+package darks.learning.test.da;
 
 import org.jblas.DoubleMatrix;
 import org.jblas.SimpleBlas;
 import org.junit.Test;
 
-import darks.learning.neuron.dbn.DBN;
-import darks.learning.neuron.rbm.RBMConfig.LayoutType;
+import darks.learning.neuron.sda.StackedDenosingAutoEncoder;
 
-public class DBNTest
+public class SdaTest
 {
 
 	@Test
 	public void testRBMWithRegression()
 	{
-//		double[][] trainX = {
-//				{0, 1, 1, 0, 0, 0},
-//				{0, 0, 1, 0, 0, 0},
-//				{0, 1, 0, 0, 0, 0},
-//				{1, 0, 1, 0, 0, 0},
-//				{1, 1, 0, 0, 0, 0},
-//				{1, 1, 1, 0, 0, 0},
-//				{0, 0, 0, 1, 1, 1},
-//				{0, 0, 0, 1, 1, 0},
-//				{0, 0, 0, 1, 0, 1},
-//				{0, 0, 0, 0, 1, 1},
-//				{0, 0, 0, 0, 1, 0},
-//				{0, 0, 0, 1, 0, 0}
-//			};
-//		
-//		double[][] labels = {
-//				{1, 0},
-//				{1, 0},
-//				{1, 0},
-//				{1, 0},
-//				{1, 0},
-//				{1, 0},
-//				{0, 1},
-//				{0, 1},
-//				{0, 1},
-//				{0, 1},
-//				{0, 1},
-//				{0, 1},
-//			}; 
 		
 		double[][] trainX = {
 				{0, 0.9, 0.8, 0, 0, 0, 0, 0, 0},
@@ -102,12 +72,11 @@ public class DBNTest
 			}; 
 		
 		
-		DBN dbn = new DBN();
-		dbn.config.setHiddenLayouts(new int[]{32, 64})
+		StackedDenosingAutoEncoder sda = new StackedDenosingAutoEncoder();
+		sda.config.setHiddenLayouts(new int[]{32, 64})
 					.setNormalized(true)
-					.setUseSample(false)
-					.setHiddenLayoutType(LayoutType.BINARY);
-		dbn.train(new DoubleMatrix(trainX), new DoubleMatrix(labels));
+					.setUseSample(false);
+		sda.train(new DoubleMatrix(trainX), new DoubleMatrix(labels));
 		
 		double[][] testX = {
 				{1, 1, 0, 0, 1, 0, 0, 0, 0},
@@ -120,7 +89,7 @@ public class DBNTest
 				{0, 0, 0, 0, 0, 0, 0, 1, 1},
 				{0, 0, 0, 0, 0, 0, 1, 1, 1},
 			};
-		DoubleMatrix result = dbn.predict(new DoubleMatrix(testX));
+		DoubleMatrix result = sda.predict(new DoubleMatrix(testX));
 		System.out.println(result.toString("%f", "[\n", "\n]", ", ", "\n"));
 		for (int i = 0; i < result.rows; i++)
 		{

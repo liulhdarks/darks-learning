@@ -16,13 +16,13 @@
  */
 package darks.learning.neuron.rbm;
 
-import static darks.learning.common.utils.MatrixHelper.sqrt;
-import static darks.learning.common.utils.MatrixHelper.max;
 import static darks.learning.common.utils.MatrixHelper.binomial;
 import static darks.learning.common.utils.MatrixHelper.columnVariance;
 import static darks.learning.common.utils.MatrixHelper.gaussion;
+import static darks.learning.common.utils.MatrixHelper.max;
 import static darks.learning.common.utils.MatrixHelper.sigmoid;
 import static darks.learning.common.utils.MatrixHelper.softmax;
+import static darks.learning.common.utils.MatrixHelper.sqrt;
 
 import org.jblas.DoubleMatrix;
 import org.slf4j.Logger;
@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import darks.learning.UnsupervisedLearning;
 import darks.learning.exceptions.LearningException;
 import darks.learning.neuron.AbstractNeuronNetwork;
+import darks.learning.neuron.PropPair;
 import darks.learning.neuron.ReConstructon;
 import darks.learning.neuron.gradient.GradientComputer;
 import darks.learning.neuron.rbm.RBMConfig.LayoutType;
@@ -133,6 +134,10 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning, 
 		return gradComputer;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public PropPair sampleHiddenByVisible(DoubleMatrix v)
 	{
 		DoubleMatrix h1Prob = propForward(v);
@@ -160,7 +165,11 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning, 
 		}
 		return new PropPair(h1Prob, h1Sample);
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public PropPair sampleVisibleByHidden(DoubleMatrix h)
 	{
 	    DoubleMatrix v2Prob = propBackward(h);
@@ -179,7 +188,11 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning, 
 		}
 		return new PropPair(v2Prob, v2Sample);
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public DoubleMatrix propForward(DoubleMatrix v)
 	{
 		if(config.visibleType == LayoutType.GAUSSION)
@@ -214,7 +227,11 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning, 
 			throw new LearningException("RBM's hidden type " + config.hiddenType + " is invalid.");
 		}
 	}
-    
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public DoubleMatrix propBackward(DoubleMatrix h)
     {
         DoubleMatrix preProb = h.mmul(weights.transpose());
@@ -246,40 +263,7 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning, 
         }
     }
 	
-	public static class PropPair
-	{
-		DoubleMatrix prob;
-		
-		DoubleMatrix sample;
-
-		public PropPair(DoubleMatrix prob, DoubleMatrix sample)
-		{
-			this.prob = prob;
-			this.sample = sample;
-		}
-
-		public DoubleMatrix getProb()
-		{
-			return prob;
-		}
-
-		public void setProb(DoubleMatrix prob)
-		{
-			this.prob = prob;
-		}
-
-		public DoubleMatrix getSample()
-		{
-			return sample;
-		}
-
-		public void setSample(DoubleMatrix sample)
-		{
-			this.sample = sample;
-		}
-		
-		
-	}
+	
 
 	/**
 	 * {@inheritDoc}

@@ -141,6 +141,11 @@ public class MatrixHelper
 		return ret;
 	}
 
+	public static int binomial(double p, RandomFunction rng)
+	{
+		return rng.randDouble() < p ? 1 : 0;
+	}
+
 	public static DoubleMatrix columnVariance(DoubleMatrix input)
 	{
 		DoubleMatrix columnMeans = input.columnMeans();

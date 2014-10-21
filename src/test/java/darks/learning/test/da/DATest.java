@@ -14,21 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package darks.learning.test.rbm;
+package darks.learning.test.da;
 
 import org.jblas.DoubleMatrix;
 import org.junit.Test;
 
 import darks.learning.lossfunc.LossFunction;
-import darks.learning.neuron.rbm.RBM;
-import darks.learning.neuron.rbm.RBMConfig.LayoutType;
+import darks.learning.neuron.da.DenoisingAutoEncoder;
 import darks.learning.optimize.LearningOptimizer.OptimizeType;
 
-public class RBMTest
+public class DATest
 {
 
 	@Test
-	public void testRBM()
+	public void testDA()
 	{
 		double[][] trainX = {
 				{0, 1, 1, 0, 0, 0},
@@ -45,16 +44,14 @@ public class RBMTest
 				{0, 0, 0, 1, 0, 0}
 			};
 		
-		RBM rbm = new RBM();
-		rbm.config.setHiddenSize(32)
+		DenoisingAutoEncoder da = new DenoisingAutoEncoder();
+		da.config.setHiddenSize(64)
 				.setMaxIterateCount(10000)
-				.setMomentum(0)
+				.setMomentum(0.1)
 				.setLossType(LossFunction.RECONSTRUCTION_CROSSENTROPY)
-				.setGibbsCount(1)
-				.setLayoutType(LayoutType.BINARY)
-				.setUseAdaGrad(true)
-				.setOptimizeType(OptimizeType.NONE);
-		rbm.train(new DoubleMatrix(trainX));
+				.setUseAdaGrad(false)
+				.setOptimizeType(OptimizeType.LINE_SEARCH);
+		da.train(new DoubleMatrix(trainX));
 		
 		double[][] testX = {
 				{0, 1, 1, 0, 0, 0},
@@ -62,7 +59,7 @@ public class RBMTest
 				{0, 0, 0, 0, 1, 1},
 				{0, 0, 0, 1, 0, 1}
 			};
-		DoubleMatrix ret = rbm.reconstruct(new DoubleMatrix(testX));
+		DoubleMatrix ret = da.reconstruct(new DoubleMatrix(testX));
 		System.out.println(ret.toString().replace(";", "\n"));
 	}
 	

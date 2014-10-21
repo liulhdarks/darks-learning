@@ -95,7 +95,27 @@ public abstract class AbstractNeuronNetwork implements ReConstructon
 	 * @return GradientComputer
 	 */
 	public abstract GradientComputer getGradient(DoubleMatrix input);
+	
+	public PropPair sampleHiddenByVisible(DoubleMatrix v)
+	{
+		return null;
+	}
 
+	public PropPair sampleVisibleByHidden(DoubleMatrix h)
+	{
+		return null;
+	}
+	
+	public DoubleMatrix propForward(DoubleMatrix v)
+	{
+		return null;
+	}
+	
+	public DoubleMatrix propBackward(DoubleMatrix h)
+    {
+		return null;
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
