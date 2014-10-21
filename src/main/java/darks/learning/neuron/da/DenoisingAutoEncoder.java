@@ -104,6 +104,9 @@ public class DenoisingAutoEncoder extends AbstractNeuronNetwork implements Unsup
 	public GradientComputer getGradient(DoubleMatrix input)
 	{
 		gradComputer.setBatchSize(input.rows);
+		gradComputer.setWeights(weights);
+		gradComputer.sethBias(hBias);
+		gradComputer.setvBias(vBias);
 
 		DoubleMatrix corruptX = getCorruptInput(input);
 		DoubleMatrix y = propForward(corruptX);

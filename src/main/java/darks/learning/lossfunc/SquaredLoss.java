@@ -43,7 +43,12 @@ public class SquaredLoss extends LossFunction
 	{
 		DoubleMatrix target = reConstructon.reconstruct(input);
 		DoubleMatrix diff = pow(target.sub(input), 2);
-		return diff.columnSums().sum() / input.rows;
+		double loss = diff.columnSums().sum() / input.rows;
+		if(config.useRegularization) 
+		{
+            loss += 0.5 * config.L2 * pow(weights, 2).sum();
+        }
+		return loss;
 	}
 	
 	

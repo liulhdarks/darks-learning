@@ -37,12 +37,17 @@ public class FreqCount<K>
 	
 	public void addValue(K key)
 	{
+		addValue(key, 1);
+	}
+	
+	public void addValue(K key, int value)
+	{
 		Long count = countMap.get(key);
 		if (count == null)
 		{
 			count = 0l;
 		}
-		countMap.put(key, ++count);
+		countMap.put(key, count + value);
 	}
 	
 	public Long getValue(K key)
@@ -59,5 +64,15 @@ public class FreqCount<K>
 	public Iterator<Entry<K, Long>> entrySetIterator()
 	{
 		return countMap.entrySet().iterator();
+	}
+	
+	public long totalCount()
+	{
+		long sum = 0;
+		for (Long v : countMap.values())
+		{
+			sum += v;
+		}
+		return sum;
 	}
 }

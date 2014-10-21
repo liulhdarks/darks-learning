@@ -66,7 +66,7 @@ public class SoftmaxRegression extends Regression
 	
 	private void initWeight(DoubleMatrix input, DoubleMatrix output)
 	{
-		weight = DoubleMatrix.rand(input.columns, output.columns);
+		weights = DoubleMatrix.rand(input.columns, output.columns);
 		bias = DoubleMatrix.zeros(1, output.columns);
 	}
 	
@@ -95,10 +95,12 @@ public class SoftmaxRegression extends Regression
 	
 	private double calcuateLossValue(DoubleMatrix input, DoubleMatrix output)
 	{
-		DoubleMatrix f = config.activateFunction.activate(input.mmul(weight));
+		DoubleMatrix f = config.activateFunction.activate(input.mmul(weights));
 		config.lossFunction.setActiveValue(f);
 		config.lossFunction.setInput(input);
 		config.lossFunction.setOutput(output);
+		config.lossFunction.setWeights(weights);
+		config.lossFunction.sethBias(bias);
 		return -config.lossFunction.getLossValue();
 	}
 
@@ -108,7 +110,7 @@ public class SoftmaxRegression extends Regression
 	@Override
 	public DoubleMatrix predict(DoubleMatrix input)
 	{
-		return config.activateFunction.activate(input.mmul(weight));
+		return config.activateFunction.activate(input.mmul(weights));
 	}
 
 }

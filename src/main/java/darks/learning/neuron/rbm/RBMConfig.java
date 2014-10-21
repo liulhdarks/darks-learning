@@ -156,6 +156,12 @@ public class RBMConfig extends NNConfig
 		this.optimizeType = optimizeType;
 		return this;
 	}
+
+	public RBMConfig setUseRegularization(boolean useRegularization)
+	{
+		this.useRegularization = useRegularization;
+		return this;
+	}
 	
 	
 }

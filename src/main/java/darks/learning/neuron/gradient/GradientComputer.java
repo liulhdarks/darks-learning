@@ -47,6 +47,12 @@ public abstract class GradientComputer
 	
 	DoubleMatrix hGradient;
 	
+	DoubleMatrix weights;
+	
+	DoubleMatrix vBias;
+	
+	DoubleMatrix hBias;
+	
 	NNConfig config;
 	
 	AdaptiveLRGradient wAdaGrad;
@@ -190,6 +196,35 @@ public abstract class GradientComputer
 	{
 		this.hGradient = hGradient;
 	}
-	
+
+	public DoubleMatrix getWeights()
+	{
+		return weights;
+	}
+
+	public void setWeights(DoubleMatrix weights)
+	{
+		this.weights = weights;
+	}
+
+	public DoubleMatrix getvBias()
+	{
+		return vBias;
+	}
+
+	public void setvBias(DoubleMatrix vBias)
+	{
+		this.vBias = vBias;
+	}
+
+	public DoubleMatrix gethBias()
+	{
+		return hBias;
+	}
+
+	public void sethBias(DoubleMatrix hBias)
+	{
+		this.hBias = hBias;
+	}
 	
 }

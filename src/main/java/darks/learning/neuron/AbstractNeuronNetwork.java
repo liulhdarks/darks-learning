@@ -68,10 +68,15 @@ public abstract class AbstractNeuronNetwork implements ReConstructon
 	
 	public double getLossValue()
 	{
+		cfg.lossFunction.setWeights(weights);
+		cfg.lossFunction.sethBias(hBias);
+		cfg.lossFunction.setvBias(vBias);
 		cfg.lossFunction.setInput(vInput);
 		cfg.lossFunction.setReConstructon(this);
 		double val = cfg.lossFunction.getLossValue();
-		if (cfg.lossType == LossFunction.MSE || cfg.lossType == LossFunction.SQUARED_LOSS)
+		if (cfg.lossType == LossFunction.MSE
+				|| cfg.lossType == LossFunction.SQUARED_LOSS
+				|| cfg.lossType == LossFunction.RMSE)
 		{
 			return -val;
 		}

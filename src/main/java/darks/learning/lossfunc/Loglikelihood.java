@@ -18,6 +18,7 @@ package darks.learning.lossfunc;
 
 import static darks.learning.common.utils.MatrixHelper.log;
 import static darks.learning.common.utils.MatrixHelper.oneMinus;
+import static darks.learning.common.utils.MatrixHelper.pow;
 
 import org.jblas.DoubleMatrix;
 
@@ -42,14 +43,19 @@ public class Loglikelihood extends LossFunction
 	{
 		DoubleMatrix x = activeValue == null ? reConstructon.reconstruct(input) : activeValue;
 		DoubleMatrix y = output == null ? input : output;
-		double likelihood = y.mul(log(x)).add(
+		double likelihood = -y.mul(log(x)).add(
                 oneMinus(y).mul(log(oneMinus(x))))
                 .columnSums().mean();
+		if (config.useRegularization)
+		{
+			double regular = (2 / config.L2) * pow(weights, 2).sum();
+			likelihood += regular;
+		}
 		if (config.normalized)
 		{
 			likelihood /= input.rows;
 		}
-		return likelihood;
+		return -likelihood;
 	}
 	
 	

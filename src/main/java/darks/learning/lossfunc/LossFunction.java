@@ -47,6 +47,11 @@ public abstract class LossFunction
 	 * Minimum squared error loss function
 	 */
 	public static final int MSE = 4;
+
+	/**
+	 * root-means squared error loss function
+	 */
+	public static final int RMSE = 5;
 	
 	protected DoubleMatrix hBias;
 	
@@ -86,6 +91,8 @@ public abstract class LossFunction
 			return new Loglikelihood(config);
 		case RECONSTRUCTION_CROSSENTROPY:
 			return new ReConstructCrossEntropy(config);
+		case RMSE:
+			return new RMSELoss(config);
 		}
 		return null;
 	}

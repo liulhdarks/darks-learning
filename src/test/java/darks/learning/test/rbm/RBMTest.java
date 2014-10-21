@@ -49,7 +49,7 @@ public class RBMTest
 		rbm.config.setHiddenSize(32)
 				.setMaxIterateCount(10000)
 				.setMomentum(0)
-				.setLossType(LossFunction.RECONSTRUCTION_CROSSENTROPY)
+				.setLossType(LossFunction.RMSE)
 				.setGibbsCount(1)
 				.setLayoutType(LayoutType.BINARY)
 				.setUseAdaGrad(true)

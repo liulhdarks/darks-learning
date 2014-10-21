@@ -411,7 +411,7 @@ public class Word2Vec
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		finally
 		{
@@ -456,7 +456,7 @@ public class Word2Vec
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		finally
 		{

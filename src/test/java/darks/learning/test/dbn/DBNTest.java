@@ -20,6 +20,7 @@ import org.jblas.DoubleMatrix;
 import org.jblas.SimpleBlas;
 import org.junit.Test;
 
+import darks.learning.eval.Evaluation;
 import darks.learning.neuron.dbn.DBN;
 import darks.learning.neuron.rbm.RBMConfig.LayoutType;
 
@@ -120,12 +121,28 @@ public class DBNTest
 				{0, 0, 0, 0, 0, 0, 0, 1, 1},
 				{0, 0, 0, 0, 0, 0, 1, 1, 1},
 			};
+		
+
+		double[][] testLabels = {
+				{1, 0, 0},
+				{1, 0, 0},
+				{1, 0, 0},
+				{0, 1, 0},
+				{0, 1, 0},
+				{0, 1, 0},
+				{0, 0, 1},
+				{0, 0, 1},
+				{0, 0, 1}
+			};
 		DoubleMatrix result = dbn.predict(new DoubleMatrix(testX));
 		System.out.println(result.toString("%f", "[\n", "\n]", ", ", "\n"));
 		for (int i = 0; i < result.rows; i++)
 		{
 			System.out.println(SimpleBlas.iamax(result.getRow(i)));
 		}
+		Evaluation eval = new Evaluation();
+		eval.eval(result, new DoubleMatrix(testLabels));
+		System.out.println(eval.f1());
 	}
 	
 }

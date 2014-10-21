@@ -116,6 +116,9 @@ public class RBM extends AbstractNeuronNetwork implements UnsupervisedLearning, 
 	public GradientComputer getGradient(DoubleMatrix input)
 	{
 		gradComputer.setBatchSize(input.rows);
+		gradComputer.setWeights(weights);
+		gradComputer.sethBias(hBias);
+		gradComputer.setvBias(vBias);
 		PropPair hProp1 = sampleHiddenByVisible(input);
 		PropPair hPropn = hProp1;
 		PropPair vPropn = null;

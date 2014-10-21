@@ -43,10 +43,12 @@ public class NNGradientComputer extends GradientComputer
 		wOriginGradient = wGrad.dup();
 		vOriginGradient = vBiasGrad.dup();
 		hOriginGradient = hBiasGrad.dup();
+		DoubleMatrix wAdaGradLR = null;
 		if (config.useAdaGrad)
 		{
 			buildAdaGrad(wGrad, vBiasGrad, hBiasGrad);
-			wGrad.muli(wAdaGrad.getLearnRates(wGrad));
+			wAdaGradLR = wAdaGrad.getLearnRates(wGrad);
+			wGrad.muli(wAdaGradLR);
 			hBiasGrad = hBiasGrad.mul(hBiasAdaGrad.getLearnRates(hBiasGrad));
 			vBiasGrad = vBiasGrad.mul(vBiasAdaGrad.getLearnRates(vBiasGrad));
 		}
@@ -76,6 +78,18 @@ public class NNGradientComputer extends GradientComputer
         	wGrad.divi(batchSize);
         	hBiasGrad.divi(batchSize);
         	vBiasGrad.divi(batchSize);
+        }
+        
+        if (config.useRegularization && config.L2 > 0)
+        {
+        	if (config.useAdaGrad)
+        	{
+        		wGrad.subi(weights.mul(config.L2).mul(wAdaGradLR));
+        	}
+        	else
+        	{
+        		wGrad.subi(weights.mul(config.L2 * learnRate));
+        	}
         }
 
         wGradient = wGrad;

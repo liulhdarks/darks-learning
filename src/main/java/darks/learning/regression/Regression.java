@@ -32,7 +32,7 @@ public abstract class Regression implements SupervisedLearning
 	
 	public RegressionConfig config = new RegressionConfig();
 	
-	DoubleMatrix weight = null;
+	DoubleMatrix weights = null;
 	
 	DoubleMatrix bias = null;
 	
@@ -52,7 +52,7 @@ public abstract class Regression implements SupervisedLearning
 	
 	protected void gradientDescent(DoubleMatrix input, DoubleMatrix output)
 	{
-		DoubleMatrix f = config.activateFunction.activate(input.mmul(weight).addRowVector(bias));
+		DoubleMatrix f = config.activateFunction.activate(input.mmul(weights).addRowVector(bias));
 		DoubleMatrix error = output.sub(f);
 		DoubleMatrix theta = null;
 		if (config.useAdaGrad)
@@ -74,7 +74,7 @@ public abstract class Regression implements SupervisedLearning
 			delta.divi(input.rows);
 			theta.divi(input.rows);
 		}
-		weight.addi(delta);
+		weights.addi(delta);
 		bias.addi(theta);
 	}
 	

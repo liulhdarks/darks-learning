@@ -14,33 +14,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package darks.learning;
+package darks.learning.lossfunc;
 
-import darks.learning.common.rand.JdkRandomFunction;
-import darks.learning.common.rand.RandomFunction;
-import darks.learning.lossfunc.LossFunction;
+import static darks.learning.common.utils.MatrixHelper.pow;
+
+import org.apache.commons.math3.util.FastMath;
+import org.jblas.DoubleMatrix;
+
+import darks.learning.LearningConfig;
 
 /**
- * Learning algorithm basic configuration
+ * Loss function
  * 
  * @author Darks.Liu
  *
  */
-public abstract class LearningConfig
+public class RMSELoss extends LossFunction
 {
-
 	
-	public RandomFunction randomFunction = new JdkRandomFunction();
 	
-	public boolean normalized = false;
 	
-	public LossFunction lossFunction = null;
+	public RMSELoss(LearningConfig config)
+	{
+		super(config);
+	}
 	
-	public int lossType;
-	
-	public boolean useRegularization = true;
-	
-	public double L2 = 0.1;
+	@Override
+	public double getLossValue()
+	{
+		DoubleMatrix target = reConstructon.reconstruct(input);
+		DoubleMatrix diff = pow(target.sub(input), 2);
+		return FastMath.sqrt(diff.sum() / input.rows);
+	}
 	
 	
 }
+
