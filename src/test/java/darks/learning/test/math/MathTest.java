@@ -96,5 +96,6 @@ public class MathTest
 		System.out.println(wm.sub(im.columnMeans()));
 		System.out.println(im.rowSums());
 		System.out.println(im.columnSums());
+		System.out.println(Integer.parseInt(String.valueOf(Long.MAX_VALUE)));
 	}
 }

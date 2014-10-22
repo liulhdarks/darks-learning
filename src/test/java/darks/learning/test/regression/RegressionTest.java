@@ -19,11 +19,11 @@ package darks.learning.test.regression;
 import org.jblas.DoubleMatrix;
 import org.junit.Test;
 
+import darks.learning.classifier.regression.LogisticRegression;
+import darks.learning.classifier.regression.Regression;
+import darks.learning.classifier.regression.SoftmaxRegression;
 import darks.learning.model.ModelLoader;
 import darks.learning.model.ModelSet;
-import darks.learning.regression.LogisticRegression;
-import darks.learning.regression.Regression;
-import darks.learning.regression.SoftmaxRegression;
 
 public class RegressionTest
 {

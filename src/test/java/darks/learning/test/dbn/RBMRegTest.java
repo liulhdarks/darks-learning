@@ -19,12 +19,12 @@ package darks.learning.test.dbn;
 import org.jblas.DoubleMatrix;
 import org.junit.Test;
 
+import darks.learning.classifier.regression.Regression;
+import darks.learning.classifier.regression.SoftmaxRegression;
 import darks.learning.lossfunc.LossFunction;
 import darks.learning.neuron.rbm.RBM;
 import darks.learning.neuron.rbm.RBMConfig.LayoutType;
 import darks.learning.optimize.LearningOptimizer.OptimizeType;
-import darks.learning.regression.Regression;
-import darks.learning.regression.SoftmaxRegression;
 
 public class RBMRegTest
 {

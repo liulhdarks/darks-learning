@@ -41,6 +41,4 @@ public abstract class LearningConfig
 	public boolean useRegularization = true;
 	
 	public double L2 = 0.1;
-	
-	
 }

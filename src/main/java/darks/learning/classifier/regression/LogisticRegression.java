@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package darks.learning.regression;
+package darks.learning.classifier.regression;
 
 import org.jblas.DoubleMatrix;
 import org.slf4j.Logger;
@@ -28,14 +28,14 @@ import darks.learning.neuron.activate.Activations;
  * @author Darks.Liu
  *
  */
-public class SoftmaxRegression extends Regression
+public class LogisticRegression extends Regression
 {
 	
-	private static Logger log = LoggerFactory.getLogger(SoftmaxRegression.class);
+	private static Logger log = LoggerFactory.getLogger(LogisticRegression.class);
 	
-	public SoftmaxRegression()
+	public LogisticRegression()
 	{
-		config.setActivateFunction(Activations.softmax());
+		config.setActivateFunction(Activations.sigmoid());
 	}
 
 	/**
@@ -44,7 +44,7 @@ public class SoftmaxRegression extends Regression
 	@Override
 	public void train(DoubleMatrix input, DoubleMatrix output)
 	{
-		log.info("Training softmax regression.");
+		log.info("Training logistic regression.");
 		double startLearnRate = config.learnRate;
 		learnRate = startLearnRate;
 		initWeight(input, output);
@@ -66,8 +66,8 @@ public class SoftmaxRegression extends Regression
 	
 	private void initWeight(DoubleMatrix input, DoubleMatrix output)
 	{
-		weights = DoubleMatrix.rand(input.columns, output.columns);
-		bias = DoubleMatrix.zeros(1, output.columns);
+		weights = DoubleMatrix.ones(input.columns, 1);
+		bias = DoubleMatrix.ones(1, 1);
 	}
 	
 	private void iterator(DoubleMatrix input, DoubleMatrix output)

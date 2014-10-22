@@ -21,11 +21,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.learning.SupervisedLearning;
+import darks.learning.classifier.regression.LogisticRegression;
+import darks.learning.classifier.regression.Regression;
+import darks.learning.classifier.regression.SoftmaxRegression;
 import darks.learning.neuron.dbn.DBNConfig.FinetuneType;
 import darks.learning.neuron.rbm.RBM;
-import darks.learning.regression.LogisticRegression;
-import darks.learning.regression.Regression;
-import darks.learning.regression.SoftmaxRegression;
 
 /**
  * Deep belief network
