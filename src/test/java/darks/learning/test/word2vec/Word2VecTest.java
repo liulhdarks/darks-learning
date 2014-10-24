@@ -17,6 +17,8 @@
 package darks.learning.test.word2vec;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -33,42 +35,42 @@ public class Word2VecTest
 	public void testTrain()
 	{
 		CorpusLoader loader = new CorpusLoader();
-		loader.addFilter(new CorpusFilter()
-		{
-			@Override
-			public boolean filter(String s)
-			{
-				return s.length() <= 1;
-			}
-		});
+//		loader.addFilter(new CorpusFilter()
+//		{
+//			@Override
+//			public boolean filter(String s)
+//			{
+//				return s.length() <= 1;
+//			}
+//		});
 		loader.addStopwords(new File("corpus/dic/lex-stopword.lex"));
 		loader.addStopwords(new File("corpus/dic/lex-stopword1.lex"));
-		Corpus corpus = loader.loadFromFile(new File("corpus/corpus.txt"));
+		Corpus corpus = loader.loadFromFile(new File("corpus/corpus_ali.txt"));
 		
 		Word2Vec word2vec = new Word2Vec();
 		word2vec.config.setTrainType(Word2VecType.CBOW)
 						.setFeatureSize(100)
 						.setMinVocabCount(0)
-						.setNegative(5);
+						.setWindow(5)
+						.setNegative(0);
 		word2vec.train(corpus);
-		word2vec.saveModel(new File("test/test.model"));
+		word2vec.saveModel(new File("test/test_ali.model"));
 	}
 
 	@Test
 	public void testDistance()
 	{
 		Word2Vec vec = new Word2Vec();
-		vec.loadModel(new File("test/test.model"));
-        System.out.println(vec.getWordVector("国家队").toString());
-        System.out.println(vec.getWordVector("央视").toString());
-		System.out.println(vec.distance("计算机"));
-		System.out.println(vec.distance("学习"));
-		System.out.println(vec.distance("研究"));
-		System.out.println(vec.distance("服务器"));
-		System.out.println(vec.distance("毛泽东"));
-		System.out.println(vec.distance("飞机"));
-		System.out.println(vec.distance("国家"));
+		vec.loadModel(new File("test/test_ali.model"));
+		System.out.println(vec.distance("版本"));
+		System.out.println(vec.distance("分流"));
 		double sim = vec.distance("计算机", "电脑");
+		System.out.println(sim);
+		List<String> sources = new LinkedList<String>(); //我国 自行 研制 了 功能 强大 的 机群 操作系统 
+		List<String> targets = new LinkedList<String>();
+		sources.add("希望");sources.add("人性化");
+		targets.add("分流");targets.add("开关");
+		sim = vec.distance(sources, targets);
 		System.out.println(sim);
 	}
 	

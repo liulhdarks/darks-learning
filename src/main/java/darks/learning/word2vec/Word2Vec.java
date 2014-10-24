@@ -319,6 +319,26 @@ public class Word2Vec
 		}
 		return node1.feature.dot(node2.feature);
 	}
+	
+	/**
+	 * Calculate similar between two words lists
+	 * 
+	 * @param sources Source words list
+	 * @param targets Target words list
+	 * @return Similar score
+	 */
+	public double distance(List<String> sources, List<String> targets)
+	{
+		DoubleMatrix srcMt = getCenterFeature(sources);
+		DoubleMatrix targetMt = getCenterFeature(targets);
+		if (srcMt == null || targetMt == null)
+		{
+			return 0.001;
+		}
+		double sim = srcMt.dot(targetMt);
+		sim = sim / (srcMt.norm2() * targetMt.norm2());
+		return sim;
+	}
 
 	/**
 	 * Calculate specify word's nearest or relate words
@@ -364,6 +384,27 @@ public class Word2Vec
 			}
 		}
 		return result;
+	}
+	
+	private DoubleMatrix getCenterFeature(List<String> words)
+	{
+		DoubleMatrix center = null;
+		for (String word : words)
+		{
+			WordNode node = wordNodes.get(word);
+			if (node != null)
+			{
+				if (center == null)
+				{
+					center = node.feature;
+				}
+				else
+				{
+					center.addi(node.feature);
+				}
+			}
+		}
+		return center;
 	}
 	
 	/**
