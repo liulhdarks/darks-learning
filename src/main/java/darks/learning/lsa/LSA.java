@@ -16,6 +16,8 @@
  */
 package darks.learning.lsa;
 
+import static darks.learning.common.utils.MatrixHelper.svd;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
@@ -34,6 +36,8 @@ import org.jblas.SimpleBlas;
 import org.jblas.Singular;
 import org.jblas.Solve;
 
+import darks.learning.common.utils.MatrixHelper;
+
 public class LSA
 {
 	
@@ -49,55 +53,59 @@ public class LSA
 	{
 		LSA lsa = new LSA();
 		lsa.loadCorpus();
-		DoubleMatrix A = lsa.calculateTFIDF();
-		String[] sentence = "你好 今天 怎么 突然 常用 入口 点 进去 呢 想 流量 订单 都 看不到 着急".split(" ");
-		DoubleMatrix vector = lsa.calTFIDF(sentence);
-		System.out.println(vector);
-		
-		A = A.getRange(0, 500, 0, 500);
-		vector = vector.getRange(0, 500, 0, 1);
-		DoubleMatrix[] USV = Singular.fullSVD(A);
-//		double[][] arg = new double[][]
-//		{
-//				{0.1, 0.2, 0, 0.4, 0.5},
-//				{0.2, 0.1, 0.3, 0.1, 0.1},
-//				{0, 0.3, 0.1, 0.2, 0.1},
-//				{0.1, 0.4, 0.3, 0.2, 0},
-//		};
-		int k = 300;
-		DoubleMatrix U = USV[0];
-		DoubleMatrix S = USV[1];
-		DoubleMatrix V = USV[2];
-		U = U.getRange(0, U.rows, 0, k);
-		S = S.getRange(0, k, 0, 1);
-		V = V.getRange(0, k, 0, V.columns);
-		DoubleMatrix Ak = U.mulRowVector(S).mmul(V);
-		System.out.println(Ak.rows + " " + Ak.columns);
+        DoubleMatrix A = lsa.calculateTFIDF();
+//      String[] sentence = "无法 打开 出售 中 宝贝 详情 页面".split(" ");
+//      DoubleMatrix vector = lsa.calTFIDF(sentence);
+//        System.out.println(vector.mean());
+//      System.out.println(vector);
+        
+//        A = A.getRange(0, 400, 0, 500);
+        DoubleMatrix[] USV = svd(A);
+        int k = 300;
+        DoubleMatrix U = USV[0];
+        DoubleMatrix S = USV[1];
+        DoubleMatrix V = USV[2];
+        U = U.getRange(0, U.rows, 0, k);
+        S = S.getRange(0, k, 0, k);
+        V = V.getRange(0, k, 0, V.columns);
 
-		DoubleMatrix vu = vector.transpose().mmul(U);
-		System.out.println(S.rows + " " + S.columns);
-		DoubleMatrix S1 = Solve.pinv(S);
-		System.out.println(vu.rows + " " + vu.columns);
-		System.out.println(S1.rows + " " + S1.columns);
-		vector = vu.mmul(Solve.pinv(S));
+        DoubleMatrix Sinv = Solve.pinv(S);
+        DoubleMatrix An = A.transpose().mmul(U).mmul(Sinv); //n*k
+        DoubleMatrix anorm = MatrixHelper.sqrt(An.mul(An).rowSums());
 		
-		DoubleMatrix div = vector.transpose().mmul(Ak);
-		
-		DoubleMatrix sum = Ak.muli(Ak).columnSums();
-		DoubleMatrix mt = MatrixFunctions.sqrt(sum);
-		double sqrt = vector.norm2();
-		mt.muli(sqrt);
-		mt = div.div(mt);
-		System.out.println(mt);
-		int index = SimpleBlas.iamax(mt);
-		System.out.println(lsa.lineIndex.get(index));
+		lsa.similar("无法 打开 出售 中 宝贝 详情 页面", An, anorm, U, Sinv);
+        lsa.similar("刷新 订单 数量 还是 显示 错乱 旺旺 聊天 查看 买家 信誉 不了 以前 老 版本 没有 这种 问题", An, anorm, U, Sinv);
+        lsa.similar("怎么 你们 千牛 软件 电脑 版 弹不出 聊天 窗口", An, anorm, U, Sinv);
+        lsa.similar("为什么 手机 登陆 旺旺 聊天记录 其它 客服 接待 现实 号", An, anorm, U, Sinv);
+        lsa.similar("电脑 登陆 时候 说 数据 不能 保存 系统盘 只有 一个盘 没有 分区", An, anorm, U, Sinv);
+        lsa.similar("收不到 系统 提示信息 还有 设置 信息 声音 提示 怎么 会 没有", An, anorm, U, Sinv);
+        lsa.similar("千 牛 电脑 端 怎么 登陆 打开 聊天 窗口 一直 响应 黑 然后 怎么回事", An, anorm, U, Sinv);
+        lsa.similar("千 牛 电脑 端 怎么 登陆 打开 聊天 窗口 一直 响应 黑 然后 怎么回事 求 回应 已经 反馈 几次 现在 不了 点 开 就是", An, anorm, U, Sinv);
 	}
+    
+    public void similar(String senetence, DoubleMatrix An, DoubleMatrix anorm, DoubleMatrix U, DoubleMatrix Sinv)
+    {
+        String[] sentence = senetence.split(" ");
+        DoubleMatrix vector = calTFIDF(sentence);
+//        vector = vector.getRange(0, 400, 0, 1);
+        DoubleMatrix q = vector.transpose().mmul(U).mmul(Sinv);  //1*k
+        DoubleMatrix dotVector = q.mmul(An.transpose());
+        double vnorm = vector.norm2();
+        
+        DoubleMatrix cosMt = dotVector.div(anorm.mul(vnorm));
+//        System.out.println(cosMt);
+        int index = SimpleBlas.iamax(cosMt);
+        System.out.println("=========================================================");
+        System.out.println("source:" + senetence);
+        System.out.println("index:" + index);
+        System.out.println("target:" + lineIndex.get(index));
+    }
 	
 	public void loadCorpus()
 	{
 		try
 		{
-			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("data/corpus_ali.txt"), "UTF-8"));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("corpus/corpus_ali_train.txt"), "UTF-8"));
 			String line = null;
 			while ((line = reader.readLine()) != null)
 			{

@@ -18,6 +18,7 @@ package darks.learning.corpus;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import darks.learning.common.utils.FreqCount;
 import darks.learning.common.utils.IOUtils;
 import darks.learning.exceptions.CorpusException;
+import darks.learning.lsa.TfIdf;
 
 /**
  * Train corpus loader
@@ -44,28 +46,52 @@ public class CorpusLoader
 	
 	private List<CorpusFilter> corpusFilters = new LinkedList<CorpusFilter>();
 	
+	private int corpusType = Corpus.TYPE_WORD_FREQ;
+	
 	public CorpusLoader()
 	{
 		
 	}
-	
+    
+    public CorpusLoader(int corpusType)
+    {
+        this.corpusType = corpusType;
+    }
+    
+
+    public Corpus loadFromFile(File file)
+    {
+        if (!file.exists())
+        {
+            throw new CorpusException("Cannot find corpus " + file);
+        }
+
+        try
+        {
+            Corpus corpus = loadFromReader(new BufferedReader(new FileReader(file)));
+            corpus.setFile(file);
+            return corpus;
+        }
+        catch (FileNotFoundException e)
+        {
+            log.error(e.getMessage(), e);
+        }
+        return null;
+    }
+    
 	/**
 	 * Load corpus from file
 	 * @param file Corpus file
 	 * @return Corpus
 	 */
-	public Corpus loadFromFile(File file)
+	public Corpus loadFromReader(BufferedReader reader)
 	{
-		if (!file.exists())
-		{
-			throw new CorpusException("Cannot find corpus " + file);
-		}
-		BufferedReader reader = null;
 		try
 		{
-			long totalCount = 0;
+			long totalWordsCount = 0;
+			long totalLineCount = 0;
 			FreqCount<String> wordFreq = new FreqCount<String>();
-			reader = new BufferedReader(new FileReader(file));
+			TfIdf tfidf = new TfIdf();
 			String line = null;
 			while ((line = reader.readLine()) != null)
 			{
@@ -73,6 +99,7 @@ public class CorpusLoader
 				{
 					continue;
 				}
+				//line = line.trim();
 				StringTokenizer token = new StringTokenizer(line, " \t");
 				while (token.hasMoreTokens())
 				{
@@ -81,11 +108,20 @@ public class CorpusLoader
 					{
 						continue;
 					}
-					totalCount++;
-					wordFreq.addValue(word);
+					totalWordsCount++;
+					if (corpusType == Corpus.TYPE_WORD_FREQ || corpusType == Corpus.TYPE_TF_IDF_FREQ)
+					{
+	                    wordFreq.addValue(word);
+					}
+					if (corpusType == Corpus.TYPE_TF_IDF || corpusType == Corpus.TYPE_TF_IDF_FREQ)
+					{
+					    tfidf.addWord(line, word);
+					}
 				}
+				totalLineCount++;
 			}
-			return new Corpus(file, wordFreq, stopwordDictionary, totalCount);
+			long totalUniqueCount = corpusType == Corpus.TYPE_WORD_FREQ ? wordFreq.getUniqueCount() : tfidf.getUniqueWordsCount();
+			return new Corpus(wordFreq, tfidf, stopwordDictionary, totalWordsCount, totalLineCount, totalUniqueCount);
 		}
 		catch (Exception e)
 		{

@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import darks.learning.common.utils.FreqCount;
 import darks.learning.common.utils.IOUtils;
 import darks.learning.exceptions.CorpusException;
+import darks.learning.lsa.TfIdf;
 
 /**
  * Train corpus
@@ -36,6 +37,12 @@ import darks.learning.exceptions.CorpusException;
  */
 public class Corpus
 {
+    
+    public final static int TYPE_WORD_FREQ = 0;
+    
+    public final static int TYPE_TF_IDF = 1;
+    
+    public final static int TYPE_TF_IDF_FREQ = 3;
 
 	private static Logger log = LoggerFactory.getLogger(Corpus.class);
 	
@@ -49,6 +56,12 @@ public class Corpus
 	
 	private long totalVocabCount = 0;
 	
+	private long totalLineCount = 0;
+	
+	private long totalUniqueCount = 0;
+	
+	private TfIdf tfIDF;
+	
 	public Corpus()
 	{
 		
@@ -59,14 +72,17 @@ public class Corpus
 		this.file = file;
 		this.wordFreq = wordFreq;
 	}
-	
-	public Corpus(File file, FreqCount<String> wordFreq, StopwordDictionary stopwordDictionary, long totalVocabCount)
-	{
-		this.file = file;
-		this.wordFreq = wordFreq;
-		this.stopwordDictionary = stopwordDictionary;
-		this.totalVocabCount = totalVocabCount;
-	}
+    
+    public Corpus(FreqCount<String> wordFreq, TfIdf tfIDF, StopwordDictionary stopwordDictionary, 
+        long totalVocabCount, long totalLineCount, long totalUniqueCount)
+    {
+        this.wordFreq = wordFreq;
+        this.tfIDF = tfIDF;
+        this.stopwordDictionary = stopwordDictionary;
+        this.totalVocabCount = totalVocabCount;
+        this.totalLineCount = totalLineCount;
+        this.totalUniqueCount = totalUniqueCount;
+    }
 	
 	/**
 	 * Read one line from reader
@@ -153,8 +169,40 @@ public class Corpus
 	{
 		this.totalVocabCount = totalVocabCount;
 	}
+	
+	public TfIdf getTfIDF()
+    {
+        return tfIDF;
+    }
 
-	@Override
+    public void setTfIDF(TfIdf tfIDF)
+    {
+        this.tfIDF = tfIDF;
+    }
+
+    
+    
+    public long getTotalLineCount()
+    {
+        return totalLineCount;
+    }
+
+    public void setTotalLineCount(long totalLineCount)
+    {
+        this.totalLineCount = totalLineCount;
+    }
+
+    public long getTotalUniqueCount()
+    {
+        return totalUniqueCount;
+    }
+
+    public void setTotalUniqueCount(long totalUniqueCount)
+    {
+        this.totalUniqueCount = totalUniqueCount;
+    }
+
+    @Override
 	public String toString()
 	{
 		return "Corpus [file=" + file + ", totalVocabCount=" + totalVocabCount + "]";

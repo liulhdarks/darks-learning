@@ -17,6 +17,7 @@ import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.util.FastMath;
 import org.jblas.DoubleMatrix;
 import org.jblas.MatrixFunctions;
+import org.jblas.Singular;
 
 import darks.learning.common.distribution.Distributions;
 import darks.learning.common.rand.RandomFunction;
@@ -171,5 +172,23 @@ public class MatrixHelper
 			result.putRow(i, row);
 		}
 		return result;
+	}
+	
+	public static DoubleMatrix[] svd(DoubleMatrix src)
+	{
+	    DoubleMatrix[] usv = Singular.fullSVD(src);
+        DoubleMatrix S = usv[1];
+        usv[1] = convertDiagMatrix(S, src.rows, src.columns);
+        return usv;
+	}
+	
+	public static DoubleMatrix convertDiagMatrix(DoubleMatrix vector, int rows, int columns)
+	{
+	    DoubleMatrix mt = new DoubleMatrix(rows, columns);
+        for (int i = 0; i < vector.length; i++)
+        {
+            mt.put(i, i, vector.get(i));
+        }
+        return mt;
 	}
 }

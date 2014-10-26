@@ -4,6 +4,8 @@ import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.SingularValueDecomposition;
 import org.jblas.DoubleMatrix;
+import org.jblas.Singular;
+import org.jblas.Solve;
 import org.junit.Test;
 
 public class MathTest
@@ -19,21 +21,28 @@ public class MathTest
 			};
 		RealMatrix matrix = MatrixUtils.createRealMatrix(testData);
 		SingularValueDecomposition svd = new SingularValueDecomposition(matrix);
-		System.out.println(svd.getS());
-		System.out.println(svd.getV());
-		System.out.println(svd.getU());
+        System.out.println(svd.getU());
+        System.out.println(svd.getS());
+        System.out.println(svd.getV());
 		
-		double[][] data1 = { 
-				{ 1, 2, 3}, 
-				{ 4, 5, 6}, 
-				{ 7, 8, 9} 
-			};
-		double[] blas = { 
-				1, 2, 3
-			};
-		DoubleMatrix dmatrix = new DoubleMatrix(data1);
-		DoubleMatrix bmatrix = new DoubleMatrix(blas);
-		System.out.println(DoubleMatrix.concatHorizontally(dmatrix, bmatrix));
+		DoubleMatrix[] usv = Singular.fullSVD(new DoubleMatrix(testData));
+        System.out.println(usv[0]);
+        System.out.println(usv[1]);
+        System.out.println(usv[2]);
+
+        DoubleMatrix U = usv[0];
+        DoubleMatrix S = usv[1];
+        DoubleMatrix V = usv[2];
+        DoubleMatrix mt = new DoubleMatrix(3, 4);
+        for (int i = 0; i < S.length; i++)
+        {
+            mt.put(i, i, S.get(i));
+        }
+        System.out.println(mt.toString().replace(";", "\n"));
+        DoubleMatrix src = U.mmul(mt).mmul(V.transpose());
+        System.out.println(src.toString().replace(";", "\n"));
+        mt = Solve.pinv(mt);
+        System.out.println(mt.toString().replace(";", "\n"));
 	}
 
 	@Test

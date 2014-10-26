@@ -31,6 +31,8 @@ public class FreqCount<K>
 
 	private Map<K, Long> countMap = new HashMap<K, Long>();
 	
+	private long totalFreqCount = 0;
+	
 	public FreqCount()
 	{
 	}
@@ -47,6 +49,7 @@ public class FreqCount<K>
 		{
 			count = 0l;
 		}
+		totalFreqCount += value;
 		countMap.put(key, count + value);
 	}
 	
@@ -68,11 +71,11 @@ public class FreqCount<K>
 	
 	public long totalCount()
 	{
-		long sum = 0;
-		for (Long v : countMap.values())
-		{
-			sum += v;
-		}
-		return sum;
+		return totalFreqCount;
+	}
+	
+	public long getUniqueCount()
+	{
+	    return countMap.size();
 	}
 }
