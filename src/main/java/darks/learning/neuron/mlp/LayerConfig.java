@@ -19,11 +19,15 @@ package darks.learning.neuron.mlp;
 import darks.learning.LearningConfig;
 import darks.learning.common.rand.RandomFunction;
 import darks.learning.lossfunc.LossFunction;
+import darks.learning.neuron.activate.ActivateFunction;
+import darks.learning.neuron.activate.Activations;
 
 public class LayerConfig extends LearningConfig
 {
 	
-	public int layerSize;
+	int layerSize;
+	
+	ActivateFunction activateFunction = Activations.sigmoid();
 	
 	public LayerConfig()
 	{

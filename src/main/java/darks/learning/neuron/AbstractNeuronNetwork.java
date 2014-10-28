@@ -191,9 +191,12 @@ public abstract class AbstractNeuronNetwork implements ReConstructon
 	public Map<String, Object> backup()
 	{
 		Map<String, Object> result = new HashMap<String, Object>();
-		result.put("weights", weights.dup());
-		result.put("vbias", vBias.dup());
-		result.put("hbias", hBias.dup());
+		if (weights != null)
+		    result.put("weights", weights.dup());
+        if (vBias != null)
+            result.put("vbias", vBias.dup());
+        if (hBias != null)
+            result.put("hbias", hBias.dup());
 		if (gradComputer != null)
 		{
 			result.put("wgrad", gradComputer.getwGradient() == null ? null : gradComputer.getwGradient().dup());

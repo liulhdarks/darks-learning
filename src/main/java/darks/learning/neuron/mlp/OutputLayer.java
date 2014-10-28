@@ -29,6 +29,27 @@ import darks.learning.neuron.gradient.GradientComputer;
  */
 public class OutputLayer extends AbstractNeuronNetwork
 {
+    LayerConfig config = new LayerConfig();
+    
+
+    public OutputLayer()
+    {
+        
+    }
+    
+    public OutputLayer(MlpConfig parentConfig)
+    {
+        config.setLayerSize(parentConfig.outputLayerSize)
+            .setL2(parentConfig.L2)
+            .setLossType(parentConfig.lossType)
+            .setNormalized(parentConfig.normalized)
+            .setRandomFunction(parentConfig.randomFunction)
+            .setUseRegularization(parentConfig.useRegularization);
+        int lastSize = parentConfig.hiddenLayouts[parentConfig.hiddenLayouts.length - 1];
+        weights = new DoubleMatrix(lastSize, config.layerSize);
+        hBias = DoubleMatrix.rand(config.layerSize);
+    }
+
 
 	@Override
 	public GradientComputer getGradient(DoubleMatrix input)
@@ -40,8 +61,13 @@ public class OutputLayer extends AbstractNeuronNetwork
 	@Override
 	public DoubleMatrix propForward(DoubleMatrix v)
 	{
-		// TODO Auto-generated method stub
-		return super.propForward(v);
+	    if (v.isColumnVector())
+        {
+            v = v.transpose();
+        }
+        DoubleMatrix preProb = v.mmul(weights);
+        preProb.addiRowVector(hBias);
+        return config.activateFunction.activate(preProb);
 	}
 
 	@Override

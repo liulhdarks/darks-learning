@@ -47,7 +47,7 @@ public class HiddenLayer extends AbstractNeuronNetwork
 		 	.setUseRegularization(parentConfig.useRegularization);
 		int lastSize = layerIndex == 0 ? parentConfig.inputLayerSize : parentConfig.hiddenLayouts[layerIndex - 1];
 		weights = new DoubleMatrix(lastSize, config.layerSize);
-//		hBias = DoubleMatrix.rand(rows, columns)
+		hBias = DoubleMatrix.rand(config.layerSize);
 	}
 
 	@Override
@@ -60,8 +60,13 @@ public class HiddenLayer extends AbstractNeuronNetwork
 	@Override
 	public DoubleMatrix propForward(DoubleMatrix v)
 	{
-//		v.mmul(v)
-		return super.propForward(v);
+	    if (v.isColumnVector())
+        {
+            v = v.transpose();
+        }
+        DoubleMatrix preProb = v.mmul(weights);
+        preProb.addiRowVector(hBias);
+		return config.activateFunction.activate(preProb);
 	}
 
 	@Override
