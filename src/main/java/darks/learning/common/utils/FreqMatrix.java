@@ -16,12 +16,18 @@
  */
 package darks.learning.common.utils;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class FreqMatrix<T>
+public class FreqMatrix<T> implements Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6799400725373584837L;
+	
 	private Map<T, FreqCount<T>> countMap = new HashMap<T, FreqCount<T>>();
 	
 	public void add(T real, T guess)

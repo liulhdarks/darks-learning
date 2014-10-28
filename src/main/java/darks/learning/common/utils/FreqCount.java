@@ -16,6 +16,7 @@
  */
 package darks.learning.common.utils;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -26,8 +27,13 @@ import java.util.Map.Entry;
  * @author Darks.Liu
  *
  */
-public class FreqCount<K>
+public class FreqCount<K> implements Serializable
 {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6980004114842595199L;
 
 	private Map<K, Long> countMap = new HashMap<K, Long>();
 	

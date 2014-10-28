@@ -25,10 +25,10 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import darks.learning.common.basic.TfIdf;
 import darks.learning.common.utils.FreqCount;
 import darks.learning.common.utils.IOUtils;
 import darks.learning.exceptions.CorpusException;
-import darks.learning.lsa.TfIdf;
 
 /**
  * Train corpus

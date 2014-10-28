@@ -18,8 +18,10 @@ package darks.learning.corpus;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -27,10 +29,10 @@ import java.util.StringTokenizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import darks.learning.common.basic.TfIdf;
 import darks.learning.common.utils.FreqCount;
 import darks.learning.common.utils.IOUtils;
 import darks.learning.exceptions.CorpusException;
-import darks.learning.lsa.TfIdf;
 
 /**
  * Train corpus loader
@@ -79,6 +81,38 @@ public class CorpusLoader
         return null;
     }
     
+
+    public Corpus loadFromFile(File file, String charName)
+    {
+    	if (!file.exists())
+        {
+            throw new CorpusException("Cannot find corpus " + file);
+        }
+
+        try
+        {
+        	Corpus corpus = null;
+        	if (charName != null)
+        	{
+        		corpus = loadFromReader(new BufferedReader(new InputStreamReader(new FileInputStream(file), charName)));
+        	}
+        	else
+        	{
+                corpus = loadFromReader(new BufferedReader(new FileReader(file)));
+        	}
+        	if (corpus != null)
+        	{
+        		corpus.setFile(file);
+        	}
+            return corpus;
+        }
+        catch (Exception e)
+        {
+            log.error(e.getMessage(), e);
+        }
+        return null;
+    }
+    
 	/**
 	 * Load corpus from file
 	 * @param file Corpus file
@@ -99,7 +133,7 @@ public class CorpusLoader
 				{
 					continue;
 				}
-				//line = line.trim();
+				line = line.trim();
 				StringTokenizer token = new StringTokenizer(line, " \t");
 				while (token.hasMoreTokens())
 				{

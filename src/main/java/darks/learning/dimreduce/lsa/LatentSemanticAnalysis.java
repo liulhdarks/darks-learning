@@ -1,7 +1,14 @@
-package darks.learning.lsa;
+package darks.learning.dimreduce.lsa;
 
 import static darks.learning.common.utils.MatrixHelper.svd;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -13,7 +20,9 @@ import org.jblas.Solve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import darks.learning.common.basic.TfIdf;
 import darks.learning.common.utils.FreqCount;
+import darks.learning.common.utils.IOUtils;
 import darks.learning.common.utils.MatrixHelper;
 import darks.learning.corpus.Corpus;
 import darks.learning.exceptions.TrainingException;
@@ -22,8 +31,6 @@ public class LatentSemanticAnalysis
 {
     
     private static Logger log = LoggerFactory.getLogger(LatentSemanticAnalysis.class);
-    
-    private Corpus corpus;
     
     private Map<Integer, String> sentenceColumnIndexs = new HashMap<Integer, String>();
     
@@ -43,7 +50,6 @@ public class LatentSemanticAnalysis
     
     public void train(Corpus corpus)
     {
-        this.corpus = corpus;
         tfidf = corpus.getTfIDF();
         if (tfidf == null)
         {
@@ -54,7 +60,7 @@ public class LatentSemanticAnalysis
         DoubleMatrix trainMatrix = initTrainData();
         log.info("Training LSA...");
 
-        trainMatrix = trainMatrix.getRange(0, 400, 0, 500);
+//        trainMatrix = trainMatrix.getRange(0, 400, 0, 500);
         DoubleMatrix[] USV = svd(trainMatrix);
         
         DoubleMatrix U = USV[0];
@@ -81,7 +87,7 @@ public class LatentSemanticAnalysis
     public int predictIndex(String[] words)
     {
         DoubleMatrix vector = getSentenceVector(words);
-        vector = vector.getRange(0, 400, 0, 1);
+//        vector = vector.getRange(0, 400, 0, 1);
         DoubleMatrix vectorMapping = vector.transpose().mmul(Uk).mmul(inverseS);  //1*k
         DoubleMatrix dotVector = vectorMapping.mmul(preMatrix.transpose());
         double norm = vector.norm2();
@@ -89,11 +95,59 @@ public class LatentSemanticAnalysis
         return SimpleBlas.iamax(cosMt);
     }
     
+    public void saveModel(File file)
+    {
+    	LsaModel model = new LsaModel(sentenceColumnIndexs, wordsRowIndexs, K, 
+    				preMatrix, preNorm, inverseS, Uk, tfidf);
+    	ObjectOutputStream oos = null;
+    	try
+		{
+        	oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
+        	oos.writeObject(model);
+        	oos.flush();
+		}
+		catch (Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
+    	finally
+    	{
+    		IOUtils.closeStream(oos);
+    	}
+    	
+    }
+    
+    public void loadModel(File file)
+    {
+    	ObjectInputStream ois = null;
+    	try
+		{
+    		ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)));
+    		LsaModel model = (LsaModel) ois.readObject();
+    		sentenceColumnIndexs = model.getSentenceColumnIndexs();
+    		wordsRowIndexs = model.getWordsRowIndexs();
+    		K = model.getK();
+    		preMatrix = model.getPreMatrix();
+    		preNorm = model.getPreNorm();
+    		inverseS = model.getInverseS();
+    		Uk = model.getUk();
+    		tfidf = model.getTfidf();
+		}
+		catch (Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
+    	finally
+    	{
+    		IOUtils.closeStream(ois);
+    	}
+    }
+    
     private DoubleMatrix initTrainData()
     {
         int corpusCount = (int)tfidf.getTotalSentenceCount();
-        int wordsCount = (int)corpus.getTotalUniqueCount();
-        log.debug("Initialize LSA training data " + wordsCount + " * " + corpusCount);
+        int wordsCount = (int)tfidf.getUniqueWordsCount();
+        log.debug("Initialize LSA training data " + corpusCount + " * " + wordsCount);
         DoubleMatrix result = new DoubleMatrix(wordsCount, corpusCount);
         int columnIndex = 0;
         int rowIndex = 0;
@@ -123,7 +177,7 @@ public class LatentSemanticAnalysis
     
     private DoubleMatrix getSentenceVector(String[] sentence)
     {
-        int wordsCount = (int)corpus.getTotalUniqueCount();
+        int wordsCount = (int)tfidf.getUniqueWordsCount();
         DoubleMatrix result = new DoubleMatrix(wordsCount);
         FreqCount<String> freq = new FreqCount<String>();
         for (String s : sentence)
@@ -145,4 +199,16 @@ public class LatentSemanticAnalysis
         }
         return result;
     }
+
+	public Map<Integer, String> getSentenceColumnIndexs()
+	{
+		return sentenceColumnIndexs;
+	}
+
+	public Map<String, Integer> getWordsRowIndexs()
+	{
+		return wordsRowIndexs;
+	}
+    
+    
 }

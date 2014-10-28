@@ -1,17 +1,21 @@
-package darks.learning.lsa;
+package darks.learning.common.basic;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import darks.learning.common.utils.FreqCount;
 
-public class TfIdf
+public class TfIdf implements Serializable
 {
     
-    private Map<String, Set<String>> wordsMap = new HashMap<String, Set<String>>();
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8695575116939851071L;
+
+	private Map<String, Integer> wordsMap = new HashMap<String, Integer>();
     
     private int totalWordsCount;
     
@@ -19,13 +23,12 @@ public class TfIdf
     
     public void addWord(String sentence, String word)
     {
-        Set<String> wordSet = wordsMap.get(word);
-        if (wordSet == null)
+    	Integer wordRefCount = wordsMap.get(word);
+        if (wordRefCount == null)
         {
-            wordSet = new HashSet<String>();
-            wordsMap.put(word, wordSet);
+        	wordRefCount = 0;
         }
-        wordSet.add(sentence);
+        wordsMap.put(word, ++wordRefCount);
         totalWordsCount++;
         FreqCount<String> freq = sentenceMap.get(sentence);
         if (freq == null)
@@ -79,8 +82,8 @@ public class TfIdf
     public double getIDF(String word)
     {
         int totalCorpus = sentenceMap.size();
-        Set<String> wordSet = wordsMap.get(word);
-        int wordInDocCount = wordSet == null ? 0 : wordSet.size();
+        Integer wordRefCount = wordsMap.get(word);
+        int wordInDocCount = wordRefCount == null ? 0 : wordRefCount;
         return Math.log((double) totalCorpus / (double)(wordInDocCount + 1));
     }
 
@@ -92,12 +95,6 @@ public class TfIdf
     public int getTotalSentenceCount()
     {
         return sentenceMap.size();
-    }
-
-
-    public Map<String, Set<String>> getWordsMap()
-    {
-        return wordsMap;
     }
 
     public Map<String, FreqCount<String>> getSentenceMap()

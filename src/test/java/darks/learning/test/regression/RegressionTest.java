@@ -24,6 +24,8 @@ import darks.learning.classifier.regression.Regression;
 import darks.learning.classifier.regression.SoftmaxRegression;
 import darks.learning.model.ModelLoader;
 import darks.learning.model.ModelSet;
+import darks.learning.neuron.activate.ActivateFunction;
+import darks.learning.neuron.activate.Activations;
 
 public class RegressionTest
 {
@@ -115,7 +117,8 @@ public class RegressionTest
 					.setMaxIteratorCount(500000)
 					.setRandomGradient(false)
 					.setNormalized(true)
-					.setUseAdaGrad(false);
+					.setUseAdaGrad(true)
+					.setActivateFunction(Activations.sigmoid());
 		reg.train(modelSet);
 		DoubleMatrix result = reg.predict(new DoubleMatrix(testX));
 		System.out.println(result.toString().replace(";", "\n"));
