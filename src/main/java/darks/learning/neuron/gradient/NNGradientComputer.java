@@ -41,22 +41,28 @@ public class NNGradientComputer extends GradientComputer
 	public void computeGradient(DoubleMatrix wGrad, DoubleMatrix vBiasGrad, DoubleMatrix hBiasGrad)
 	{
 		wOriginGradient = wGrad.dup();
-		vOriginGradient = vBiasGrad.dup();
-		hOriginGradient = hBiasGrad.dup();
+		if (vBiasGrad != null)
+		    vOriginGradient = vBiasGrad.dup();
+        if (hBiasGrad != null)
+            hOriginGradient = hBiasGrad.dup();
 		DoubleMatrix wAdaGradLR = null;
 		if (config.useAdaGrad)
 		{
 			buildAdaGrad(wGrad, vBiasGrad, hBiasGrad);
 			wAdaGradLR = wAdaGrad.getLearnRates(wGrad);
 			wGrad.muli(wAdaGradLR);
-			hBiasGrad = hBiasGrad.mul(hBiasAdaGrad.getLearnRates(hBiasGrad));
-			vBiasGrad = vBiasGrad.mul(vBiasAdaGrad.getLearnRates(vBiasGrad));
+			if (hBiasGrad != null && hBiasAdaGrad != null)
+			    hBiasGrad = hBiasGrad.mul(hBiasAdaGrad.getLearnRates(hBiasGrad));
+            if (vBiasGrad != null && vBiasAdaGrad != null)
+                vBiasGrad = vBiasGrad.mul(vBiasAdaGrad.getLearnRates(vBiasGrad));
 		}
 		else
 		{
 			wGrad.muli(learnRate);
-			hBiasGrad = hBiasGrad.mul(learnRate);
-			vBiasGrad = vBiasGrad.mul(learnRate);
+            if (hBiasGrad != null)
+                hBiasGrad = hBiasGrad.mul(learnRate);
+            if (vBiasGrad != null)
+                vBiasGrad = vBiasGrad.mul(learnRate);
 		}
         
         double momentum = config.momentum;
@@ -76,8 +82,10 @@ public class NNGradientComputer extends GradientComputer
         if (config.normalized)
         {
         	wGrad.divi(batchSize);
-        	hBiasGrad.divi(batchSize);
-        	vBiasGrad.divi(batchSize);
+        	if (hBiasGrad != null)
+        	    hBiasGrad.divi(batchSize);
+            if (vBiasGrad != null)
+                vBiasGrad.divi(batchSize);
         }
         
         if (config.useRegularization && config.L2 > 0)

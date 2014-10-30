@@ -112,4 +112,16 @@ public class MlpConfig extends NNConfig
 		return this;
 	}
 	
+    public MlpConfig setUseRegularization(boolean useRegularization)
+    {
+        this.useRegularization = useRegularization;
+        return this;
+    }
+
+    public MlpConfig setL2(double l2)
+    {
+        L2 = l2;
+        return this;
+    }
+    
 }

@@ -16,6 +16,8 @@
  */
 package darks.learning.neuron.mlp;
 
+import static darks.learning.common.utils.MatrixHelper.oneMinus;
+
 import org.jblas.DoubleMatrix;
 
 import darks.learning.neuron.AbstractNeuronNetwork;
@@ -32,6 +34,12 @@ public class HiddenLayer extends AbstractNeuronNetwork
 	
 	LayerConfig config = new LayerConfig();
 	
+
+    DoubleMatrix output;
+    
+    DoubleMatrix error;
+    
+	
 	public HiddenLayer()
 	{
 		
@@ -44,17 +52,23 @@ public class HiddenLayer extends AbstractNeuronNetwork
 		 	.setLossType(parentConfig.lossType)
 		 	.setNormalized(parentConfig.normalized)
 		 	.setRandomFunction(parentConfig.randomFunction)
-		 	.setUseRegularization(parentConfig.useRegularization);
+		 	.setUseRegularization(parentConfig.useRegularization)
+		 	.setUseAdaGrad(parentConfig.useAdaGrad)
+		 	.setLearnRate(parentConfig.learnRate);
 		int lastSize = layerIndex == 0 ? parentConfig.inputLayerSize : parentConfig.hiddenLayouts[layerIndex - 1];
 		weights = new DoubleMatrix(lastSize, config.layerSize);
 		hBias = DoubleMatrix.rand(config.layerSize);
+        initialize(config);
 	}
 
 	@Override
 	public GradientComputer getGradient(DoubleMatrix input)
 	{
-		// TODO Auto-generated method stub
-		return null;
+	    gradComputer.setBatchSize(input.rows);
+        gradComputer.setWeights(weights);
+        gradComputer.sethBias(hBias);
+        gradComputer.computeGradient(error.mul(output), null, error);
+		return gradComputer;
 	}
 
 	@Override
@@ -66,14 +80,43 @@ public class HiddenLayer extends AbstractNeuronNetwork
         }
         DoubleMatrix preProb = v.mmul(weights);
         preProb.addiRowVector(hBias);
-		return config.activateFunction.activate(preProb);
+        output = config.activateFunction.activate(preProb);
+        return output;
 	}
 
 	@Override
-	public DoubleMatrix propBackward(DoubleMatrix h)
+	public DoubleMatrix propBackward(DoubleMatrix E)
 	{
-		// TODO Auto-generated method stub
-		return super.propBackward(h);
+	    error = output.mul(oneMinus(output)).mul(E);
+		return error.mmul(weights.transpose());
 	}
 
+    public void update(DoubleMatrix input)
+    {
+        GradientComputer grad = getGradient(input);
+        weights.addiRowVector(grad.getwGradient().columnMeans());
+        hBias.addi(grad.gethGradient().columnMeans());
+    }
+
+    public DoubleMatrix getOutput()
+    {
+        return output;
+    }
+
+    public void setOutput(DoubleMatrix output)
+    {
+        this.output = output;
+    }
+
+    public DoubleMatrix getError()
+    {
+        return error;
+    }
+
+    public void setError(DoubleMatrix error)
+    {
+        this.error = error;
+    }
+
+	
 }

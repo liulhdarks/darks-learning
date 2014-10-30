@@ -17,8 +17,12 @@
 package darks.learning.neuron.mlp;
 
 import org.jblas.DoubleMatrix;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import darks.learning.SupervisedLearning;
+import darks.learning.lossfunc.LossFunction;
+import darks.learning.neuron.ReConstructon;
 
 /**
  * Multiple layer neuron network. Just like back propagation neuron network.
@@ -26,8 +30,10 @@ import darks.learning.SupervisedLearning;
  * @author Darks.Liu
  *
  */
-public class MultiLayerNeuronNetwork implements SupervisedLearning
+public class MultiLayerNeuronNetwork implements SupervisedLearning,ReConstructon
 {
+    
+    private static Logger log = LoggerFactory.getLogger(MultiLayerNeuronNetwork.class);
 	
 	public MlpConfig config = new MlpConfig();
 
@@ -35,9 +41,19 @@ public class MultiLayerNeuronNetwork implements SupervisedLearning
 	
 	private OutputLayer outputLayer;
 	
+	private DoubleMatrix vInput;
+	
+	private DoubleMatrix labels;
+
+	private double eps = 1.0e-10;
+    
+	private double tolerance = 1.0e-5;
+	
+	double lastLoss = 0;
+	
 	public MultiLayerNeuronNetwork()
 	{
-		
+	    config.lossFunction = LossFunction.lossFunc(LossFunction.MSE, config);
 	}
 	
 	private void initialize()
@@ -50,7 +66,7 @@ public class MultiLayerNeuronNetwork implements SupervisedLearning
 			{
 				hiddenLayers[i] = new HiddenLayer(config, i);
 			}
-			outputLayer = new OutputLayer();
+			outputLayer = new OutputLayer(config);
 		}
 	}
 
@@ -60,8 +76,33 @@ public class MultiLayerNeuronNetwork implements SupervisedLearning
 	@Override
 	public void train(DoubleMatrix input, DoubleMatrix output)
 	{
+	    this.vInput = input;
+	    this.labels = output;
 		initialize();
-		
+		int maxIterateCount = config.maxIterateCount;
+		boolean useCount = maxIterateCount > 0;
+		int iterateNumber = 1;
+		while (true)
+		{
+		    iterate(iterateNumber, input, output);
+	        double loss = getLossValue();
+	        if (log.isDebugEnabled())
+	        {
+	            log.debug("MLP iterate number " + iterateNumber + " loss:" + loss);
+	        }
+            if (2.0 * Math.abs(loss - lastLoss) <= tolerance * (Math.abs(loss) + Math.abs(lastLoss) + eps)) 
+            {
+                log.info ("Gradient Ascent: Value difference " + Math.abs(loss - lastLoss) +" below " +
+                        "tolerance; arriving converged.");
+                //break;
+            }
+            lastLoss = loss;
+		    if (useCount && iterateNumber >= maxIterateCount)
+		    {
+		        break;
+		    }
+            iterateNumber++;
+		}
 	}
 
 	/**
@@ -70,8 +111,53 @@ public class MultiLayerNeuronNetwork implements SupervisedLearning
 	@Override
 	public DoubleMatrix predict(DoubleMatrix input)
 	{
-		// TODO Auto-generated method stub
-		return null;
+	    int hiddenCount = hiddenLayers.length;
+        for (int i = 0; i < hiddenCount; i++)
+        {
+            input = hiddenLayers[i].propForward(input);
+        }
+        return outputLayer.propForward(input);
 	}
 	
+	private void iterate(int iterateNumber, DoubleMatrix initInput, DoubleMatrix output)
+	{
+	    int hiddenCount = hiddenLayers.length;
+	    DoubleMatrix input = initInput;
+        for (int i = 0; i < hiddenCount; i++)
+        {
+            hiddenLayers[i].setNumIterate(iterateNumber);
+            input = hiddenLayers[i].propForward(input);
+        }
+        outputLayer.setNumIterate(iterateNumber);
+        outputLayer.propForward(input);
+        
+        DoubleMatrix error = outputLayer.propBackward(output);
+        outputLayer.update(initInput);
+        for (int i = 0; i < hiddenCount; i++)
+        {
+            error = hiddenLayers[i].propBackward(error);
+            hiddenLayers[i].update(initInput);
+        }
+	}
+
+    @Override
+    public DoubleMatrix reconstruct()
+    {
+        return outputLayer.getOutput();
+    }
+
+    @Override
+    public DoubleMatrix reconstruct(DoubleMatrix input)
+    {
+        return outputLayer.getOutput();
+    }
+	
+    
+    public double getLossValue()
+    {
+        config.lossFunction.setInput(labels);
+        config.lossFunction.setReConstructon(this);
+        double val = config.lossFunction.getLossValue();
+        return -val;
+    }
 }
