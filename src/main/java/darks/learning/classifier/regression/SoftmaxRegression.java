@@ -33,6 +33,8 @@ public class SoftmaxRegression extends Regression
 	
 	private static Logger log = LoggerFactory.getLogger(SoftmaxRegression.class);
 	
+	protected double tolerance = 1.0e-6;
+	
 	public SoftmaxRegression()
 	{
 		config.setActivateFunction(Activations.softmax());
@@ -49,6 +51,7 @@ public class SoftmaxRegression extends Regression
 		learnRate = startLearnRate;
 		initWeight(input, output);
 		int iterCount = config.maxIteratorCount;
+		double lastLoss = 0;
 		for (int i = 1; i <= iterCount; i++)
 		{
 			if (!config.useAdaGrad)
@@ -61,6 +64,13 @@ public class SoftmaxRegression extends Regression
 			{
 				log.debug("Iterator:" + i + " cost:" + costValue + " lr:" + (config.useAdaGrad ? "Adagrad" : learnRate));
 			}
+			if (Math.abs(costValue - lastLoss) < tolerance) 
+			{
+                log.info ("Gradient Ascent: Value difference " + Math.abs(costValue - lastLoss) +" below " +
+                        "tolerance; arriving converged.");
+                break;
+            }
+			lastLoss = costValue;
 		}
 	}
 	
@@ -68,6 +78,13 @@ public class SoftmaxRegression extends Regression
 	{
 		weights = DoubleMatrix.rand(input.columns, output.columns);
 		bias = DoubleMatrix.zeros(1, output.columns);
+		if (log.isDebugEnabled())
+		{
+			log.debug("Softmax input:[" + input.rows + "," + input.columns 
+					+ "] output:[" + output.rows + "," + output.columns + "]");
+			log.debug("Softmax weights:[" + weights.rows + "," + weights.columns 
+						+ "] bias:[" + bias.rows + "," + bias.columns + "]");
+		}
 	}
 	
 	private void iterator(DoubleMatrix input, DoubleMatrix output)

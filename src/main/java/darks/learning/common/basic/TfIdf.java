@@ -86,6 +86,11 @@ public class TfIdf implements Serializable
         int wordInDocCount = wordRefCount == null ? 0 : wordRefCount;
         return Math.log((double) totalCorpus / (double)(wordInDocCount + 1));
     }
+    
+    public boolean containSentence(String sentence)
+    {
+    	return sentenceMap.containsKey(sentence);
+    }
 
     public int getTotalWordsCount()
     {

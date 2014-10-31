@@ -50,16 +50,20 @@ public class LatentSemanticAnalysis
     
     public void train(Corpus corpus)
     {
-        tfidf = corpus.getTfIDF();
+    	tfidf = corpus.getTfIDF();
+        DoubleMatrix trainMatrix = initTrainData();
+        train(tfidf, trainMatrix);
+    }
+    
+    public void train(TfIdf tfidf, DoubleMatrix trainMatrix)
+    {
         if (tfidf == null)
         {
             throw new TrainingException("LSA training corpus should have TF-IDF type.");
         }
         log.info("Start to train LSA algorithm.");
         long st = System.currentTimeMillis();
-        DoubleMatrix trainMatrix = initTrainData();
         log.info("Training LSA...");
-
 //        trainMatrix = trainMatrix.getRange(0, 400, 0, 500);
         DoubleMatrix[] USV = svd(trainMatrix);
         
@@ -87,6 +91,11 @@ public class LatentSemanticAnalysis
     public int predictIndex(String[] words)
     {
         DoubleMatrix vector = getSentenceVector(words);
+        return predictIndex(vector);
+    }
+    
+    public int predictIndex(DoubleMatrix vector)
+    {
 //        vector = vector.getRange(0, 400, 0, 1);
         DoubleMatrix vectorMapping = vector.transpose().mmul(Uk).mmul(inverseS);  //1*k
         DoubleMatrix dotVector = vectorMapping.mmul(preMatrix.transpose());
