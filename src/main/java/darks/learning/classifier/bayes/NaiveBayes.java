@@ -38,10 +38,10 @@ import darks.learning.corpus.Documents.Document;
  * @author Darks.Liu
  *
  */
-public class NativeBayes
+public class NaiveBayes
 {
 	
-	private static Logger log = LoggerFactory.getLogger(NativeBayes.class);
+	private static Logger log = LoggerFactory.getLogger(NaiveBayes.class);
 	
 	public static final int BINAMIAL = 0;
 	
@@ -49,7 +49,7 @@ public class NativeBayes
 	
 	public static final int LAPLACE = 1;
 	
-	public NativeBayesConfig config = new NativeBayesConfig();
+	public NaiveBayesConfig config = new NaiveBayesConfig();
 	
 	long uniqueTermCount = 0;
 	
@@ -63,7 +63,7 @@ public class NativeBayes
 	
 	FreqCount<String> termsFreq;
 	
-	public NativeBayes()
+	public NaiveBayes()
 	{
 		
 	}
@@ -222,36 +222,19 @@ public class NativeBayes
 		double pC = (double)labelsMap.get(label).size() / (double)totalDocCount;
 		Double pTC = null;
 		Set<String> berTerms = new HashSet<String>(terms);
-		for (String term : berTerms)
-		{
-			Double pTCi = bernoulliProbality(label, term);
-			if (pTCi == null)
-			{
-				continue;
-			}
-			if (config.logLikelihood)
-			{
-				pTC = pTC == null ? Math.log(pTCi) : pTC + Math.log(pTCi);
-			}
-			else
-			{
-				pTC = pTC == null ? pTCi : pTC * pTCi;
-			}
-		}
 		Iterator<Entry<String, Long>> it = termsFreq.entrySetIterator();
 		while (it.hasNext())
 		{
 			Entry<String, Long> entry = it.next();
-			if (berTerms.contains(entry.getKey()))
-			{
-				continue;
-			}
 			Double pTCi = bernoulliProbality(label, entry.getKey());
 			if (pTCi == null)
 			{
 				continue;
 			}
-			pTCi = 1 - pTCi;
+			if (!berTerms.contains(entry.getKey()))
+			{
+				pTCi = 1 - pTCi;
+			}
 			if (config.logLikelihood)
 			{
 				pTC = pTC == null ? Math.log(pTCi) : pTC + Math.log(pTCi);

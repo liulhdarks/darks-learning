@@ -17,13 +17,12 @@
 package darks.learning.test.word2vec;
 
 import java.io.File;
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
 
 import darks.learning.corpus.Corpus;
-import darks.learning.corpus.CorpusFilter;
 import darks.learning.corpus.CorpusLoader;
 import darks.learning.word2vec.Word2Vec;
 import darks.learning.word2vec.Word2Vec.Word2VecType;
@@ -43,33 +42,31 @@ public class Word2VecTest
 //				return s.length() <= 1;
 //			}
 //		});
-		loader.addStopwords(new File("corpus/dic/lex-stopword.lex"));
-		loader.addStopwords(new File("corpus/dic/lex-stopword1.lex"));
-		Corpus corpus = loader.loadFromFile(new File("corpus/corpus_ali.txt"));
+		//loader.addStopwords(new File("corpus/dic/lex-stopword.lex"));
+		//loader.addStopwords(new File("corpus/dic/lex-stopword1.lex"));
+		Corpus corpus = loader.loadFromFile(new File("corpus/train_data.txt"));
 		
 		Word2Vec word2vec = new Word2Vec();
 		word2vec.config.setTrainType(Word2VecType.CBOW)
-						.setFeatureSize(100)
+						.setFeatureSize(500)
 						.setMinVocabCount(0)
 						.setWindow(5)
 						.setNegative(0);
 		word2vec.train(corpus);
-		word2vec.saveModel(new File("test/test_ali.model"));
+		word2vec.saveModel(new File("test/train_data.model"));
 	}
 
 	@Test
 	public void testDistance()
 	{
 		Word2Vec vec = new Word2Vec();
-		vec.loadModel(new File("test/test_ali.model"));
+		vec.loadModel(new File("test/train_data.model"));
 		System.out.println(vec.distance("版本"));
 		System.out.println(vec.distance("分流"));
 		double sim = vec.distance("计算机", "电脑");
 		System.out.println(sim);
-		List<String> sources = new LinkedList<String>(); //我国 自行 研制 了 功能 强大 的 机群 操作系统 
-		List<String> targets = new LinkedList<String>();
-		sources.add("希望");sources.add("人性化");
-		targets.add("分流");targets.add("开关");
+		List<String> sources = Arrays.asList("系统 拨打 手机".split(" "));
+		List<String> targets = Arrays.asList("锁屏 系统 咨询 选择 点击 不能 安卓 淘宝 苹果 电话号码 客户 不稳定 声音 卖家 拨打 手机".split(" "));
 		sim = vec.distance(sources, targets);
 		System.out.println(sim);
 	}

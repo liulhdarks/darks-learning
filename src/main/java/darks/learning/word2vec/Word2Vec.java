@@ -102,6 +102,26 @@ public class Word2Vec
 		log.info("Complete to train word2vec corpus.Used time:" + (System.currentTimeMillis() - st)
 				/ 1000 + "s");
 	}
+	
+	/**
+	 * Incremental training sentence. 
+	 * 
+	 * @param source Target source
+	 * @return Whether success
+	 */
+	public boolean trainIncrement(String source)
+	{
+		log.debug("Training word2vec " + source + " by increment way.");
+		StringTokenizer token = new StringTokenizer(source, " \t");
+		trainingVocabCount = token.countTokens();
+		List<WordNode> sentence = sampleSentence(token);
+		if (sentence.isEmpty())
+		{
+			return false;
+		}
+		executeNeuronNetwork(sentence);
+		return true;
+	}
 
 	private void buildWordNodes(Corpus corpus)
 	{
@@ -394,13 +414,14 @@ public class Word2Vec
 			WordNode node = wordNodes.get(word);
 			if (node != null)
 			{
+				DoubleMatrix feature = node.feature;
 				if (center == null)
 				{
-					center = node.feature;
+					center = feature.dup();
 				}
 				else
 				{
-					center.addi(node.feature);
+					center.addi(feature);
 				}
 			}
 		}

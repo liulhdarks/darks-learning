@@ -18,17 +18,18 @@ package darks.learning.test.bayes;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map.Entry;
 
 import org.junit.Test;
 
-import darks.learning.classifier.bayes.NativeBayes;
+import darks.learning.classifier.bayes.NaiveBayes;
 import darks.learning.corpus.Documents;
 
 public class BayesTest
 {
 
 	@Test
-	public void testNativeBayes()
+	public void testNaiveBayes()
 	{
 		File input = new File("corpus/train_data.txt");
 		File labels = new File("corpus/train_labels.txt");
@@ -36,11 +37,24 @@ public class BayesTest
 		try
 		{
 			docs = Documents.loadFromFile(input, labels, "UTF-8");
-			NativeBayes bayes = new NativeBayes();
+			NaiveBayes bayes = new NaiveBayes();
 			bayes.config.setLogLikelihood(true)
-						.setModelType(NativeBayes.BINAMIAL);
+						.setModelType(NaiveBayes.BINAMIAL);
 			bayes.train(docs);
-			System.out.println(bayes.predict("显示 卖家版旺旺 状态 账号 分流 登录 手机 "));
+			int count = 0;
+			for (Entry<String, String> entry : docs.getDocsMap().entrySet())
+			{
+				String classify = bayes.predict(entry.getKey());
+				if (!classify.equals(entry.getValue()))
+				{
+					System.out.println("QA:" + entry.getKey() + " output:" + classify + " expect:" + entry.getValue());
+				}
+				else
+				{
+					count++;
+				}
+			}
+			System.out.println("Accurancy:" + (float)count / (float)docs.getDocsMap().size());
 		}
 		catch (IOException e)
 		{

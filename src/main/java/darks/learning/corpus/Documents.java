@@ -56,6 +56,8 @@ public class Documents implements Serializable
 	private Map<String, List<Document>> labelsMap = new HashMap<String, List<Document>>();
 	
 	private FreqCount<String> termsFreq = new FreqCount<String>();
+	
+	private Map<String, String> docsMap = new HashMap<String, String>();
 
 	/**
 	 * Load document from file
@@ -130,6 +132,7 @@ public class Documents implements Serializable
 			labelsMap.put(label, docs);
 		}
 		docs.add(new Document(termsFreq, input, label, " \t\n"));
+		docsMap.put(input, label);
 	}
 
 	public Map<String, List<Document>> getLabelsMap()
@@ -142,6 +145,14 @@ public class Documents implements Serializable
 	{
 		return termsFreq;
 	}
+
+	
+	public Map<String, String> getDocsMap()
+	{
+		return docsMap;
+	}
+
+
 
 	public static class Document implements Serializable
 	{
@@ -193,6 +204,16 @@ public class Documents implements Serializable
 			this.label = label;
 		}
 
+		public String getSource()
+		{
+			return source;
+		}
+
+		public void setSource(String source)
+		{
+			this.source = source;
+		}
+
 		@Override
 		public int hashCode()
 		{
@@ -221,6 +242,7 @@ public class Documents implements Serializable
 				return false;
 			return true;
 		}
+		
 	}
 	
 	

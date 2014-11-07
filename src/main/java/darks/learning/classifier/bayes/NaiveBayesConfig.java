@@ -22,12 +22,12 @@ package darks.learning.classifier.bayes;
  * @author Darks.Liu
  *
  */
-public class NativeBayesConfig
+public class NaiveBayesConfig
 {
 
-	int modelType = NativeBayes.BINAMIAL;
+	int modelType = NaiveBayes.BINAMIAL;
 	
-	int smoothFactor = NativeBayes.LAPLACE;
+	int smoothFactor = NaiveBayes.LAPLACE;
 	
 	boolean logLikelihood = false;
 	
@@ -37,7 +37,7 @@ public class NativeBayesConfig
 		return smoothFactor;
 	}
 
-	public NativeBayesConfig setSmoothFactor(int smoothFactor)
+	public NaiveBayesConfig setSmoothFactor(int smoothFactor)
 	{
 		this.smoothFactor = smoothFactor;
 		return this;
@@ -48,7 +48,7 @@ public class NativeBayesConfig
 		return logLikelihood;
 	}
 
-	public NativeBayesConfig setLogLikelihood(boolean logLikelihood)
+	public NaiveBayesConfig setLogLikelihood(boolean logLikelihood)
 	{
 		this.logLikelihood = logLikelihood;
 		return this;
@@ -59,7 +59,7 @@ public class NativeBayesConfig
 		return modelType;
 	}
 
-	public NativeBayesConfig setModelType(int modelType)
+	public NaiveBayesConfig setModelType(int modelType)
 	{
 		this.modelType = modelType;
 		return this;
