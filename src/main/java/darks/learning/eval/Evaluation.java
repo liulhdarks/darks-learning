@@ -63,7 +63,7 @@ public class Evaluation
 				TP++;
 				for (Integer index : matrix.getClasses())
 				{
-					if (index != guessIndex)
+					if (!index.equals(guessIndex))
 					{
 						TN.addValue(index);
 					}
@@ -120,11 +120,37 @@ public class Evaluation
 		return TN.totalCount() + FN;
 	}
 	
+	/**
+	 * f1() = fScore(1)
+	 * @return
+	 */
 	public double f1()
 	{
 		double P = precision();
 		double R = recall();
 		return 2 * P * R / (P + R);
+	}
+	
+	/**
+	 * f-score = (1 + beta^2) * (precision * recall) / (precision * beta^2 + recall)
+	 * @param n beta
+	 * @return F score
+	 */
+	public double fScore(int n)
+	{
+		double P = precision();
+		double R = recall();
+		return (1 + Math.pow(n, 2)) * P * R / (P * Math.pow(n, 2) + R);
+	}
+	
+	public double TPR()
+	{
+		return recall();
+	}
+	
+	public double FPR()
+	{
+		return (double)FP.totalCount() / negative();
 	}
 
 	public String status()

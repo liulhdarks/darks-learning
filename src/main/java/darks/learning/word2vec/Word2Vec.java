@@ -349,8 +349,8 @@ public class Word2Vec
 	 */
 	public double distance(List<String> sources, List<String> targets)
 	{
-		DoubleMatrix srcMt = getCenterFeature(sources);
-		DoubleMatrix targetMt = getCenterFeature(targets);
+		DoubleMatrix srcMt = getSentenceFeature(sources);
+		DoubleMatrix targetMt = getSentenceFeature(targets);
 		if (srcMt == null || targetMt == null)
 		{
 			return 0.001;
@@ -406,7 +406,12 @@ public class Word2Vec
 		return result;
 	}
 	
-	private DoubleMatrix getCenterFeature(List<String> words)
+	/**
+	 * Get sentence feature
+	 * @param words Sentence words
+	 * @return matrix
+	 */
+	public DoubleMatrix getSentenceFeature(List<String> words)
 	{
 		DoubleMatrix center = null;
 		for (String word : words)
