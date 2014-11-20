@@ -3,12 +3,27 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>darks.learning</groupId>
 	<artifactId>darks-learning</artifactId>
-	<version>1.0.0a</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<name>Darks Learning</name>
 	<description>Darks learning is the machine learning algorithm library.</description>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+	
+	
+  
+  <distributionManagement>
+      <repository>
+         <id>releases</id>
+         <url>http://mvnrepo.taobao.ali.com/mvn/releases</url>
+      </repository>
+      <snapshotRepository>
+         <id>snapshots</id>
+         <url>http://mvnrepo.taobao.ali.com/mvn/snapshots</url>
+      </snapshotRepository>
+   
+   </distributionManagement>
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.jblas</groupId>

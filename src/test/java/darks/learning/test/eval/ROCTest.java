@@ -16,6 +16,8 @@
  */
 package darks.learning.test.eval;
 
+import java.util.Random;
+
 import org.junit.Test;
 
 import darks.learning.eval.ROC;
@@ -35,10 +37,31 @@ public class ROCTest
 		roc.addPoint(lineId, 0.5, 0.7, "v4");
 		roc.addPoint(lineId, 0.3, 0.2, "v5");
 		roc.addPoint(lineId, 0.6, 0.8, "v6");
-		roc.evalPlot(lineId, 1);
-//		roc.showPlot();
-		
-        System.out.println("debug");
+//		roc.evalPlot(lineId, 1);
+//		roc.eval(lineId, 1.);
+		roc.showPlot();
+		System.out.println("AUC:" + roc.aucValue(lineId));
+        System.out.println("pause");
 	}
-	
+
+	@Test
+	public void testROCMulti()
+	{
+		
+		ROC roc = new ROC();
+		
+		Random rand = new Random(System.currentTimeMillis());
+		for (int i = 1; i <= 2; i++)
+		{
+			int lineId = i;
+			roc.addLine(lineId, "test" + lineId);
+			for (float p = 0.05f; p <= 1; p += 0.05f)
+			{
+				roc.addPoint(lineId, rand.nextDouble(), p, String.format("%.2f", p));
+			}
+			System.out.println("Line " + i + " AUC:" + roc.aucValue(lineId));
+		}
+		roc.evalPlot(1, 1);
+        System.out.println("pause");
+	}
 }

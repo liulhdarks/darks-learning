@@ -32,6 +32,8 @@ public class ROCPoint implements Comparable<ROCPoint>
 	double k;
 	
 	boolean valid = true;
+	
+	Object extern;
 
 	public ROCPoint(double tpr, double fpr, String label)
 	{
@@ -48,6 +50,86 @@ public class ROCPoint implements Comparable<ROCPoint>
 		this.valid = valid;
 	}
 
+	
+	public double getTpr()
+	{
+		return tpr;
+	}
+
+	public void setTpr(double tpr)
+	{
+		this.tpr = tpr;
+	}
+
+	public double getFpr()
+	{
+		return fpr;
+	}
+
+	public void setFpr(double fpr)
+	{
+		this.fpr = fpr;
+	}
+
+	public String getLabel()
+	{
+		return label;
+	}
+
+	public void setLabel(String label)
+	{
+		this.label = label;
+	}
+
+	public ROCPoint getPrev()
+	{
+		return prev;
+	}
+
+	public void setPrev(ROCPoint prev)
+	{
+		this.prev = prev;
+	}
+
+	public ROCPoint getNext()
+	{
+		return next;
+	}
+
+	public void setNext(ROCPoint next)
+	{
+		this.next = next;
+	}
+
+	public double getK()
+	{
+		return k;
+	}
+
+	public void setK(double k)
+	{
+		this.k = k;
+	}
+
+	public boolean isValid()
+	{
+		return valid;
+	}
+
+	public void setValid(boolean valid)
+	{
+		this.valid = valid;
+	}
+
+	public Object getExtern()
+	{
+		return extern;
+	}
+
+	public void setExtern(Object extern)
+	{
+		this.extern = extern;
+	}
 
 	@Override
 	public String toString()

@@ -46,7 +46,7 @@ public class ROC
 		PlotLine plotLine = plotsMap.get(lineId);
 		if (plotLine == null)
 		{
-			plotLine = new PlotLine(name);
+			plotLine = new PlotLine(lineId, name);
 			plotsMap.put(lineId, plotLine);
 		}
 	}
@@ -60,12 +60,27 @@ public class ROC
 	 */
 	public void addPoint(int lineId, double tpr, double fpr, String label)
 	{
+		addPoint(lineId, tpr, fpr, label, null);
+	}
+	
+	/**
+	 * Add point for ROC line 
+	 * @param lineId Line id
+	 * @param tpr TPR
+	 * @param fpr FPR
+	 * @param label Point label
+	 * @param extern External object
+	 */
+	public void addPoint(int lineId, double tpr, double fpr, String label, Object extern)
+	{
 		PlotLine plotLine = plotsMap.get(lineId);
 		if (plotLine == null)
 		{
 			throw new EvaluationException("Cannot find plot line by line id " + lineId);
 		}
-		plotLine.plots.add(new ROCPoint(tpr, fpr, label));
+		ROCPoint point = new ROCPoint(tpr, fpr, label);
+		point.setExtern(extern);
+		plotLine.plots.add(point);
 	}
 	
 	/**
@@ -85,6 +100,12 @@ public class ROC
 		return estimate(plotLine, fitK);
 	}
 	
+	/**
+	 * The method will evaluate and show ROC plot window.
+	 * 
+	 * @param lineId Line Id
+	 * @param fitK Fit K value
+	 */
 	public void evalPlot(int lineId, double fitK)
 	{
 		PlotLine plotLine = plotsMap.get(lineId);
@@ -98,11 +119,27 @@ public class ROC
 		plot.show();
 	}
 	
+	/**
+	 * The method will show ROC plot window.
+	 * 
+	 */
 	public void showPlot()
 	{
 		ROCPlot plot = new ROCPlot(this);
 		plot.initialize();
 		plot.show();
+	}
+	
+	public double aucValue(int lineId)
+	{
+		PlotLine plotLine = plotsMap.get(lineId);
+		if (plotLine == null)
+		{
+			throw new EvaluationException("Cannot find plot line by line id " + lineId);
+		}
+		prepareLine(plotLine);
+		AUC auc = new AUC(this, lineId);
+		return auc.compute();
 	}
 	
 	private void prepareLine(PlotLine plotLine)
@@ -155,7 +192,7 @@ public class ROC
 	ROCPoint estimate(PlotLine plotLine, double fitK)
 	{
 		ROCPoint lastPlot = plotLine.zeroPlot;
-		double maxY = Double.MIN_VALUE;
+		double maxY = Double.NEGATIVE_INFINITY;
 		ROCPoint maxPlot = null;
 		while (lastPlot != null)
 		{
@@ -185,6 +222,8 @@ public class ROC
 	
 	class PlotLine
 	{
+		int lineId;
+		
 		String name;
 		
 		Set<ROCPoint> plots = new TreeSet<ROCPoint>();
@@ -193,9 +232,9 @@ public class ROC
 		
 		List<ROCPoint> excludePoints = new ArrayList<ROCPoint>();
 
-		public PlotLine(String name)
+		public PlotLine(int lineId, String name)
 		{
-			super();
+			this.lineId = lineId;
 			this.name = name;
 		}
 		
