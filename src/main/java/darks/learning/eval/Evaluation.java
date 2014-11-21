@@ -63,7 +63,7 @@ public class Evaluation
 				TP++;
 				for (Integer index : matrix.getClasses())
 				{
-					if (!index.equals(guessIndex))
+					if (index.intValue() != guessIndex)
 					{
 						TN.addValue(index);
 					}
