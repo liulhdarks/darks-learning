@@ -56,7 +56,7 @@ public class HiddenLayer extends AbstractNeuronNetwork
 		 	.setUseAdaGrad(parentConfig.useAdaGrad)
 		 	.setLearnRate(parentConfig.learnRate);
 		int lastSize = layerIndex == 0 ? parentConfig.inputLayerSize : parentConfig.hiddenLayouts[layerIndex - 1];
-		weights = new DoubleMatrix(lastSize, config.layerSize);
+		weights = DoubleMatrix.rand(lastSize, config.layerSize);
 		hBias = DoubleMatrix.rand(config.layerSize);
         initialize(config);
 	}

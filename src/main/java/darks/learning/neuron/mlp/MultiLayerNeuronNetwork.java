@@ -94,7 +94,7 @@ public class MultiLayerNeuronNetwork implements SupervisedLearning,ReConstructon
             {
                 log.info ("Gradient Ascent: Value difference " + Math.abs(loss - lastLoss) +" below " +
                         "tolerance; arriving converged.");
-                //break;
+                break;
             }
             lastLoss = loss;
 		    if (useCount && iterateNumber >= maxIterateCount)
@@ -132,8 +132,9 @@ public class MultiLayerNeuronNetwork implements SupervisedLearning,ReConstructon
         outputLayer.propForward(input);
         
         DoubleMatrix error = outputLayer.propBackward(output);
+        System.out.println(error.max());
         outputLayer.update(initInput);
-        for (int i = 0; i < hiddenCount; i++)
+        for (int i = hiddenCount - 1; i >= 0; i--)
         {
             error = hiddenLayers[i].propBackward(error);
             hiddenLayers[i].update(initInput);
