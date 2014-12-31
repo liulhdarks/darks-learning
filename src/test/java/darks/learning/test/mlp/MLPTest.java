@@ -12,7 +12,7 @@ public class MLPTest
     public void testMLP()
     {
         double[][] trainX = {
-            {0, 0.9, 0.8, 0, 0, 0, 0, 0, 0},
+            {0, 1, 1, 0, 0, 0, 0, 0, 0},
             {0, 0, 1, 0, 0, 0, 0, 0, 0},
             {0, 1, 0, 0, 0, 0, 0, 0, 0},
             {1, 0, 1, 0, 0, 0, 0, 0, 0},
@@ -54,10 +54,10 @@ public class MLPTest
         }; 
     
         MultiLayerNeuronNetwork mlp = new MultiLayerNeuronNetwork();
-        mlp.config.setHiddenLayouts(new int[]{10})
-                    .setUseAdaGrad(true)
-                    .setLearnRate(0.001)
-                    .setMaxIterateCount(30000)
+        mlp.config.setHiddenLayouts(new int[]{16, 32})
+                    .setUseAdaGrad(false)
+                    .setLearnRate(0.1)
+                    .setMaxIterateCount(10000)
                     .setInputLayerSize(9)
                     .setOutputLayerSize(3)
                     .setUseRegularization(false);
@@ -88,7 +88,7 @@ public class MLPTest
             {0, 0, 1}
         };
         
-        DoubleMatrix testRet = mlp.predict(new DoubleMatrix(testX));
+        DoubleMatrix testRet = mlp.predict(new DoubleMatrix(trainX));
         System.out.println(testRet.toString().replace(";", "\n"));
     }
     

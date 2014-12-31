@@ -77,6 +77,16 @@ public class TfIdf implements Serializable
         long count = freq.getValue(word);
         long total = freq.totalCount();
         return (double) count / (double) total;
+    }//
+    
+    public long getWordFreqCount(String sentence, String word)
+    {
+        FreqCount<String> freq = sentenceMap.get(sentence);
+        if (freq == null)
+        {
+            return 0;
+        }
+        return freq.getValue(word);
     }
     
     public double getIDF(String word)

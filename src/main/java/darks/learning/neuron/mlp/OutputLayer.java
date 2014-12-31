@@ -53,7 +53,7 @@ public class OutputLayer extends AbstractNeuronNetwork
             .setUseAdaGrad(parentConfig.useAdaGrad)
             .setLearnRate(parentConfig.learnRate);
         int lastSize = parentConfig.hiddenLayouts[parentConfig.hiddenLayouts.length - 1];
-        weights = new DoubleMatrix(lastSize, config.layerSize);
+        weights = DoubleMatrix.rand(lastSize, config.layerSize);
         hBias = DoubleMatrix.rand(config.layerSize);
         initialize(config);
     }
