@@ -48,7 +48,7 @@ public class Word2VecTest
 		
 		Word2Vec word2vec = new Word2Vec();
 		word2vec.config.setTrainType(Word2VecType.CBOW)
-						.setFeatureSize(500)
+						.setFeatureSize(200)
 						.setMinVocabCount(0)
 						.setWindow(5)
 						.setNegative(0);

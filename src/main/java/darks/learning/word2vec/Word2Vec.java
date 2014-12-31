@@ -359,6 +359,29 @@ public class Word2Vec
 		sim = sim / (srcMt.norm2() * targetMt.norm2());
 		return sim;
 	}
+	
+	/**
+	 * Calculate similar between two words lists with weights
+	 * 
+	 * @param sources Source words list
+	 * @param sourceWeights Source words weight
+	 * @param targets Target words list
+	 * @param targetWeights Target words weight
+	 * @return Similar score
+	 */
+	public double distance(List<String> sources, Map<String, Double> sourceWeights, 
+			List<String> targets, Map<String, Double> targetWeights)
+	{
+		DoubleMatrix srcMt = getSentenceFeature(sources, sourceWeights);
+		DoubleMatrix targetMt = getSentenceFeature(targets, targetWeights);
+		if (srcMt == null || targetMt == null)
+		{
+			return 0.001;
+		}
+		double sim = srcMt.dot(targetMt);
+		sim = sim / (srcMt.norm2() * targetMt.norm2());
+		return sim;
+	}
 
 	/**
 	 * Calculate specify word's nearest or relate words
@@ -434,6 +457,39 @@ public class Word2Vec
 	}
 	
 	/**
+	 * Get sentence feature
+	 * @param words Sentence words
+	 * @param weights Word weights
+	 * @return matrix
+	 */
+	public DoubleMatrix getSentenceFeature(List<String> words, Map<String, Double> weights)
+	{
+		DoubleMatrix center = null;
+		for (String word : words)
+		{
+			WordNode node = wordNodes.get(word);
+			if (node != null)
+			{
+				DoubleMatrix feature = node.feature.dup();
+				Double weight = weights.get(word);
+				if (weight != null)
+				{
+					feature.muli(weight);
+				}
+				if (center == null)
+				{
+					center = feature;
+				}
+				else
+				{
+					center.addi(feature);
+				}
+			}
+		}
+		return center;
+	}
+	
+	/**
 	 * Get specify word's vector
 	 * 
 	 * @param word Specify word
@@ -484,6 +540,42 @@ public class Word2Vec
 		{
 			IOUtils.closeStream(dos);
 		}
+	}
+
+	/**
+	 * Load model from single word
+	 * 
+	 * @param word Single word
+	 * @param matrix Word feature
+	 */
+	public void loadModelFromWord(String word, DoubleMatrix matrix)
+	{
+		config.featureSize = matrix.length;
+		wordNodes.put(word, new WordNode(word, matrix));
+	}
+
+	/**
+	 * Load model from single word
+	 * 
+	 * @param word Single word
+	 * @param attrs Word feature
+	 */
+	public void loadModelFromWord(String word, String attrs)
+	{
+		String[] features = attrs.split(" ");
+		int featureSize = features.length;
+		DoubleMatrix feature = new DoubleMatrix(featureSize);
+		double len = 0;
+		for (int f = 0; f < featureSize; f++)
+		{
+			double w = Double.parseDouble(features[f]);
+			feature.put(f, w);
+			len += w * w;
+		}
+		len = FastMath.sqrt(len);
+		//feature.divi(len);
+		config.featureSize = feature.length;
+		wordNodes.put(word, new WordNode(word, feature));
 	}
 
 	/**

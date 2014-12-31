@@ -17,6 +17,7 @@
 package darks.learning.classifier.regression;
 
 import org.jblas.DoubleMatrix;
+import org.jblas.SimpleBlas;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +46,10 @@ public class LogisticRegression extends Regression
 	public void train(DoubleMatrix input, DoubleMatrix output)
 	{
 		log.info("Training logistic regression.");
+		if (!output.isScalar())
+		{
+			output = scalarMatrix(output);
+		}
 		double startLearnRate = config.learnRate;
 		learnRate = startLearnRate;
 		initWeight(input, output);
@@ -62,6 +67,16 @@ public class LogisticRegression extends Regression
 				log.debug("Iterator:" + i + " cost:" + costValue + " lr:" + (config.useAdaGrad ? "Adagrad" : learnRate));
 			}
 		}
+	}
+	
+	private DoubleMatrix scalarMatrix(DoubleMatrix output)
+	{
+		DoubleMatrix result = new DoubleMatrix(output.rows);
+		for (int i = 0; i < output.rows; i++)
+		{
+			result.put(i, SimpleBlas.iamax(output.getRow(i)));
+		}
+		return result;
 	}
 	
 	private void initWeight(DoubleMatrix input, DoubleMatrix output)
