@@ -27,6 +27,11 @@ import darks.learning.common.utils.MatrixHelper;
 import darks.learning.corpus.Corpus;
 import darks.learning.exceptions.TrainingException;
 
+/**
+ * Latent Semantic Analysis
+ * @author Darks.Liu
+ *
+ */
 public class LatentSemanticAnalysis
 {
     
@@ -48,6 +53,24 @@ public class LatentSemanticAnalysis
     
     TfIdf tfidf = null;
     
+    public LatentSemanticAnalysis()
+    {
+    	
+    }
+    
+    /**
+     * Construction
+     * @param targetDimension Target reduce dimension.Default 300
+     */
+    public LatentSemanticAnalysis(int targetDimension)
+    {
+    	K = targetDimension > 0 ? targetDimension : K;
+    }
+    
+    /**
+     * Train model by corpus
+     * @param corpus {@linkplain darks.learning.corpus.Corpus Corpus}
+     */
     public void train(Corpus corpus)
     {
     	tfidf = corpus.getTfIDF();
@@ -81,19 +104,35 @@ public class LatentSemanticAnalysis
                             + inverseS.rows + "," + inverseS.columns + ")");
         log.info("LSA training cost " + (System.currentTimeMillis() - st) + "ms");
     }
-    
+
+
+    /**
+     * Predict target sentence content by words' array
+     * @param words Words' array
+     * @return Target sentence content
+     */
     public String predict(String[] words)
     {
         int column = predictIndex(words);
         return sentenceColumnIndexs.get(column);
     }
-    
+
+    /**
+     * Predict target index by words' array
+     * @param words Words' array
+     * @return Target index
+     */
     public int predictIndex(String[] words)
     {
         DoubleMatrix vector = getSentenceVector(words);
         return predictIndex(vector);
     }
     
+    /**
+     * Predict target index by vector
+     * @param vector Feature vector
+     * @return Target index
+     */
     public int predictIndex(DoubleMatrix vector)
     {
 //        vector = vector.getRange(0, 400, 0, 1);
@@ -104,6 +143,10 @@ public class LatentSemanticAnalysis
         return SimpleBlas.iamax(cosMt);
     }
     
+    /**
+     * Save LSA model
+     * @param file Target model file
+     */
     public void saveModel(File file)
     {
     	LsaModel model = new LsaModel(sentenceColumnIndexs, wordsRowIndexs, K, 
@@ -126,6 +169,10 @@ public class LatentSemanticAnalysis
     	
     }
     
+    /**
+     * Load LSA model from file
+     * @param file Model file 
+     */
     public void loadModel(File file)
     {
     	ObjectInputStream ois = null;
@@ -208,7 +255,7 @@ public class LatentSemanticAnalysis
         }
         return result;
     }
-
+    
 	public Map<Integer, String> getSentenceColumnIndexs()
 	{
 		return sentenceColumnIndexs;
