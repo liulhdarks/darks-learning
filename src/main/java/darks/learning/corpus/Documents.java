@@ -23,15 +23,19 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.StringTokenizer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import darks.learning.common.rand.JdkRandomFunction;
+import darks.learning.common.rand.RandomFunction;
 import darks.learning.common.utils.FreqCount;
 import darks.learning.common.utils.IOUtils;
 
@@ -68,7 +72,73 @@ public class Documents implements Serializable
 	 */
 	public static Documents loadFromFile(File input, File labels) throws IOException
 	{
-		return loadFromFile(input, labels, null);
+		return loadFromFile(input, labels, "UTF-8");
+	}
+
+	/**
+	 * Load from file
+	 * @param inputFile Input file with labels
+	 * @return Document
+	 * @throws IOException
+	 */
+	public static Documents loadFromFile(File inputFile) throws IOException
+	{
+		return loadFromFile(inputFile, "UTF-8");
+	}
+
+	/**
+	 * Load from file
+	 * @param inputFile Input file with labels
+	 * @param charsetName File charset name
+	 * @return Document
+	 * @throws IOException
+	 */
+	public static Documents loadFromFile(File inputFile, String charsetName) throws IOException
+	{
+		BufferedReader reader = null;
+		try
+		{
+			if (charsetName != null)
+			{
+				reader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), charsetName));
+			}
+			else
+			{
+				reader = new BufferedReader(new FileReader(inputFile));
+			}
+			Documents docs = new Documents();
+			String line = null;
+			while ((line = reader.readLine()) != null)
+			{
+				line = line.trim();
+				if ("".equals(line) || line.startsWith("#"))
+				{
+					continue;
+				}
+				int index = line.indexOf("\t");
+				if (index < 0)
+				{
+					continue;
+				}
+				String label = line.substring(0, index).trim();
+				String input = line.substring(index + 1).trim();
+				if ("".equals(input.trim()) || "".equals(label.trim()))
+				{
+					continue;
+				}
+				docs.addData(input, label);
+			}
+			return docs;
+		}
+		catch (Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
+		finally
+		{
+			IOUtils.closeStream(reader);
+		}
+		return null;
 	}
 
 	/**
@@ -95,21 +165,7 @@ public class Documents implements Serializable
 		}
 		try
 		{
-			Documents docs = new Documents();
-			String inputLine = null;
-			String labelsLine = null;
-			while ((inputLine = reader.readLine()) != null 
-					&& (labelsLine = readerLabel.readLine()) != null)
-			{
-				inputLine = inputLine.trim();
-				labelsLine = labelsLine.trim();
-				if ("".equals(inputLine) || "".equals(labelsLine))
-				{
-					continue;
-				}
-				docs.addLine(inputLine, labelsLine);
-			}
-			return docs;
+			return loadFromFile(reader, readerLabel);
 		}
 		catch (Exception e)
 		{
@@ -122,8 +178,42 @@ public class Documents implements Serializable
 		}
 		return null;
 	}
+
+	/**
+	 * Load from file
+	 * @param reader Input reader
+	 * @param readerLabel Label reader
+	 * @return Document
+	 * @throws IOException
+	 */
+	public static Documents loadFromFile(BufferedReader reader, BufferedReader readerLabel) throws IOException
+	{
+		try
+		{
+			Documents docs = new Documents();
+			String inputLine = null;
+			String labelsLine = null;
+			while ((inputLine = reader.readLine()) != null 
+					&& (labelsLine = readerLabel.readLine()) != null)
+			{
+				inputLine = inputLine.trim();
+				labelsLine = labelsLine.trim();
+				if ("".equals(inputLine) || "".equals(labelsLine))
+				{
+					continue;
+				}
+				docs.addData(inputLine, labelsLine);
+			}
+			return docs;
+		}
+		catch (Exception e)
+		{
+			log.error(e.getMessage(), e);
+		}
+		return null;
+	}
 	
-	void addLine(String input, String label)
+	public void addData(String input, String label)
 	{
 		List<Document> docs = labelsMap.get(label);
 		if (docs == null)
@@ -134,7 +224,93 @@ public class Documents implements Serializable
 		docs.add(new Document(termsFreq, input, label, " \t\n"));
 		docsMap.put(input, label);
 	}
-
+	
+	public void merge(List<Documents> docsList)
+	{
+		for (Documents docs : docsList)
+		{
+			for (Entry<String, List<Document>> entry : docs.getLabelsMap().entrySet())
+			{
+				for (Document doc : entry.getValue())
+				{
+					addData(doc.source, doc.label);
+				}
+			}
+		}
+	}
+	
+	public List<Documents> splitDocuments(int splitCount)
+	{
+		List<Documents> result = new ArrayList<Documents>();
+		List<Entry<String, String>> docsList = new ArrayList<Entry<String, String>>(docsMap.entrySet());
+		int totalSize = docsList.size();
+		int splitSize = totalSize / splitCount;
+		splitSize = splitSize <= 0 ? 1 : splitSize;
+		for (int i = 0; i < totalSize; i += splitSize)
+		{
+			Documents docs = new Documents();
+			int maxIndex = Math.min(totalSize, i + splitSize);
+			for (int j = i; j < maxIndex; j++)
+			{
+				Entry<String, String> entry = docsList.get(j);
+				docs.addData(entry.getKey(), entry.getValue());
+			}
+			result.add(docs);
+		}
+		return result;
+	}
+	
+	public List<Documents> splitEachLabels(int splitCount)
+	{
+		Map<String, List<Document>> tempMap = new HashMap<String, List<Document>>();
+		for (Entry<String, List<Document>> entry : labelsMap.entrySet())
+		{
+			tempMap.put(entry.getKey(), new LinkedList<Document>(entry.getValue()));
+		}
+		RandomFunction rand = new JdkRandomFunction();
+		List<Documents> result = new ArrayList<Documents>();
+		for (int i = 0; i < splitCount; i++)
+		{
+			result.add(new Documents());
+		}
+		for (Entry<String, List<Document>> entry : tempMap.entrySet())
+		{
+			String label = entry.getKey();
+			List<Document> docs = entry.getValue();
+			int totalSize = tempMap.get(label).size();
+//			int splitSize = totalSize % splitCount == 0 ? totalSize / splitCount : totalSize / splitCount + 1;
+			int splitSize = totalSize / splitCount;
+			for (int index = 0; index < splitCount; index++)
+			{
+				Documents docsRet = result.get(index);
+				int maxIndex = Math.min(splitSize, docs.size());
+				for (int i = 0; i < maxIndex; i++)
+				{
+					Document doc = docs.remove(rand.randInt(docs.size()));
+					docsRet.addData(doc.source, doc.label);
+				}
+			}
+			if (!docs.isEmpty())
+			{
+				Documents docsRet = null;
+				if (result.size() <= splitCount)
+				{
+					docsRet = new Documents();
+					result.add(docsRet);
+				}
+				else
+				{
+					docsRet = result.get(result.size() - 1);
+				}
+				for (Document doc : docs)
+				{
+					docsRet.addData(doc.source, doc.label);
+				}
+			}
+		}
+		return result;
+	}
+	
 	public Map<String, List<Document>> getLabelsMap()
 	{
 		return labelsMap;

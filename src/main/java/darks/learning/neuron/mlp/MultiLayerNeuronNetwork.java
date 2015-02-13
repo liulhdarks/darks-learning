@@ -67,6 +67,7 @@ public class MultiLayerNeuronNetwork implements SupervisedLearning,ReConstructon
 				hiddenLayers[i] = new HiddenLayer(config, i);
 			}
 			outputLayer = new OutputLayer(config);
+			print();
 		}
 	}
 
@@ -130,6 +131,7 @@ public class MultiLayerNeuronNetwork implements SupervisedLearning,ReConstructon
         }
         outputLayer.setNumIterate(iterateNumber);
         outputLayer.propForward(input);
+//		print();
         
         DoubleMatrix error = outputLayer.propBackward(output);
         System.out.println(error.max());
@@ -139,6 +141,7 @@ public class MultiLayerNeuronNetwork implements SupervisedLearning,ReConstructon
             error = hiddenLayers[i].propBackward(error);
             hiddenLayers[i].update(initInput);
         }
+		print();
 	}
 
     @Override
@@ -160,5 +163,14 @@ public class MultiLayerNeuronNetwork implements SupervisedLearning,ReConstructon
         config.lossFunction.setReConstructon(this);
         double val = config.lossFunction.getLossValue();
         return -val;
+    }
+    
+    private void print()
+    {
+    	for (int i = 0; i < hiddenLayers.length; i++)
+		{
+			System.out.println(hiddenLayers[i].getWeights());
+		}
+		System.out.println(outputLayer.getWeights());
     }
 }

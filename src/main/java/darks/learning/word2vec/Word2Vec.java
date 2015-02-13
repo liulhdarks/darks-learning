@@ -23,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -31,6 +32,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.math3.util.FastMath;
 import org.jblas.DoubleMatrix;
@@ -61,6 +63,11 @@ public class Word2Vec
 	{
 		CBOW, SKIP_GRAM
 	}
+	
+	public enum DistanceType
+	{
+		COSINE, STATISTIC
+	}
 
 	public Word2VecConfig config = new Word2VecConfig();
 
@@ -75,6 +82,8 @@ public class Word2Vec
 	private long actualVocabCount = 0;
 
 	private long trainingVocabCount = 0;
+	
+	private volatile boolean parallelLoad = false;
 
 	double startLearnRate;
 
@@ -92,15 +101,19 @@ public class Word2Vec
 	 * 
 	 * @param corpus Corpus
 	 */
-	public void train(Corpus corpus)
+	public boolean train(Corpus corpus)
 	{
 		log.info("Start to train word2vec corpus.");
 		long st = System.currentTimeMillis();
-		buildWordNodes(corpus);
+		if (!buildWordNodes(corpus))
+		{
+			return false;
+		}
 		initTrainer();
 		startTrainer(corpus);
 		log.info("Complete to train word2vec corpus.Used time:" + (System.currentTimeMillis() - st)
 				/ 1000 + "s");
+		return true;
 	}
 	
 	/**
@@ -123,7 +136,7 @@ public class Word2Vec
 		return true;
 	}
 
-	private void buildWordNodes(Corpus corpus)
+	private boolean buildWordNodes(Corpus corpus)
 	{
 		totalVocabCount = corpus.getTotalVocabCount();
 		Iterator<Map.Entry<String, Long>> it = corpus.getWordFreq().entrySetIterator();
@@ -144,11 +157,17 @@ public class Word2Vec
 					+ wordNodes.size());
 			log.debug("Building haffman for word2vec node.");
 		}
+		if (wordNodes.isEmpty())
+		{
+			log.error("Training vocab count is zero.");
+			return false;
+		}
 		new Haffman(wordNodes.values()).build(config.featureSize);
 		if (log.isDebugEnabled())
 		{
 			log.debug("Complete to Build haffman tree.");
 		}
+		return true;
 	}
 
 	private void createExpTable()
@@ -347,17 +366,22 @@ public class Word2Vec
 	 * @param targets Target words list
 	 * @return Similar score
 	 */
-	public double distance(List<String> sources, List<String> targets)
+	public double distance(Collection<String> sources, Collection<String> targets)
 	{
-		DoubleMatrix srcMt = getSentenceFeature(sources);
-		DoubleMatrix targetMt = getSentenceFeature(targets);
-		if (srcMt == null || targetMt == null)
-		{
-			return 0.001;
-		}
-		double sim = srcMt.dot(targetMt);
-		sim = sim / (srcMt.norm2() * targetMt.norm2());
-		return sim;
+		return distance(sources, null, targets, null);
+	}
+	
+	/**
+	 * Calculate similar between two words lists
+	 * 
+	 * @param sources Source words list
+	 * @param targets Target words list
+	 * @param distanceType Distance type
+	 * @return Similar score
+	 */
+	public double distance(Collection<String> sources, Collection<String> targets, DistanceType distanceType)
+	{
+		return distance(sources, null, targets, null, distanceType);
 	}
 	
 	/**
@@ -369,8 +393,47 @@ public class Word2Vec
 	 * @param targetWeights Target words weight
 	 * @return Similar score
 	 */
-	public double distance(List<String> sources, Map<String, Double> sourceWeights, 
-			List<String> targets, Map<String, Double> targetWeights)
+	public double distance(Collection<String> sources, Map<String, Double> sourceWeights, 
+			Collection<String> targets, Map<String, Double> targetWeights)
+	{
+		return distance(sources, sourceWeights, targets, targetWeights, DistanceType.COSINE);
+	}
+	
+	/**
+	 * Calculate similar between two words lists with weights
+	 * 
+	 * @param sources Source words list
+	 * @param sourceWeights Source words weight
+	 * @param targets Target words list
+	 * @param targetWeights Target words weight
+	 * @param distanceType Distance type
+	 * @return Similar score
+	 */
+	public double distance(Collection<String> sources, Map<String, Double> sourceWeights, 
+			Collection<String> targets, Map<String, Double> targetWeights, DistanceType distanceType)
+	{
+		if (distanceType == DistanceType.COSINE)
+		{
+			return distanceCosine(sources, sourceWeights, targets, targetWeights);
+		}
+		else
+		{
+			return distanceStatistic(sources, sourceWeights, targets, targetWeights);
+		}
+	}
+	
+
+	/**
+	 * Calculate similar between two words lists with weights by cosine
+	 * 
+	 * @param sources Source words list
+	 * @param sourceWeights Source words weight
+	 * @param targets Target words list
+	 * @param targetWeights Target words weight
+	 * @return Similar score
+	 */
+	private double distanceCosine(Collection<String> sources, Map<String, Double> sourceWeights, 
+			Collection<String> targets, Map<String, Double> targetWeights)
 	{
 		DoubleMatrix srcMt = getSentenceFeature(sources, sourceWeights);
 		DoubleMatrix targetMt = getSentenceFeature(targets, targetWeights);
@@ -381,6 +444,81 @@ public class Word2Vec
 		double sim = srcMt.dot(targetMt);
 		sim = sim / (srcMt.norm2() * targetMt.norm2());
 		return sim;
+	}
+	
+	/**
+	 * Calculate similar between two words lists with weights by statistic way
+	 * 
+	 * @param sources Source words list
+	 * @param sourceWeights Source words weight
+	 * @param targets Target words list
+	 * @param targetWeights Target words weight
+	 * @return Similar score
+	 */
+	private double distanceStatistic(Collection<String> sources, Map<String, Double> sourceWeights, 
+			Collection<String> targets, Map<String, Double> targetWeights)
+	{
+		double m = sources.size();
+		double n = targets.size();
+		DoubleMatrix similarMatrix = DoubleMatrix.zeros(sources.size(), targets.size());
+		double sum1 = 0;
+		int i = 0;
+		int j = 0;
+		for (String w1 : sources)
+		{
+			j = 0;
+			double max = Double.NEGATIVE_INFINITY;
+			for (String w2 : targets)
+			{
+				double s = similarMatrix.get(i, j);
+				if (Double.compare(s, 0) == 0)
+				{
+					s = distance(w1, w2);
+					similarMatrix.put(i, j, s);
+				}
+				max = Math.max(max, s);
+				j++;
+			}
+			Double weight = sourceWeights == null ? null : sourceWeights.get(w1);
+			if (weight != null)
+			{
+				m += weight - 1;
+				max *= weight;
+			}
+			sum1 += max;
+			i++;
+		}
+		double v1 = sum1 / m;
+		
+		double sum2 = 0;
+		i = 0;
+		j = 0;
+		for (String w2 : targets)
+		{
+			i = 0;
+			double max = Double.NEGATIVE_INFINITY;
+			for (String w1 : sources)
+			{
+				double s = similarMatrix.get(i, j);
+				if (Double.compare(s, 0) == 0)
+				{
+					s = distance(w1, w2);
+					similarMatrix.put(i, j, s);
+				}
+				max = Math.max(max, s);
+				i++;
+			}
+			Double weight = targetWeights == null ? null : targetWeights.get(w2);
+			if (weight != null)
+			{
+				n += weight - 1;
+				max *= weight;
+			}
+			sum2 += max;
+			j++;
+		}
+		double v2 = sum2 / (double)n;
+		return (v1 + v2) / 2.D;
 	}
 
 	/**
@@ -434,7 +572,7 @@ public class Word2Vec
 	 * @param words Sentence words
 	 * @return matrix
 	 */
-	public DoubleMatrix getSentenceFeature(List<String> words)
+	public DoubleMatrix getSentenceFeature(Collection<String> words)
 	{
 		DoubleMatrix center = null;
 		for (String word : words)
@@ -462,7 +600,7 @@ public class Word2Vec
 	 * @param weights Word weights
 	 * @return matrix
 	 */
-	public DoubleMatrix getSentenceFeature(List<String> words, Map<String, Double> weights)
+	public DoubleMatrix getSentenceFeature(Collection<String> words, Map<String, Double> weights)
 	{
 		DoubleMatrix center = null;
 		for (String word : words)
@@ -471,7 +609,7 @@ public class Word2Vec
 			if (node != null)
 			{
 				DoubleMatrix feature = node.feature.dup();
-				Double weight = weights.get(word);
+				Double weight = weights == null ? null : weights.get(word);
 				if (weight != null)
 				{
 					feature.muli(weight);
@@ -574,8 +712,11 @@ public class Word2Vec
 		}
 		len = FastMath.sqrt(len);
 		//feature.divi(len);
-		config.featureSize = feature.length;
 		wordNodes.put(word, new WordNode(word, feature));
+		if (!parallelLoad)
+		{
+			config.featureSize = feature.length;
+		}
 	}
 
 	/**
@@ -608,7 +749,7 @@ public class Word2Vec
 					len += w * w;
 				}
 				len = FastMath.sqrt(len);
-				feature.divi(len);
+//				feature.divi(len);
 				wordNodes.put(name, new WordNode(name, feature));
 			}
 			log.info("Succeed to read word2vec model. Word dictionary size " + wordNodes.size());
@@ -688,5 +829,22 @@ public class Word2Vec
 		return unigramTable;
 	}
 
-	
+	public boolean isParallelLoad()
+	{
+		return parallelLoad;
+	}
+
+	public void setParallelLoad(boolean parallelLoad)
+	{
+		this.parallelLoad = parallelLoad;
+		if (parallelLoad)
+		{
+			wordNodes = new ConcurrentHashMap<String, WordNode>(wordNodes);
+		}
+		else
+		{
+			wordNodes = new HashMap<String, WordNode>(wordNodes);
+		}
+	}
+
 }
