@@ -18,16 +18,19 @@ package darks.learning.test.cluster;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import darks.learning.cluster.Cluster;
 import darks.learning.cluster.ClusterPoint;
 import darks.learning.cluster.hierarchy.DynamicalCluster;
+import darks.learning.corpus.Corpus;
+import darks.learning.corpus.CorpusLoader;
+import darks.learning.dimreduce.plsa.ProbabilityLSA;
 import darks.learning.distance.Distance;
 import darks.learning.word2vec.Word2Vec;
 
@@ -37,7 +40,8 @@ public class ClusterTest
 	@Test
 	public void testDynamicalCluster()
 	{
-		RecordDistance distance = new RecordDistance("test/train_data.model");
+//		RecordDistance distance = new RecordDistance("test/train_data.model");
+		RecordLsaDistance distance = new RecordLsaDistance("corpus/train_data.txt");
 		DynamicalCluster<TestRecord> cluster = new DynamicalCluster<TestRecord>(distance);
 		
 		try
@@ -90,6 +94,31 @@ public class ClusterTest
 		public double distance(TestRecord a, TestRecord b)
 		{
 			return word2Vec.distance(a.words, b.words);
+		}
+
+	}
+	
+	
+	
+	class RecordLsaDistance implements Distance<TestRecord>
+	{
+		
+		ProbabilityLSA plsa;
+		
+		public RecordLsaDistance(String modelPath)
+		{
+			CorpusLoader loader = new CorpusLoader(Corpus.TYPE_TF_IDF);
+	        File file = new File(modelPath);
+	        Corpus corpus = loader.loadFromFile(file, "UTF-8");
+	        plsa = new ProbabilityLSA(100);
+	        plsa.setIterNumber(20);
+	        plsa.train(corpus);
+		}
+
+		@Override
+		public double distance(TestRecord a, TestRecord b)
+		{
+			return plsa.distanceDocuments(a.title, b.title);
 		}
 
 	}
