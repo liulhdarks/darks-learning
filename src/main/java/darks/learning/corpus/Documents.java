@@ -28,8 +28,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.StringTokenizer;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +62,14 @@ public class Documents implements Serializable
 	private FreqCount<String> termsFreq = new FreqCount<String>();
 	
 	private Map<String, String> docsMap = new HashMap<String, String>();
+	
+	private long docsCount;
 
+	public Documents()
+	{
+	    
+	}
+	
 	/**
 	 * Load document from file
 	 * @param input Input file
@@ -223,6 +230,7 @@ public class Documents implements Serializable
 		}
 		docs.add(new Document(termsFreq, input, label, " \t\n"));
 		docsMap.put(input, label);
+		docsCount++;
 	}
 	
 	public void merge(List<Documents> docsList)
@@ -278,7 +286,6 @@ public class Documents implements Serializable
 			String label = entry.getKey();
 			List<Document> docs = entry.getValue();
 			int totalSize = tempMap.get(label).size();
-//			int splitSize = totalSize % splitCount == 0 ? totalSize / splitCount : totalSize / splitCount + 1;
 			int splitSize = totalSize / splitCount;
 			for (int index = 0; index < splitCount; index++)
 			{
@@ -328,98 +335,99 @@ public class Documents implements Serializable
 		return docsMap;
 	}
 
+    public long getDocsCount()
+    {
+        return docsCount;
+    }
 
+    public static class Document implements Serializable
+    {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 700658812752564691L;
 
-	public static class Document implements Serializable
-	{
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 700658812752564691L;
+        String source;
+        
+        List<String> terms = new LinkedList<String>();
+        
+        String label;
+        
+        public Document(FreqCount<String> freq, String s, String label, String delim)
+        {
+            this.source = s;
+            StringTokenizer token = new StringTokenizer(s, delim);
+            while (token.hasMoreTokens())
+            {
+                String term = token.nextToken().trim();
+                if ("".equals(term))
+                {
+                    continue;
+                }
+                terms.add(term);
+                freq.addValue(term);
+            }
+            this.label = label;
+        }
 
-		String source;
-		
-		List<String> terms = new LinkedList<String>();
-		
-		String label;
-		
-		public Document(FreqCount<String> freq, String s, String label, String delim)
-		{
-			this.source = s;
-			StringTokenizer token = new StringTokenizer(s, delim);
-			while (token.hasMoreTokens())
-			{
-				String term = token.nextToken().trim();
-				if ("".equals(term))
-				{
-					continue;
-				}
-				terms.add(term);
-				freq.addValue(term);
-			}
-			this.label = label;
-		}
+        public List<String> getTerms()
+        {
+            return terms;
+        }
 
-		public List<String> getTerms()
-		{
-			return terms;
-		}
+        public void setTerms(List<String> terms)
+        {
+            this.terms = terms;
+        }
 
-		public void setTerms(List<String> terms)
-		{
-			this.terms = terms;
-		}
+        public String getLabel()
+        {
+            return label;
+        }
 
-		public String getLabel()
-		{
-			return label;
-		}
+        public void setLabel(String label)
+        {
+            this.label = label;
+        }
 
-		public void setLabel(String label)
-		{
-			this.label = label;
-		}
+        public String getSource()
+        {
+            return source;
+        }
 
-		public String getSource()
-		{
-			return source;
-		}
+        public void setSource(String source)
+        {
+            this.source = source;
+        }
 
-		public void setSource(String source)
-		{
-			this.source = source;
-		}
+        @Override
+        public int hashCode()
+        {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((source == null) ? 0 : source.hashCode());
+            return result;
+        }
 
-		@Override
-		public int hashCode()
-		{
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((source == null) ? 0 : source.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj)
-		{
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			Document other = (Document) obj;
-			if (source == null)
-			{
-				if (other.source != null)
-					return false;
-			}
-			else if (!source.equals(other.source))
-				return false;
-			return true;
-		}
-		
-	}
-	
-	
+        @Override
+        public boolean equals(Object obj)
+        {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            Document other = (Document) obj;
+            if (source == null)
+            {
+                if (other.source != null)
+                    return false;
+            }
+            else if (!source.equals(other.source))
+                return false;
+            return true;
+        }
+        
+    }
 }

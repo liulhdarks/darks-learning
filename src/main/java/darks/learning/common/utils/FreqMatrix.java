@@ -30,20 +30,20 @@ public class FreqMatrix<T> implements Serializable
 	
 	private Map<T, FreqCount<T>> countMap = new HashMap<T, FreqCount<T>>();
 	
-	public void add(T real, T guess)
+	public void add(T k1, T k2)
 	{
-		add(real, guess, 1);
+		add(k1, k2, 1);
 	}
 	
-	public void add(T real, T guess, int value)
+	public void add(T k1, T k2, int value)
 	{
-		FreqCount<T> guessFreq = countMap.get(real);
+		FreqCount<T> guessFreq = countMap.get(k1);
 		if (guessFreq == null)
 		{
 			guessFreq = new FreqCount<T>();
-			countMap.put(real, guessFreq);
+			countMap.put(k1, guessFreq);
 		}
-		guessFreq.addValue(guess, value);
+		guessFreq.addValue(k2, value);
 	}
 	
 	public long count(T real, T guess)
