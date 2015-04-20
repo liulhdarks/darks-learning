@@ -69,7 +69,7 @@ public class ROCPlot
 
 	JFrame frame = null;
 
-	Double fitK = null;
+	Double fitK = 1.0;
 
 	Integer evalLineId = null;
 

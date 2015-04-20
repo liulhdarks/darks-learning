@@ -56,6 +56,8 @@ public class Documents implements Serializable
 
 	private static Logger log = LoggerFactory.getLogger(Documents.class);
 	
+	private static List<DocumentFilter> filters = new LinkedList<DocumentFilter>();
+	
 	
 	private Map<String, List<Document>> labelsMap = new HashMap<String, List<Document>>();
 	
@@ -222,13 +224,19 @@ public class Documents implements Serializable
 	
 	public void addData(String input, String label)
 	{
+		Document doc = new Document(termsFreq, input, label, " \t\n");
+		for (DocumentFilter filter : filters)
+		{
+			if (filter.filter(doc))
+				return;
+		}
 		List<Document> docs = labelsMap.get(label);
 		if (docs == null)
 		{
 			docs = new LinkedList<Document>();
 			labelsMap.put(label, docs);
 		}
-		docs.add(new Document(termsFreq, input, label, " \t\n"));
+		docs.add(doc);
 		docsMap.put(input, label);
 		docsCount++;
 	}
@@ -316,6 +324,11 @@ public class Documents implements Serializable
 			}
 		}
 		return result;
+	}
+	
+	public static void addFilter(DocumentFilter filter)
+	{
+		filters.add(filter);
 	}
 	
 	public Map<String, List<Document>> getLabelsMap()

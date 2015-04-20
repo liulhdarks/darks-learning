@@ -27,6 +27,8 @@ public class GISMaxent extends Maxent
     
     private static final Logger log = LoggerFactory.getLogger(GISMaxent.class);
     
+    private static final double DEFAULT_MIN_ERROR = 0.0001;
+    
     DoubleMatrix empiricalE = null;
     
     DoubleMatrix modelE = null;
@@ -44,6 +46,8 @@ public class GISMaxent extends Maxent
     int maxFeatureCount = 0;
     
     Map<String, Integer> labelIndexMap = null;
+    
+    double minError = DEFAULT_MIN_ERROR;
     
     /**
      * {@inheritDoc}
@@ -147,6 +151,7 @@ public class GISMaxent extends Maxent
     
     private void computeModelExpect(Documents docs)
     {
+    	modelE.fill(0.);
         int labelSize = labels.size();
         long docsSize = docs.getDocsCount();
         FeaturePair pair = new FeaturePair();
@@ -164,7 +169,7 @@ public class GISMaxent extends Maxent
                         Integer index = featureIndexMap.get(pair);
                         if (index == null)
                             continue;
-                        modelE.put(index, probYX.get(i) / (double) docsSize);
+                        modelE.put(index, modelE.get(index) + probYX.get(i) / (double) docsSize);
                     }
                 }
             }
@@ -201,7 +206,7 @@ public class GISMaxent extends Maxent
     {
         DoubleMatrix mean = MatrixFunctions.abs(lastLambda.sub(lambda));
         int maxIndex = SimpleBlas.iamax(mean);
-        if (mean.get(maxIndex) >= 0.01)
+        if (mean.get(maxIndex) >= minError)
         {
             log.info("GIS iteration " + epuchNum + " error:" + mean.get(maxIndex));
             return false;

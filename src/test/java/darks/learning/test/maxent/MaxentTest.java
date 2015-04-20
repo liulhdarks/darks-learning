@@ -9,7 +9,9 @@ import org.junit.Test;
 import darks.learning.classifier.bayes.NaiveBayes;
 import darks.learning.classifier.maxent.GISMaxent;
 import darks.learning.classifier.maxent.Maxent;
+import darks.learning.corpus.DocumentFilter;
 import darks.learning.corpus.Documents;
+import darks.learning.corpus.Documents.Document;
 
 public class MaxentTest
 {
@@ -17,17 +19,30 @@ public class MaxentTest
     @Test
     public void testMaxentGIS()
     {
+        File inputFile = new File("corpus/maxent_data3.txt");
         File input = new File("corpus/train_data.txt");
         File labels = new File("corpus/train_labels.txt");
         Documents docs;
         try
         {
-            docs = Documents.loadFromFile(input, labels, "UTF-8");
+//            docs = Documents.loadFromFile(input, labels, "UTF-8");
+        	Documents.addFilter(new DocumentFilter()
+			{
+				@Override
+				public boolean filter(Document doc)
+				{
+					return "mid".equalsIgnoreCase(doc.getLabel());
+				}
+			});
+        	docs = Documents.loadFromFile(inputFile, "UTF-8");
             Maxent maxent = new GISMaxent();
-            maxent.train(docs, 500);
+            maxent.train(docs, 1000);
             int count = 0;
+            int totalCount = 0;
             for (Entry<String, String> entry : docs.getDocsMap().entrySet())
             {
+            	if ("mid".equalsIgnoreCase(entry.getValue()))
+            		continue;
                 String[] terms = entry.getKey().split(" ");
                 int index = maxent.predict(terms);
                 String classify = maxent.getLabel(index);
@@ -39,8 +54,9 @@ public class MaxentTest
                 {
                     count++;
                 }
+                totalCount++;
             }
-            System.out.println("Accurancy:" + (float)count / (float)docs.getDocsMap().size());
+            System.out.println("Accurancy:" + (float)count / (float)totalCount);
         }
         catch (IOException e)
         {
