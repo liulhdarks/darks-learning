@@ -1,7 +1,6 @@
 package darks.learning.classifier.maxent;
 
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +40,8 @@ public class GISMaxent extends Maxent
     
     Map<FeaturePair, Long> featureMap = null;
     
+	HashMap<String, Integer> termIndexMap = new HashMap<String, Integer>();
+    
     int featureIndexSeed = 0;
     
     int maxFeatureCount = 0;
@@ -49,12 +50,17 @@ public class GISMaxent extends Maxent
     
     double minError = DEFAULT_MIN_ERROR;
     
+    int[][] ctxIndexs;
+    
+    int[][] modelIndexs;
+    
     /**
      * {@inheritDoc}
      */
     @Override
     public void train(Documents docs, int maxIteration)
     {
+    	long start = System.currentTimeMillis();
         initParam(docs);
         computeEmpiricalExpect(docs);
         for (int i = 0; i < maxIteration; i++)
@@ -64,6 +70,8 @@ public class GISMaxent extends Maxent
             if (checkConverge(i))
                 break;
         }
+        long cost = System.currentTimeMillis() - start;
+        log.info("Cost:" + cost);
     }
     
     /**
@@ -72,7 +80,15 @@ public class GISMaxent extends Maxent
     @Override
     public int predict(String[] input)
     {
-        DoubleMatrix probYX = computeProbYX(Arrays.asList(input));
+    	int[] termIndexs = new int[input.length];
+    	for (int i = 0; i < input.length; i++)
+    	{
+    		String term = input[i];
+    		Integer index = termIndexMap.get(term);
+    		int v = index == null ? -1 : index;
+    		termIndexs[i] = v;
+    	}
+        DoubleMatrix probYX = computeProbYX(termIndexs);
         return SimpleBlas.iamax(probYX);
     }
 
@@ -88,9 +104,12 @@ public class GISMaxent extends Maxent
     
     private void initParam(Documents docs)
     {
+    	int termIndexSeed = 0;
         featureIndexMap = new HashMap<FeaturePair, Integer>();
         featureMap = new HashMap<FeaturePair, Long>();
         labelIndexMap = new HashMap<String, Integer>();
+        ctxIndexs = new int[(int)docs.getDocsCount()][];
+        int docIndex = 0;
         for (Entry<String, List<Document>> entry : docs.getLabelsMap().entrySet())
         {
             String label = entry.getKey();
@@ -102,6 +121,8 @@ public class GISMaxent extends Maxent
             }
             for (Document doc : entry.getValue())
             {
+                int termIndex = 0;
+                int[] indexs = new int[doc.getTerms().size()];
                 for (String term : doc.getTerms())
                 {
                     FeaturePair pair = new FeaturePair(label, term);
@@ -109,18 +130,36 @@ public class GISMaxent extends Maxent
                     if (index == null)
                         index = featureIndexSeed++;
                     featureIndexMap.put(pair, index);
+                    
+                    index = termIndexMap.get(term);
+                    if (index == null){
+                        index = termIndexSeed++;
+                        termIndexMap.put(term, index);
+                    }
+                    indexs[termIndex++] = index;
+                    
                     Long count = featureMap.get(pair);
                     if (count == null)
                         count = 0l;
                     featureMap.put(pair, ++count);
                 }
+                ctxIndexs[docIndex++] = indexs;
                 maxFeatureCount = Math.max(maxFeatureCount, doc.getTerms().size());
             }
+        }
+        modelIndexs = new int[termIndexMap.size()][labelIndexMap.size()];
+        for (Entry<FeaturePair, Integer> featureIndex : featureIndexMap.entrySet())
+        {
+        	FeaturePair pair = featureIndex.getKey();
+        	Integer index = featureIndex.getValue();
+        	int labelIndex = labelIndexMap.get(pair.label);
+        	int termIndex = termIndexMap.get(pair.term);
+        	modelIndexs[termIndex][labelIndex] = index;
         }
         lambda = DoubleMatrix.zeros(featureIndexMap.size());
         empiricalE = DoubleMatrix.zeros(featureIndexMap.size());
         modelE = DoubleMatrix.zeros(featureIndexMap.size());
-        log.info("Feature size " + modelE.length);
+        log.info("Feature size " + modelE.length + "/" + termIndexMap.size() + "*" + labelIndexMap.size());
     }
     
     private void computeEmpiricalExpect(Documents docs)
@@ -151,49 +190,38 @@ public class GISMaxent extends Maxent
     
     private void computeModelExpect(Documents docs)
     {
-    	modelE.fill(0.);
+    	modelE = DoubleMatrix.zeros(modelE.length);
         int labelSize = labels.size();
         long docsSize = docs.getDocsCount();
-        FeaturePair pair = new FeaturePair();
-        for (Entry<String, List<Document>> entry : docs.getLabelsMap().entrySet())
+        for (int[] termIndexs : ctxIndexs)
         {
-            for (Document doc : entry.getValue())
+            DoubleMatrix probYX = computeProbYX(termIndexs);
+            for (int j = 0; j < termIndexs.length; j++)
             {
-                DoubleMatrix probYX = computeProbYX(doc.getTerms());
-                for (String term : doc.getTerms())
+                for (int i = 0; i < labelSize; i++)
                 {
-                    for (int i = 0; i < labelSize; i++)
-                    {
-                        String label = labels.get(i);
-                        pair.set(label, term);
-                        Integer index = featureIndexMap.get(pair);
-                        if (index == null)
-                            continue;
-                        modelE.put(index, modelE.get(index) + probYX.get(i) / (double) docsSize);
-                    }
+                    int index = modelIndexs[termIndexs[j]][i];
+                    if (index >= 0)
+                    	modelE.put(index, modelE.get(index) + probYX.get(i) / (double) docsSize);
                 }
             }
         }
     }
     
     //P(Y|X)
-    private DoubleMatrix computeProbYX(List<String> terms)
+    private DoubleMatrix computeProbYX(int[] termIndexs)
     {
         double sum = 0;
         int labelSize = labels.size();
         DoubleMatrix prob = DoubleMatrix.zeros(labelSize);
-        FeaturePair pair = new FeaturePair();
         for (int i = 0; i < labelSize; i++)
         {
             double lambdaSum = 0;
-            String label = labels.get(i);
-            for (String term : terms)
+            for (int j = 0; j < termIndexs.length; j++)
             {
-                pair.set(label, term);
-                Integer index = featureIndexMap.get(pair);
-                if (index == null)
-                    continue;
-                lambdaSum += lambda.get(index);
+                int index = modelIndexs[termIndexs[j]][i];
+                if (index >= 0)
+                	lambdaSum += lambda.get(index);
             }
             lambdaSum = Math.exp(lambdaSum);
             prob.put(i, lambdaSum);
