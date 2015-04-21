@@ -16,7 +16,14 @@
  */
 package darks.learning.classifier.maxent;
 
-import java.util.HashMap;
+import java.io.InputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GISModel extends MaxentModel
 {
@@ -25,17 +32,63 @@ public class GISModel extends MaxentModel
 	 * 
 	 */
 	private static final long serialVersionUID = -8820339300824239323L;
+	
+	private static final Logger log = LoggerFactory.getLogger(GISModel.class);
 
     int[][] modelIndexs;
     
-	HashMap<String, Integer> termIndexMap;
+    Map<String, Integer> termIndexMap;
+    
 
-	public int[][] getModelIndexs()
+    public GISModel()
+    {
+    }
+	
+
+    public GISModel(List<String> labels, int[][] modelIndexs, Map<String, Integer> termIndexMap)
+    {
+        super(labels);
+        this.modelIndexs = modelIndexs;
+        this.termIndexMap = termIndexMap;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean saveModel(OutputStream out)
+    {
+        ObjectOutputStream oos = null;
+        try
+        {
+            oos = new ObjectOutputStream(out);
+            oos.writeObject(this);
+            return true;
+        }
+        catch (Exception e)
+        {
+            log.error(e.getMessage(), e);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean readModel(InputStream ins)
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+
+    public int[][] getModelIndexs()
 	{
 		return modelIndexs;
 	}
 
-	public HashMap<String, Integer> getTermIndexMap()
+	public Map<String, Integer> getTermIndexMap()
 	{
 		return termIndexMap;
 	}

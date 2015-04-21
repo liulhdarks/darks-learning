@@ -16,9 +16,21 @@
  */
 package darks.learning.classifier.maxent;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import darks.learning.common.utils.IOUtils;
 
 public abstract class MaxentModel implements Serializable
 {
@@ -28,10 +40,86 @@ public abstract class MaxentModel implements Serializable
 	 */
 	private static final long serialVersionUID = 641755681544620064L;
 	
+	private static final Logger log = LoggerFactory.getLogger(MaxentModel.class);
+	
 	
 	protected List<String> labels = new ArrayList<String>();
+	
 
-	public List<String> getLabels()
+
+    public MaxentModel()
+    {
+    }
+
+	public MaxentModel(List<String> labels)
+    {
+        this.labels = labels;
+    }
+
+
+
+    
+    /**
+     * Save maxent model to file
+     * 
+     * @param file Target model file
+     * @return If success, return true
+     */
+    public boolean saveModel(File file)
+    {
+        OutputStream out = null;
+        try
+        {
+            out = new BufferedOutputStream(new FileOutputStream(file));
+            return saveModel(out);
+        }
+        catch (Exception e)
+        {
+            log.error(e.getMessage(), e);
+            return false;
+        }
+        finally
+        {
+            IOUtils.closeStream(out);
+        }
+    }
+
+    /**
+     * Save maxent model to output stream
+     * 
+     * @param file Target model file
+     * @return If success, return true
+     */
+    public abstract boolean saveModel(OutputStream out);
+    
+    
+    public boolean readModel(File file)
+    {
+        if (!file.exists())
+            return false;
+        InputStream ins = null;
+        try
+        {
+            ins = new BufferedInputStream(new FileInputStream(file));
+            return true;
+        }
+        catch (Exception e)
+        {
+            log.error(e.getMessage(), e);
+            return false;
+        }
+        finally
+        {
+            IOUtils.closeStream(ins);
+        }
+    }
+    
+    
+    public abstract boolean readModel(InputStream ins);
+    
+	
+
+    public List<String> getLabels()
 	{
 		return labels;
 	}

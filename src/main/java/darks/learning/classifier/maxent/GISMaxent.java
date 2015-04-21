@@ -1,6 +1,5 @@
 package darks.learning.classifier.maxent;
 
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,9 +39,7 @@ public class GISMaxent extends Maxent
     
     Map<FeaturePair, Long> featureMap = null;
     
-	HashMap<String, Integer> termIndexMap = new HashMap<String, Integer>();
-    
-    int featureIndexSeed = 0;
+    Map<String, Integer> termIndexMap = null;
     
     int maxFeatureCount = 0;
     
@@ -54,11 +51,21 @@ public class GISMaxent extends Maxent
     
     int[][] modelIndexs;
     
+    public GISMaxent()
+    {
+        
+    }
+    
+    public GISMaxent(GISModel model)
+    {
+        loadModel(model);
+    }
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public void train(Documents docs, int maxIteration)
+    public MaxentModel train(Documents docs, int maxIteration)
     {
     	long start = System.currentTimeMillis();
         initParam(docs);
@@ -70,8 +77,10 @@ public class GISMaxent extends Maxent
             if (checkConverge(i))
                 break;
         }
+        releaseMemory();
         long cost = System.currentTimeMillis() - start;
         log.info("Cost:" + cost);
+        return new GISModel(labels, modelIndexs, termIndexMap);
     }
     
     /**
@@ -91,20 +100,24 @@ public class GISMaxent extends Maxent
         DoubleMatrix probYX = computeProbYX(termIndexs);
         return SimpleBlas.iamax(probYX);
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean saveModel(OutputStream out)
+    
+    private void releaseMemory()
     {
-        return false;
+        ctxIndexs = null;
+        empiricalE = null;
+        modelE = null;
+        lambda = null;
+        lastLambda = null;
+        featureMap = null;
+        termIndexMap = null;
     }
     
     
     private void initParam(Documents docs)
     {
+        int featureIndexSeed = 0;
     	int termIndexSeed = 0;
+    	termIndexMap = new HashMap<String, Integer>();
         featureIndexMap = new HashMap<FeaturePair, Integer>();
         featureMap = new HashMap<FeaturePair, Long>();
         labelIndexMap = new HashMap<String, Integer>();
@@ -241,6 +254,18 @@ public class GISMaxent extends Maxent
         }
         log.info("GIS converge on " + mean.get(maxIndex));
         return true;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadModel(MaxentModel model)
+    {
+        GISModel gisModel = (GISModel) model;
+        modelIndexs = gisModel.getModelIndexs();
+        labels = gisModel.getLabels();
+        termIndexMap = gisModel.getTermIndexMap();
     }
     
     class FeaturePair
