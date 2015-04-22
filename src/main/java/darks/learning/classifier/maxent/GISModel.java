@@ -16,15 +16,29 @@
  */
 package darks.learning.classifier.maxent;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.jblas.DoubleMatrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import darks.learning.common.utils.IOUtils;
+import darks.learning.exceptions.ModelException;
+
+/**
+ * GIS model 
+ * @author Darks.Liu
+ *
+ */
 public class GISModel extends MaxentModel
 {
 
@@ -39,17 +53,20 @@ public class GISModel extends MaxentModel
     
     Map<String, Integer> termIndexMap;
     
+    DoubleMatrix lambda;
+    
 
     public GISModel()
     {
     }
 	
 
-    public GISModel(List<String> labels, int[][] modelIndexs, Map<String, Integer> termIndexMap)
+    public GISModel(List<String> labels, int[][] modelIndexs, Map<String, Integer> termIndexMap, DoubleMatrix lambda)
     {
         super(labels);
         this.modelIndexs = modelIndexs;
         this.termIndexMap = termIndexMap;
+        this.lambda = lambda;
     }
     
     /**
@@ -63,6 +80,7 @@ public class GISModel extends MaxentModel
         {
             oos = new ObjectOutputStream(out);
             oos.writeObject(this);
+            oos.flush();
             return true;
         }
         catch (Exception e)
@@ -71,15 +89,52 @@ public class GISModel extends MaxentModel
         }
         return false;
     }
+    
+    /**
+     * Read GIS model from target file
+     * 
+     * @param file Model file
+     * @return GIS model
+     */
+    public static GISModel readModel(File file)
+    {
+        if (!file.exists())
+            return null;
+        InputStream ins = null;
+        try
+        {
+            ins = new BufferedInputStream(new FileInputStream(file));
+            return readModel(ins);
+        }
+        catch (Exception e)
+        {
+            log.error(e.getMessage(), e);
+            return null;
+        }
+        finally
+        {
+            IOUtils.closeStream(ins);
+        }
+    }
 
     /**
-     * {@inheritDoc}
+     * Read GIS model from input stream
+     * 
+     * @param ins Model input stream
+     * @return GIS model
+     * @throws Exception
      */
-    @Override
-    public boolean readModel(InputStream ins)
+    public static GISModel readModel(InputStream ins) throws Exception
     {
-        // TODO Auto-generated method stub
-        return false;
+    	ObjectInputStream ois = new ObjectInputStream(ins);
+    	GISModel model = (GISModel) ois.readObject();
+    	if (model.labels == null || model.labels.isEmpty()
+    			|| model.modelIndexs == null || model.modelIndexs.length == 0
+    			|| model.termIndexMap == null || model.termIndexMap.isEmpty())
+    	{
+    		throw new ModelException("Invalid GIS model." + model);
+    	}
+    	return model;
     }
 
 
@@ -91,6 +146,18 @@ public class GISModel extends MaxentModel
 	public Map<String, Integer> getTermIndexMap()
 	{
 		return termIndexMap;
+	}
+	
+	public DoubleMatrix getLambda()
+	{
+		return lambda;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "GISModel [modelIndexs=" + Arrays.toString(modelIndexs) + ", termIndexMap="
+				+ termIndexMap + ", labels=" + labels + "]";
 	}
 	
 	

@@ -16,12 +16,9 @@
  */
 package darks.learning.classifier.maxent;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -91,31 +88,6 @@ public abstract class MaxentModel implements Serializable
      * @return If success, return true
      */
     public abstract boolean saveModel(OutputStream out);
-    
-    
-    public boolean readModel(File file)
-    {
-        if (!file.exists())
-            return false;
-        InputStream ins = null;
-        try
-        {
-            ins = new BufferedInputStream(new FileInputStream(file));
-            return true;
-        }
-        catch (Exception e)
-        {
-            log.error(e.getMessage(), e);
-            return false;
-        }
-        finally
-        {
-            IOUtils.closeStream(ins);
-        }
-    }
-    
-    
-    public abstract boolean readModel(InputStream ins);
     
 	
 

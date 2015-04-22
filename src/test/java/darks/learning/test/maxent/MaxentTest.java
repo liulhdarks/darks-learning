@@ -7,7 +7,9 @@ import java.util.Map.Entry;
 import org.junit.Test;
 
 import darks.learning.classifier.maxent.GISMaxent;
+import darks.learning.classifier.maxent.GISModel;
 import darks.learning.classifier.maxent.Maxent;
+import darks.learning.classifier.maxent.MaxentModel;
 import darks.learning.corpus.DocumentFilter;
 import darks.learning.corpus.Documents;
 import darks.learning.corpus.Documents.Document;
@@ -32,7 +34,10 @@ public class MaxentTest
 			});
         	docs = Documents.loadFromFile(inputFile, "UTF-8");
             Maxent maxent = new GISMaxent();
-            maxent.train(docs, 2000);
+            MaxentModel model = maxent.train(docs, 1000);
+            model.saveModel(new File("corpus/maxent_model.dat"));
+            GISModel gisModel = GISModel.readModel(new File("corpus/maxent_model.dat"));
+            maxent = new GISMaxent(gisModel);
             int count = 0;
             int totalCount = 0;
             for (Entry<String, String> entry : docs.getDocsMap().entrySet())

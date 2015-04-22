@@ -27,29 +27,63 @@ public class GISMaxent extends Maxent
     
     private static final double DEFAULT_MIN_ERROR = 0.0001;
     
+    /**
+     * empirical expected vector
+     */
     DoubleMatrix empiricalE = null;
-    
+
+    /**
+     * model expected vector
+     */
     DoubleMatrix modelE = null;
     
     DoubleMatrix lambda = null;
     
     DoubleMatrix lastLambda = null;
     
+    /**
+     * Store <<term,label>,index>, index is the model expect index.
+     */
     Map<FeaturePair, Integer> featureIndexMap = null;
-    
+
+    /**
+     * Store <<term,label>,count>
+     */
     Map<FeaturePair, Long> featureMap = null;
     
+    /**
+     * Store the index of terms in vector
+     */
     Map<String, Integer> termIndexMap = null;
     
+    /**
+     * Maximum feature/term count as C
+     */
     int maxFeatureCount = 0;
     
+    /**
+     * Store the index of labels
+     */
     Map<String, Integer> labelIndexMap = null;
     
     double minError = DEFAULT_MIN_ERROR;
     
+    /**
+     * Array of documents' label indexs
+     */
+    int[] ctxLabelIndexs;
+    
+    /**
+     * [document index][local term index]=[global term index]
+     */
     int[][] ctxIndexs;
     
+    /**
+     * [global term index][label index]=[model expect index]
+     */
     int[][] modelIndexs;
+    
+    double loglikelihood;
     
     public GISMaxent()
     {
@@ -67,6 +101,7 @@ public class GISMaxent extends Maxent
     @Override
     public MaxentModel train(Documents docs, int maxIteration)
     {
+    	log.info("Start to train GIS maxent model.");
     	long start = System.currentTimeMillis();
         initParam(docs);
         computeEmpiricalExpect(docs);
@@ -79,8 +114,8 @@ public class GISMaxent extends Maxent
         }
         releaseMemory();
         long cost = System.currentTimeMillis() - start;
-        log.info("Cost:" + cost);
-        return new GISModel(labels, modelIndexs, termIndexMap);
+        log.info("Complete to train GIS model. Cost:" + cost);
+        return new GISModel(labels, modelIndexs, termIndexMap, lambda);
     }
     
     /**
@@ -103,13 +138,12 @@ public class GISMaxent extends Maxent
     
     private void releaseMemory()
     {
+    	ctxLabelIndexs = null;
         ctxIndexs = null;
         empiricalE = null;
         modelE = null;
-        lambda = null;
         lastLambda = null;
         featureMap = null;
-        termIndexMap = null;
     }
     
     
@@ -122,13 +156,15 @@ public class GISMaxent extends Maxent
         featureMap = new HashMap<FeaturePair, Long>();
         labelIndexMap = new HashMap<String, Integer>();
         ctxIndexs = new int[(int)docs.getDocsCount()][];
+        ctxLabelIndexs = new int[(int)docs.getDocsCount()];
         int docIndex = 0;
         for (Entry<String, List<Document>> entry : docs.getLabelsMap().entrySet())
         {
             String label = entry.getKey();
-            if (!labelIndexMap.containsKey(label))
+            Integer labelIndex = labelIndexMap.get(label);
+            if (labelIndex == null)
             {
-                int labelIndex = labels.size();
+                labelIndex = labels.size();
                 labelIndexMap.put(label, labelIndex);
                 labels.add(label);
             }
@@ -156,6 +192,7 @@ public class GISMaxent extends Maxent
                         count = 0l;
                     featureMap.put(pair, ++count);
                 }
+                ctxLabelIndexs[docIndex] = labelIndex;
                 ctxIndexs[docIndex++] = indexs;
                 maxFeatureCount = Math.max(maxFeatureCount, doc.getTerms().size());
             }
@@ -172,7 +209,8 @@ public class GISMaxent extends Maxent
         lambda = DoubleMatrix.zeros(featureIndexMap.size());
         empiricalE = DoubleMatrix.zeros(featureIndexMap.size());
         modelE = DoubleMatrix.zeros(featureIndexMap.size());
-        log.info("Feature size " + modelE.length + "/" + termIndexMap.size() + "*" + labelIndexMap.size());
+        log.info("GIS document count " + docs.getDocsCount());
+        log.info("GIS feature size " + modelE.length + "/" + termIndexMap.size() + "*" + labelIndexMap.size());
     }
     
     private void computeEmpiricalExpect(Documents docs)
@@ -203,11 +241,13 @@ public class GISMaxent extends Maxent
     
     private void computeModelExpect(Documents docs)
     {
+    	loglikelihood = 0;
     	modelE = DoubleMatrix.zeros(modelE.length);
         int labelSize = labels.size();
         long docsSize = docs.getDocsCount();
-        for (int[] termIndexs : ctxIndexs)
+        for (int d = 0; d < ctxIndexs.length; d++)
         {
+        	int[] termIndexs = ctxIndexs[d];
             DoubleMatrix probYX = computeProbYX(termIndexs);
             for (int j = 0; j < termIndexs.length; j++)
             {
@@ -218,6 +258,7 @@ public class GISMaxent extends Maxent
                     	modelE.put(index, modelE.get(index) + probYX.get(i) / (double) docsSize);
                 }
             }
+            loglikelihood += Math.log(probYX.get(ctxLabelIndexs[d]));
         }
     }
     
@@ -232,9 +273,12 @@ public class GISMaxent extends Maxent
             double lambdaSum = 0;
             for (int j = 0; j < termIndexs.length; j++)
             {
-                int index = modelIndexs[termIndexs[j]][i];
-                if (index >= 0)
-                	lambdaSum += lambda.get(index);
+            	if (termIndexs[j] >= 0)
+            	{
+	                int index = modelIndexs[termIndexs[j]][i];
+	                if (index >= 0)
+	                	lambdaSum += lambda.get(index);
+            	}
             }
             lambdaSum = Math.exp(lambdaSum);
             prob.put(i, lambdaSum);
@@ -249,10 +293,10 @@ public class GISMaxent extends Maxent
         int maxIndex = SimpleBlas.iamax(mean);
         if (mean.get(maxIndex) >= minError)
         {
-            log.info("GIS iteration " + epuchNum + " error:" + mean.get(maxIndex));
+            log.debug("GIS iteration " + epuchNum + " error:" + mean.get(maxIndex) + " likelihood:" + loglikelihood);
             return false;
         }
-        log.info("GIS converge on " + mean.get(maxIndex));
+        log.info("GIS converge on " + mean.get(maxIndex) + " likelihood:" + loglikelihood);
         return true;
     }
     
@@ -266,6 +310,7 @@ public class GISMaxent extends Maxent
         modelIndexs = gisModel.getModelIndexs();
         labels = gisModel.getLabels();
         termIndexMap = gisModel.getTermIndexMap();
+        lambda = gisModel.getLambda();
     }
     
     class FeaturePair
