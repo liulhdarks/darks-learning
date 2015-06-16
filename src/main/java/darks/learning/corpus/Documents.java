@@ -25,11 +25,13 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +65,7 @@ public class Documents implements Serializable
 	
 	private FreqCount<String> termsFreq = new FreqCount<String>();
 	
-	private Map<String, String> docsMap = new HashMap<String, String>();
+	private Map<String, Set<String>> docsMap = new HashMap<String, Set<String>>();
 	
 	private long docsCount;
 
@@ -237,7 +239,13 @@ public class Documents implements Serializable
 			labelsMap.put(label, docs);
 		}
 		docs.add(doc);
-		docsMap.put(input, label);
+		Set<String> labels = docsMap.get(input);
+		if (labels == null)
+		{
+			labels = new HashSet<String>();
+			docsMap.put(input, labels);
+		}
+		labels.add(label);
 		docsCount++;
 	}
 	
@@ -258,7 +266,7 @@ public class Documents implements Serializable
 	public List<Documents> splitDocuments(int splitCount)
 	{
 		List<Documents> result = new ArrayList<Documents>();
-		List<Entry<String, String>> docsList = new ArrayList<Entry<String, String>>(docsMap.entrySet());
+		List<Entry<String, Set<String>>> docsList = new ArrayList<Entry<String, Set<String>>>(docsMap.entrySet());
 		int totalSize = docsList.size();
 		int splitSize = totalSize / splitCount;
 		splitSize = splitSize <= 0 ? 1 : splitSize;
@@ -268,8 +276,12 @@ public class Documents implements Serializable
 			int maxIndex = Math.min(totalSize, i + splitSize);
 			for (int j = i; j < maxIndex; j++)
 			{
-				Entry<String, String> entry = docsList.get(j);
-				docs.addData(entry.getKey(), entry.getValue());
+				Entry<String, Set<String>> entry = docsList.get(j);
+				Set<String> labels = entry.getValue();
+				for (String label : labels)
+				{
+					docs.addData(entry.getKey(), label);
+				}
 			}
 			result.add(docs);
 		}
@@ -343,7 +355,7 @@ public class Documents implements Serializable
 	}
 
 	
-	public Map<String, String> getDocsMap()
+	public Map<String, Set<String>> getDocsMap()
 	{
 		return docsMap;
 	}

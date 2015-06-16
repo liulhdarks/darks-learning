@@ -68,10 +68,10 @@ public class MLPTest
             }; 
     
         MultiLayerNeuronNetwork mlp = new MultiLayerNeuronNetwork();
-        mlp.config.setHiddenLayouts(new int[]{6})
+        mlp.config.setHiddenLayouts(new int[]{4})
                     .setUseAdaGrad(false)
                     .setLearnRate(0.1)
-                    .setMaxIterateCount(10)
+                    .setMaxIterateCount(1000)
                     .setInputLayerSize(3)
                     .setOutputLayerSize(2)
                     .setUseRegularization(false);

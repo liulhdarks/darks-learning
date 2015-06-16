@@ -3,6 +3,7 @@ package darks.learning.test.modeset;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -30,7 +31,7 @@ public class ModelSetTest
 		{
             Documents docs = Documents.loadFromFile(input, labels, "UTF-8");
             Map<String, List<Document>> labelsMap = docs.getLabelsMap();
-            Map<String, String> docsMap = docs.getDocsMap();
+            Map<String, Set<String>> docsMap = docs.getDocsMap();
             System.out.println(labelsMap.size());
             System.out.println(docsMap.size());
 		}

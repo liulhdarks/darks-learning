@@ -20,11 +20,15 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jblas.DoubleMatrix;
+import org.jblas.SimpleBlas;
 import org.junit.Test;
 
+import darks.learning.common.utils.MatrixHelper;
 import darks.learning.corpus.Corpus;
 import darks.learning.corpus.CorpusLoader;
 import darks.learning.word2vec.Word2Vec;
+import darks.learning.word2vec.Word2Vec.DistanceType;
 import darks.learning.word2vec.Word2Vec.Word2VecType;
 
 public class Word2VecTest
@@ -67,8 +71,24 @@ public class Word2VecTest
 		System.out.println(sim);
 		List<String> sources = Arrays.asList("系统 拨打 手机".split(" "));
 		List<String> targets = Arrays.asList("锁屏 系统 咨询 选择 点击 不能 安卓 淘宝 苹果 电话号码 客户 不稳定 声音 卖家 拨打 手机".split(" "));
-		sim = vec.distance(sources, targets);
+		sim = vec.distance(sources, targets, DistanceType.STATISTIC);
 		System.out.println(sim);
+		
+		DoubleMatrix srcMatrix = vec.getSentenceFeature(sources);
+		DoubleMatrix matrix = DoubleMatrix.zeros(100, 3);
+		for (int i = 0; i < matrix.columns; i++)
+		{
+			DoubleMatrix wordMatrix = vec.getSentenceFeature(targets);
+			matrix.putColumn(i, wordMatrix);
+		}
+		DoubleMatrix preNorm = MatrixHelper.sqrt(matrix.mul(matrix).columnSums());
+		
+		DoubleMatrix tmatrix = srcMatrix.transpose();
+		DoubleMatrix dotVector = tmatrix.mmul(matrix);
+        double norm = srcMatrix.norm2();
+        DoubleMatrix cosMt = dotVector.div(preNorm.mul(norm));
+        System.out.println(cosMt);
+        System.out.println(SimpleBlas.iamax(cosMt));
 	}
 	
 }

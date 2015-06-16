@@ -1,19 +1,14 @@
 package darks.learning.test.math;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.TreeSet;
 
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.SingularValueDecomposition;
-import org.jblas.ComplexDouble;
 import org.jblas.ComplexDoubleMatrix;
 import org.jblas.DoubleMatrix;
 import org.jblas.Eigen;
+import org.jblas.SimpleBlas;
 import org.jblas.Singular;
 import org.jblas.Solve;
 import org.junit.Test;
@@ -67,6 +62,9 @@ public class MathTest
 		DoubleMatrix im = new DoubleMatrix(input);
 		System.out.println(im.transpose());
 		
+		double[] p = new double[]{0.5, 0.3, 0.8, -0.9, -0.3};
+		im = new DoubleMatrix(p);
+		System.out.println(SimpleBlas.iamax(im));
 	}
 
 	@Test

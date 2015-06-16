@@ -18,6 +18,7 @@ package darks.learning.test.bayes;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.junit.Test;
@@ -42,10 +43,10 @@ public class BayesTest
 						.setModelType(NaiveBayes.BINAMIAL);
 			bayes.train(docs);
 			int count = 0;
-			for (Entry<String, String> entry : docs.getDocsMap().entrySet())
+			for (Entry<String, Set<String>> entry : docs.getDocsMap().entrySet())
 			{
 				String classify = bayes.predict(entry.getKey());
-				if (!classify.equals(entry.getValue()))
+				if (!entry.getValue().contains(classify))
 				{
 					System.out.println("QA:" + entry.getKey() + " output:" + classify + " expect:" + entry.getValue());
 				}

@@ -2,6 +2,7 @@ package darks.learning.test.maxent;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.junit.Test;
@@ -40,14 +41,14 @@ public class MaxentTest
             maxent = new GISMaxent(gisModel);
             int count = 0;
             int totalCount = 0;
-            for (Entry<String, String> entry : docs.getDocsMap().entrySet())
+            for (Entry<String, Set<String>> entry : docs.getDocsMap().entrySet())
             {
-            	if ("mid".equalsIgnoreCase(entry.getValue()))
+            	if (entry.getValue().contains("mid") || entry.getValue().contains("MID"))
             		continue;
                 String[] terms = entry.getKey().split(" ");
                 int index = maxent.predict(terms);
                 String classify = maxent.getLabel(index);
-                if (!classify.equals(entry.getValue()))
+                if (!entry.getValue().contains(classify))
                 {
                     System.out.println("QA:" + entry.getKey() + " output:" + classify + " expect:" + entry.getValue());
                 }
