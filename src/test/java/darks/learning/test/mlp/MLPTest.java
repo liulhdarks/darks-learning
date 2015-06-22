@@ -54,25 +54,34 @@ public class MLPTest
 //        }; 
     	
     	double[][] trainX = {
-                {1, 0, 0},
-                {0, 0, 1},
-                {1, 1, 0},
-                {0, 1, 1},
+                {1, 0, 0, 0, 0, 0},
+                {0, 1, 0, 0, 0, 0},
+                {1, 1, 0, 0, 0, 0},
+                {1, 0, 1, 0, 0, 0},
+                {0, 0, 0, 0, 0, 1},
+                {0, 0, 0, 0, 1, 0},
+                {0, 0, 0, 0, 1, 1},
+                {0, 0, 0, 1, 0, 1},
             };
         
         double[][] labels = {
                 {1, 0},
-                {0, 1},
                 {1, 0},
+                {1, 0},
+                {1, 0},
+                {0, 1},
+                {0, 1},
+                {0, 1},
                 {0, 1},
             }; 
     
         MultiLayerNeuronNetwork mlp = new MultiLayerNeuronNetwork();
-        mlp.config.setHiddenLayouts(new int[]{6})
+        mlp.config.setHiddenLayouts(new int[]{16})
                     .setUseAdaGrad(false)
                     .setLearnRate(0.1)
-                    .setMaxIterateCount(10)
-                    .setInputLayerSize(3)
+                    .setMomentum(0.)
+                    .setMaxIterateCount(10000)
+                    .setInputLayerSize(6)
                     .setOutputLayerSize(2)
                     .setUseRegularization(false);
         mlp.train(new DoubleMatrix(trainX), new DoubleMatrix(labels));
