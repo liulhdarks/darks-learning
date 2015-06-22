@@ -17,10 +17,10 @@
 package darks.learning.common.utils;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Calculate specify key's count
@@ -35,7 +35,7 @@ public class FreqCount<K> implements Serializable
 	 */
 	private static final long serialVersionUID = 6980004114842595199L;
 
-	private Map<K, Long> countMap = new HashMap<K, Long>();
+	private Map<K, Long> countMap = new ConcurrentHashMap<K, Long>();
 	
 	private long totalFreqCount = 0;
 	
@@ -48,7 +48,7 @@ public class FreqCount<K> implements Serializable
 		addValue(key, 1);
 	}
 	
-	public void addValue(K key, int value)
+	public synchronized void addValue(K key, int value)
 	{
 		Long count = countMap.get(key);
 		if (count == null)
@@ -59,7 +59,7 @@ public class FreqCount<K> implements Serializable
 		countMap.put(key, count + value);
 	}
 	
-	public Long getValue(K key)
+	public synchronized Long getValue(K key)
 	{
 		Long count = countMap.get(key);
 		if (count == null)

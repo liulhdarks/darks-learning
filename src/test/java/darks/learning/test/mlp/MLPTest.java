@@ -79,6 +79,8 @@ public class MLPTest
         mlp.config.setHiddenLayouts(new int[]{16})
                     .setUseAdaGrad(false)
                     .setLearnRate(0.1)
+                    .setMaxIterateCount(10)
+                    .setInputLayerSize(3)
                     .setMomentum(0.)
                     .setMaxIterateCount(10000)
                     .setInputLayerSize(6)

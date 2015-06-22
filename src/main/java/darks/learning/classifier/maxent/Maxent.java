@@ -19,6 +19,9 @@ package darks.learning.classifier.maxent;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jblas.DoubleMatrix;
+import org.jblas.SimpleBlas;
+
 import darks.learning.corpus.Documents;
 
 /**
@@ -39,7 +42,13 @@ public abstract class Maxent
      */
     public abstract MaxentModel train(Documents docs, int maxIteration);
     
-    public abstract int predict(String[] input);
+    public abstract DoubleMatrix predictMatrix(String[] input);
+    
+    public int predict(String[] input)
+    {
+    	DoubleMatrix probYX = predictMatrix(input);
+        return SimpleBlas.iamax(probYX);
+    }
 
     public abstract void loadModel(MaxentModel model);
 

@@ -122,7 +122,7 @@ public class GISMaxent extends Maxent
      * {@inheritDoc}
      */
     @Override
-    public int predict(String[] input)
+    public DoubleMatrix predictMatrix(String[] input)
     {
     	int[] termIndexs = new int[input.length];
     	for (int i = 0; i < input.length; i++)
@@ -132,8 +132,7 @@ public class GISMaxent extends Maxent
     		int v = index == null ? -1 : index;
     		termIndexs[i] = v;
     	}
-        DoubleMatrix probYX = computeProbYX(termIndexs);
-        return SimpleBlas.iamax(probYX);
+        return computeProbYX(termIndexs);
     }
     
     private void releaseMemory()
