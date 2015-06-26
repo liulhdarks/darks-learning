@@ -18,6 +18,7 @@ package darks.learning.common.utils;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,10 +30,19 @@ public class FreqMatrix<T> implements Serializable
 	private static final long serialVersionUID = -6799400725373584837L;
 	
 	private Map<T, FreqCount<T>> countMap = new HashMap<T, FreqCount<T>>();
+
+	private Set<T> classes = new HashSet<T>();
+	
+	public FreqMatrix()
+	{
+		
+	}
 	
 	public void add(T k1, T k2)
 	{
 		add(k1, k2, 1);
+		classes.add(k1);
+		classes.add(k2);
 	}
 	
 	public void add(T k1, T k2, int value)
@@ -59,6 +69,6 @@ public class FreqMatrix<T> implements Serializable
 	
 	public Set<T> getClasses()
 	{
-		return countMap.keySet();
+		return classes;
 	}
 }
