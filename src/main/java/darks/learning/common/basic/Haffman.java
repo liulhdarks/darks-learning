@@ -87,7 +87,7 @@ public class Haffman
 			elSet.add(parent);
 		}
 		buildCodePath();
-		return elSet.first();
+		return elSet.isEmpty() ? null : elSet.first();
 	}
 	
 	private void buildCodePath()

@@ -59,6 +59,17 @@ public class FreqCount<K> implements Serializable
 		countMap.put(key, count + value);
 	}
 	
+	public synchronized void addValue(K key, long value)
+	{
+		Long count = countMap.get(key);
+		if (count == null)
+		{
+			count = 0l;
+		}
+		totalFreqCount += value;
+		countMap.put(key, count + value);
+	}
+	
 	public synchronized Long getValue(K key)
 	{
 		Long count = countMap.get(key);

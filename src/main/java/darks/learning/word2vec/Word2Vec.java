@@ -138,6 +138,8 @@ public class Word2Vec
 
 	private boolean buildWordNodes(Corpus corpus)
 	{
+		if (corpus == null || corpus.getTotalVocabCount() == 0)
+			return false;
 		totalVocabCount = corpus.getTotalVocabCount();
 		Iterator<Map.Entry<String, Long>> it = corpus.getWordFreq().entrySetIterator();
 		while (it.hasNext())
