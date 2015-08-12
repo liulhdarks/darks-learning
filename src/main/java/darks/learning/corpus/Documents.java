@@ -253,12 +253,17 @@ public class Documents implements Serializable
 	{
 		for (Documents docs : docsList)
 		{
-			for (Entry<String, List<Document>> entry : docs.getLabelsMap().entrySet())
+			merge(docs);
+		}
+	}
+	
+	public void merge(Documents docs)
+	{
+		for (Entry<String, List<Document>> entry : docs.getLabelsMap().entrySet())
+		{
+			for (Document doc : entry.getValue())
 			{
-				for (Document doc : entry.getValue())
-				{
-					addData(doc.source, doc.label);
-				}
+				addData(doc.source, doc.label);
 			}
 		}
 	}

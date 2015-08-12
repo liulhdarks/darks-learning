@@ -26,6 +26,7 @@ import org.junit.Test;
 
 import darks.learning.common.utils.MatrixHelper;
 import darks.learning.corpus.Corpus;
+import darks.learning.corpus.CorpusFilter;
 import darks.learning.corpus.CorpusLoader;
 import darks.learning.word2vec.Word2Vec;
 import darks.learning.word2vec.Word2Vec.DistanceType;
@@ -38,17 +39,17 @@ public class Word2VecTest
 	public void testTrain()
 	{
 		CorpusLoader loader = new CorpusLoader();
-//		loader.addFilter(new CorpusFilter()
-//		{
-//			@Override
-//			public boolean filter(String s)
-//			{
-//				return s.length() <= 1;
-//			}
-//		});
-		//loader.addStopwords(new File("corpus/dic/lex-stopword.lex"));
-		//loader.addStopwords(new File("corpus/dic/lex-stopword1.lex"));
-		Corpus corpus = loader.loadFromFile(new File("corpus/train_data.txt"));
+		loader.addFilter(new CorpusFilter()
+		{
+			@Override
+			public boolean filter(String s)
+			{
+				return s.length() <= 1;
+			}
+		});
+		loader.addStopwords(new File("corpus/dic/lex-stopword.lex"));
+		loader.addStopwords(new File("corpus/dic/lex-stopword1.lex"));
+		Corpus corpus = loader.loadFromFile(new File("corpus/text8_limit.txt"));
 		
 		Word2Vec word2vec = new Word2Vec();
 		word2vec.config.setTrainType(Word2VecType.CBOW)
@@ -57,7 +58,16 @@ public class Word2VecTest
 						.setWindow(5)
 						.setNegative(0);
 		word2vec.train(corpus);
-		word2vec.saveModel(new File("test/train_data.model"));
+		word2vec.saveModel(new File("test/train_data_en.model"));
+	}
+
+	@Test
+	public void testDistanceEn()
+	{
+		Word2Vec vec = new Word2Vec();
+		vec.loadModel(new File("test/train_data_en.model"));
+		System.out.println(vec.distance("french"));
+		System.out.println(vec.distance("chinese"));
 	}
 
 	@Test

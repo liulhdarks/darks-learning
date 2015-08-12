@@ -28,16 +28,20 @@ public class EvalTest
 	public void testEval()
 	{
 		double[][] readArg = new double[][]{
-				{1, 0, 0},
-				{0, 1, 0},
-				{0, 0, 1},
-				{0, 1, 0}
+				{1, 0, 0, 0},
+				{0, 1, 0, 0},
+				{0, 1, 0, 0},
+				{0, 1, 0, 0},
+				{0, 1, 0, 0},
+				{0, 1, 0, 0}
 		};
 		double[][] guessArg = new double[][]{
-				{1, 0, 0},
-				{0, 1, 0},
-				{0, 0, 1},
-				{0, 1, 0}
+				{1, 0, 0, 0},
+				{0, 1, 0, 0},
+				{0, 0, 1, 0},
+				{0, 1, 0, 0},
+				{0, 1, 0, 0},
+				{0, 1, 0, 0}
 		};
 		Evaluation eval = new Evaluation();
 		DoubleMatrix real = new DoubleMatrix(readArg);
@@ -48,6 +52,7 @@ public class EvalTest
 		System.out.println(eval.accuracy());
 		System.out.println(eval.recall());
 		System.out.println(eval.status());
+		
 	}
 	
 }
