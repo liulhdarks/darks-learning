@@ -44,7 +44,7 @@ public class SoftmaxRegression extends Regression
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void train(DoubleMatrix input, DoubleMatrix output)
+	public void trainBatch(DoubleMatrix input, DoubleMatrix output)
 	{
 		log.info("Training softmax regression.");
 		double startLearnRate = config.learnRate;

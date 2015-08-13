@@ -28,12 +28,22 @@ public interface SupervisedLearning
 {
 
 	/**
-	 * Train model set
+	 * Batch train model set,Train model until converge
 	 * 
 	 * @param input Model input
 	 * @param output Model output
 	 */
-	public void train(DoubleMatrix input, DoubleMatrix output);
+	public void trainBatch(DoubleMatrix input, DoubleMatrix output);
+
+	/**
+	 * Train model set
+	 * 
+	 * @param iterateNumber Current iteration number
+	 * @param input Model input
+	 * @param output Model output
+	 * @return Loss value
+	 */
+	public double train(int iterateNumber, DoubleMatrix input, DoubleMatrix output);
 	
 	
 	

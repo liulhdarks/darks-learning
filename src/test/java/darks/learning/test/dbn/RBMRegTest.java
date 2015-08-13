@@ -92,7 +92,7 @@ public class RBMRegTest
 					.setMaxIteratorCount(10000)
 					.setRandomGradient(false)
 					.setNormalized(true);
-		reg.train(input3, new DoubleMatrix(labels));
+		reg.trainBatch(input3, new DoubleMatrix(labels));
 		
 		double[][] testX = {
 				{0, 1, 1, 0, 0, 0},

@@ -108,7 +108,7 @@ public class DBNTest
 					.setNormalized(true)
 					.setUseSample(false)
 					.setHiddenLayoutType(LayoutType.BINARY);
-		dbn.train(new DoubleMatrix(trainX), new DoubleMatrix(labels));
+		dbn.trainBatch(new DoubleMatrix(trainX), new DoubleMatrix(labels));
 		
 		double[][] testX = {
 				{1, 1, 0, 0, 1, 0, 0, 0, 0},

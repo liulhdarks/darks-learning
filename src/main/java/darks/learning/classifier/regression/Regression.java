@@ -45,9 +45,9 @@ public abstract class Regression implements SupervisedLearning
 	 * 
 	 * @param modelSet Model set
 	 */
-	public void train(ModelSet modelSet)
+	public void trainBatch(ModelSet modelSet)
 	{
-		train(modelSet.getInput(), modelSet.getOutput());
+		trainBatch(modelSet.getInput(), modelSet.getOutput());
 	}
 	
 	protected void gradientDescent(DoubleMatrix input, DoubleMatrix output)

@@ -39,6 +39,8 @@ public class HiddenLayer extends AbstractNeuronNetwork
     
     DoubleMatrix error;
     
+    HiddenLayer prevLayer;
+    
 	
 	public HiddenLayer()
 	{
@@ -67,7 +69,8 @@ public class HiddenLayer extends AbstractNeuronNetwork
 	    gradComputer.setBatchSize(input.rows);
         gradComputer.setWeights(weights);
         gradComputer.sethBias(hBias);
-        gradComputer.computeGradient(error.mul(output), null, error);
+		DoubleMatrix prevOut = prevLayer == null ? input : prevLayer.output;
+        gradComputer.computeGradient(prevOut.transpose().mmul(error), null, error);
 		return gradComputer;
 	}
 
@@ -94,7 +97,7 @@ public class HiddenLayer extends AbstractNeuronNetwork
     public void update(DoubleMatrix input)
     {
         GradientComputer grad = getGradient(input);
-        weights.addiRowVector(grad.getwGradient().columnMeans());
+        weights.addi(grad.getwGradient());
         hBias.addi(grad.gethGradient().columnMeans());
     }
 

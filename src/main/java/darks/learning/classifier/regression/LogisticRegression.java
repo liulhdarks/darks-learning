@@ -43,7 +43,7 @@ public class LogisticRegression extends Regression
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void train(DoubleMatrix input, DoubleMatrix output)
+	public void trainBatch(DoubleMatrix input, DoubleMatrix output)
 	{
 		log.info("Training logistic regression.");
 		if (!output.isScalar())

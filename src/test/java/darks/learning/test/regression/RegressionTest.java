@@ -62,7 +62,7 @@ public class RegressionTest
 					.setRandomGradient(false)
 					.setNormalized(true)
 					.setUseAdaGrad(false);
-		reg.train(modelSet);
+		reg.trainBatch(modelSet);
 		DoubleMatrix result = reg.predict(new DoubleMatrix(testX));
 		System.out.println(result.toString().replace(";", "\n"));
 	}
@@ -119,7 +119,7 @@ public class RegressionTest
 					.setNormalized(true)
 					.setUseAdaGrad(true)
 					.setActivateFunction(Activations.sigmoid());
-		reg.train(modelSet);
+		reg.trainBatch(modelSet);
 		DoubleMatrix result = reg.predict(new DoubleMatrix(testX));
 		System.out.println(result.toString().replace(";", "\n"));
 	}

@@ -79,14 +79,13 @@ public class MLPTest
         mlp.config.setHiddenLayouts(new int[]{16})
                     .setUseAdaGrad(false)
                     .setLearnRate(0.1)
-                    .setMaxIterateCount(10)
                     .setInputLayerSize(3)
-                    .setMomentum(0.)
+                    .setMomentum(0.7)
                     .setMaxIterateCount(10000)
                     .setInputLayerSize(6)
                     .setOutputLayerSize(2)
                     .setUseRegularization(false);
-        mlp.train(new DoubleMatrix(trainX), new DoubleMatrix(labels));
+        mlp.trainBatch(new DoubleMatrix(trainX), new DoubleMatrix(labels));
         
         double[][] testX = {
             {1, 1, 0, 0, 1, 0, 0, 0, 0},

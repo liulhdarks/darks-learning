@@ -76,7 +76,7 @@ public class SdaTest
 		sda.config.setHiddenLayouts(new int[]{32, 64})
 					.setNormalized(true)
 					.setUseSample(false);
-		sda.train(new DoubleMatrix(trainX), new DoubleMatrix(labels));
+		sda.trainBatch(new DoubleMatrix(trainX), new DoubleMatrix(labels));
 		
 		double[][] testX = {
 				{1, 1, 0, 0, 1, 0, 0, 0, 0},

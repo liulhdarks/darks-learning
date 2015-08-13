@@ -53,7 +53,7 @@ public class DBN implements SupervisedLearning
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void train(DoubleMatrix input, DoubleMatrix output)
+	public void trainBatch(DoubleMatrix input, DoubleMatrix output)
 	{
 		buildConfig();
 		DoubleMatrix preInput = pretrain(input);
@@ -62,7 +62,17 @@ public class DBN implements SupervisedLearning
 			finetune(preInput, output);
 		}
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public double train(int iterateNumber, DoubleMatrix input, DoubleMatrix output)
+	{
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 	private DoubleMatrix pretrain(DoubleMatrix initInput)
 	{
 		DoubleMatrix input = initInput;
@@ -92,7 +102,7 @@ public class DBN implements SupervisedLearning
 		{
 			log.debug("Start to train finetune layout." + outputLayer);
 		}
-		outputLayer.train(input, output);
+		outputLayer.trainBatch(input, output);
 	}
 	
 	/**

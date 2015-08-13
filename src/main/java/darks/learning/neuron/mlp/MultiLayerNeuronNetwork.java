@@ -44,10 +44,6 @@ public class MultiLayerNeuronNetwork implements SupervisedLearning,ReConstructon
 	private DoubleMatrix vInput;
 	
 	private DoubleMatrix labels;
-
-	private double eps = 1.0e-10;
-    
-	private double tolerance = 1.0e-5;
 	
 	double lastLoss = 0;
 	
@@ -56,7 +52,7 @@ public class MultiLayerNeuronNetwork implements SupervisedLearning,ReConstructon
 	    config.lossFunction = LossFunction.lossFunc(LossFunction.MSE, config);
 	}
 	
-	private void initialize()
+	public void initialize()
 	{
 		if (hiddenLayers == null || outputLayer == null)
 		{
@@ -65,9 +61,11 @@ public class MultiLayerNeuronNetwork implements SupervisedLearning,ReConstructon
 			for (int i = 0; i < hiddenCount; i++)
 			{
 				hiddenLayers[i] = new HiddenLayer(config, i);
+				if (i > 0)
+					hiddenLayers[i].prevLayer = hiddenLayers[i - 1];
 			}
 			outputLayer = new OutputLayer(config);
-			print();
+			outputLayer.prevLayer = hiddenLayers[hiddenCount - 1];
 		}
 	}
 
@@ -75,7 +73,7 @@ public class MultiLayerNeuronNetwork implements SupervisedLearning,ReConstructon
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void train(DoubleMatrix input, DoubleMatrix output)
+	public void trainBatch(DoubleMatrix input, DoubleMatrix output)
 	{
 	    this.vInput = input;
 	    this.labels = output;
@@ -85,13 +83,12 @@ public class MultiLayerNeuronNetwork implements SupervisedLearning,ReConstructon
 		int iterateNumber = 1;
 		while (true)
 		{
-		    iterate(iterateNumber, input, output);
-	        double loss = getLossValue();
+			double loss = train(iterateNumber, input, output);
 	        if (log.isDebugEnabled())
 	        {
 	            log.debug("MLP iterate number " + iterateNumber + " loss:" + loss);
 	        }
-            if (2.0 * Math.abs(loss - lastLoss) <= tolerance * (Math.abs(loss) + Math.abs(lastLoss) + eps)) 
+            if (loss - lastLoss < 1.0e-10) 
             {
                 log.info ("Gradient Ascent: Value difference " + Math.abs(loss - lastLoss) +" below " +
                         "tolerance; arriving converged.");
@@ -104,6 +101,16 @@ public class MultiLayerNeuronNetwork implements SupervisedLearning,ReConstructon
 		    }
             iterateNumber++;
 		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public double train(int iterateNumber, DoubleMatrix input, DoubleMatrix output)
+	{
+		iterate(iterateNumber, input, output);
+		return getLossValue();
 	}
 
 	/**
@@ -134,14 +141,13 @@ public class MultiLayerNeuronNetwork implements SupervisedLearning,ReConstructon
 //		print();
         
         DoubleMatrix error = outputLayer.propBackward(output);
-        System.out.println(error.max());
         outputLayer.update(initInput);
         for (int i = hiddenCount - 1; i >= 0; i--)
         {
             error = hiddenLayers[i].propBackward(error);
             hiddenLayers[i].update(initInput);
         }
-		print();
+//		print();
 	}
 
     @Override

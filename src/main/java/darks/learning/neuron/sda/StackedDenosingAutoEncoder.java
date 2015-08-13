@@ -53,7 +53,7 @@ public class StackedDenosingAutoEncoder implements SupervisedLearning
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void train(DoubleMatrix input, DoubleMatrix output)
+	public void trainBatch(DoubleMatrix input, DoubleMatrix output)
 	{
 		buildConfig();
 		DoubleMatrix preInput = pretrain(input);
@@ -63,6 +63,14 @@ public class StackedDenosingAutoEncoder implements SupervisedLearning
 		}
 	}
 	
+	
+	@Override
+	public double train(int iterateNumber, DoubleMatrix input, DoubleMatrix output)
+	{
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 	private DoubleMatrix pretrain(DoubleMatrix initInput)
 	{
 		DoubleMatrix input = initInput;
@@ -71,7 +79,7 @@ public class StackedDenosingAutoEncoder implements SupervisedLearning
 			DenoisingAutoEncoder hiddenLayer = hiddenLayers[i];
 			if (log.isDebugEnabled())
 			{
-				log.debug("Start to train " + i + " layout RBM algorithm.");
+				log.debug("Start to train " + i + " layout DenoisingAutoEncoder algorithm.");
 			}
 			hiddenLayer.train(input);
 			if (config.useSample)
@@ -92,7 +100,7 @@ public class StackedDenosingAutoEncoder implements SupervisedLearning
 		{
 			log.debug("Start to train finetune layout." + outputLayer);
 		}
-		outputLayer.train(input, output);
+		outputLayer.trainBatch(input, output);
 	}
 	
 	/**
