@@ -25,7 +25,7 @@ import org.junit.Test;
 
 import darks.learning.corpus.Corpus;
 import darks.learning.corpus.CorpusLoader;
-import darks.learning.dimreduce.plsa.ProbabilityLSA;
+import darks.learning.topic.plsa.ProbabilityLSA;
 
 public class PlsaTest
 {

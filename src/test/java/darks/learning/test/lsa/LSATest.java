@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import darks.learning.corpus.Corpus;
 import darks.learning.corpus.CorpusLoader;
-import darks.learning.dimreduce.lsa.LatentSemanticAnalysis;
+import darks.learning.topic.lsa.LatentSemanticAnalysis;
 
 public class LSATest
 {

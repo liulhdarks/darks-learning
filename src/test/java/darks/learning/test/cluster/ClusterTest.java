@@ -30,8 +30,8 @@ import darks.learning.cluster.ClusterPoint;
 import darks.learning.cluster.hierarchy.DynamicalCluster;
 import darks.learning.corpus.Corpus;
 import darks.learning.corpus.CorpusLoader;
-import darks.learning.dimreduce.plsa.ProbabilityLSA;
 import darks.learning.distance.Distance;
+import darks.learning.topic.plsa.ProbabilityLSA;
 import darks.learning.word2vec.Word2Vec;
 
 public class ClusterTest

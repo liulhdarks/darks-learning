@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package darks.learning.dimreduce.lsa;
+package darks.learning.topic.lsa;
 
 import java.io.Serializable;
 import java.util.HashMap;

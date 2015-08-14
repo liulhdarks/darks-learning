@@ -1,4 +1,4 @@
-package darks.learning.dimreduce.lsa;
+package darks.learning.topic.lsa;
 
 import static darks.learning.common.utils.MatrixHelper.svd;
 
