@@ -24,7 +24,9 @@ import darks.learning.SupervisedLearning;
 import darks.learning.classifier.regression.LogisticRegression;
 import darks.learning.classifier.regression.Regression;
 import darks.learning.classifier.regression.SoftmaxRegression;
+import darks.learning.neuron.PretrainFinetuneLearning;
 import darks.learning.neuron.dbn.DBNConfig.FinetuneType;
+import darks.learning.neuron.mlp.MultiLayerNeuronNetwork;
 import darks.learning.neuron.rbm.RBM;
 
 /**
@@ -33,7 +35,7 @@ import darks.learning.neuron.rbm.RBM;
  * @author Darks.Liu
  *
  */
-public class DBN implements SupervisedLearning
+public class DBN extends PretrainFinetuneLearning
 {
 	
 	private static Logger log = LoggerFactory.getLogger(DBN.class);
@@ -67,13 +69,7 @@ public class DBN implements SupervisedLearning
 	 * {@inheritDoc}
 	 */
 	@Override
-	public double train(int iterateNumber, DoubleMatrix input, DoubleMatrix output)
-	{
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	private DoubleMatrix pretrain(DoubleMatrix initInput)
+	public DoubleMatrix pretrain(DoubleMatrix initInput)
 	{
 		DoubleMatrix input = initInput;
 		for (int i = 0; i < rbmLayers.length; i++)
@@ -96,7 +92,11 @@ public class DBN implements SupervisedLearning
 		return input;
 	}
 	
-	private void finetune(DoubleMatrix input, DoubleMatrix output)
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void finetune(DoubleMatrix input, DoubleMatrix output)
 	{
 		if (log.isDebugEnabled())
 		{
@@ -192,6 +192,27 @@ public class DBN implements SupervisedLearning
 						.setRandomFunction(config.randomFunction)
 						.setUseAdaGrad(config.isFineTuneUseAdaGrads());
 			result = regress;
+		}
+		else if (config.finetuneType == FinetuneType.MLP)
+		{
+			MultiLayerNeuronNetwork mlp = new MultiLayerNeuronNetwork();
+	        mlp.config.setUseAdaGrad(config.isFineTuneUseAdaGrads())
+	                    .setLearnRate(config.getFineTuneLearnRate())
+	                    .setMomentum(0.7)
+	                    .setMaxIterateCount(config.fineTuneIterateCount)
+						.setLossType(config.getFineTuneLossType())
+						.setInputLayerSize(config.hiddenLayouts[config.hiddenLayouts.length - 1])
+	                    .setOutputLayerSize(config.fineTuneOutputLayerSize)
+	                    .setRandomFunction(config.randomFunction)
+	                    .setUseRegularization(false);
+	        if (config.fineTuneHiddenLayouts != null)
+	        	mlp.config.setHiddenLayouts(config.fineTuneHiddenLayouts);
+	        else
+	        {
+	        	int lastLaysize = config.hiddenLayouts[config.hiddenLayouts.length - 1];
+	        	mlp.config.setHiddenLayouts(new int[]{lastLaysize / 2});
+	        }
+			result = mlp;
 		}
 		return result;
 	}

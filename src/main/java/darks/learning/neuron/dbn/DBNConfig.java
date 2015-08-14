@@ -37,7 +37,7 @@ public class DBNConfig extends LearningConfig
 
 	public enum FinetuneType
 	{
-		SOFTMAX, LOGISTIC, BP
+		SOFTMAX, LOGISTIC, MLP
 	}
 	
 	double fineTuneLearnRate = 1e-3;
@@ -51,6 +51,10 @@ public class DBNConfig extends LearningConfig
 	FinetuneType finetuneType = FinetuneType.SOFTMAX;
 	
 	boolean fineTuneUseAdaGrads = false;
+	
+	int[] fineTuneHiddenLayouts;
+	
+	int fineTuneOutputLayerSize;
 	
 	SupervisedLearning fineTuneLayer;
 	
@@ -265,6 +269,18 @@ public class DBNConfig extends LearningConfig
 		return this;
 	}
 
+	public DBNConfig setFineTuneHiddenLayouts(int[] fineTuneHiddenLayouts)
+	{
+		this.fineTuneHiddenLayouts = fineTuneHiddenLayouts;
+		return this;
+	}
+
+	public DBNConfig setFineTuneOutputLayerSize(int fineTuneOutputLayerSize)
+	{
+		this.fineTuneOutputLayerSize = fineTuneOutputLayerSize;
+		return this;
+	}
+
 	/*-------------------------------------------------------------------------------------------------
 	 * Get function 
 	 *-------------------------------------------------------------------------------------------------
@@ -350,5 +366,6 @@ public class DBNConfig extends LearningConfig
 	{
 		return fineTuneUseAdaGrads;
 	}
+	
 	
 }

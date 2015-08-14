@@ -24,6 +24,7 @@ import darks.learning.SupervisedLearning;
 import darks.learning.classifier.regression.LogisticRegression;
 import darks.learning.classifier.regression.Regression;
 import darks.learning.classifier.regression.SoftmaxRegression;
+import darks.learning.neuron.PretrainFinetuneLearning;
 import darks.learning.neuron.da.DenoisingAutoEncoder;
 import darks.learning.neuron.sda.SdaConfig.FinetuneType;
 
@@ -33,7 +34,7 @@ import darks.learning.neuron.sda.SdaConfig.FinetuneType;
  * @author Darks.Liu
  *
  */
-public class StackedDenosingAutoEncoder implements SupervisedLearning
+public class StackedDenosingAutoEncoder extends PretrainFinetuneLearning
 {
 	
 	private static Logger log = LoggerFactory.getLogger(StackedDenosingAutoEncoder.class);
@@ -64,14 +65,11 @@ public class StackedDenosingAutoEncoder implements SupervisedLearning
 	}
 	
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public double train(int iterateNumber, DoubleMatrix input, DoubleMatrix output)
-	{
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	private DoubleMatrix pretrain(DoubleMatrix initInput)
+	public DoubleMatrix pretrain(DoubleMatrix initInput)
 	{
 		DoubleMatrix input = initInput;
 		for (int i = 0; i < hiddenLayers.length; i++)
@@ -93,8 +91,12 @@ public class StackedDenosingAutoEncoder implements SupervisedLearning
 		}
 		return input;
 	}
-	
-	private void finetune(DoubleMatrix input, DoubleMatrix output)
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void finetune(DoubleMatrix input, DoubleMatrix output)
 	{
 		if (log.isDebugEnabled())
 		{

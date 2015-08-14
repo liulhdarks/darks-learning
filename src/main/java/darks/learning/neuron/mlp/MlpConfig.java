@@ -17,6 +17,7 @@
 package darks.learning.neuron.mlp;
 
 import darks.learning.common.rand.RandomFunction;
+import darks.learning.lossfunc.LossFunction;
 import darks.learning.neuron.NNConfig;
 import darks.learning.optimize.LearningOptimizer.OptimizeType;
 
@@ -123,5 +124,18 @@ public class MlpConfig extends NNConfig
         L2 = l2;
         return this;
     }
+
+	public MlpConfig setLossFunction(LossFunction lossFunction)
+	{
+		this.lossFunction = lossFunction;
+		return this;
+	}
+
+	public MlpConfig setLossType(int lossType)
+	{
+		this.lossType = lossType;
+		lossFunction = LossFunction.lossFunc(lossType, this);
+		return this;
+	}
     
 }

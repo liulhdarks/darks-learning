@@ -21,8 +21,11 @@ import org.jblas.SimpleBlas;
 import org.junit.Test;
 
 import darks.learning.eval.Evaluation;
+import darks.learning.lossfunc.LossFunction;
 import darks.learning.neuron.dbn.DBN;
+import darks.learning.neuron.dbn.DBNConfig.FinetuneType;
 import darks.learning.neuron.rbm.RBMConfig.LayoutType;
+import darks.learning.optimize.LearningOptimizer.OptimizeType;
 
 public class DBNTest
 {
@@ -104,10 +107,23 @@ public class DBNTest
 		
 		
 		DBN dbn = new DBN();
-		dbn.config.setHiddenLayouts(new int[]{32, 64})
-					.setNormalized(true)
-					.setUseSample(false)
-					.setHiddenLayoutType(LayoutType.BINARY);
+//		dbn.config.setHiddenLayouts(new int[]{32, 16})
+//					.setNormalized(true)
+//					.setUseSample(false)
+//					.setHiddenLayoutType(LayoutType.BINARY)
+//					.setFineTuneIterateCount(50000);
+		dbn.config.setHiddenLayouts(new int[]{32, 24})
+			.setNormalized(true)
+			.setUseSample(false)
+			.setHiddenLayoutType(LayoutType.BINARY)
+//			.setOptimizeTypes(OptimizeType.LINE_SEARCH)
+//			.setHiddensIterateCount(1000)
+			.setFinetuneType(FinetuneType.MLP)
+			.setFineTuneOutputLayerSize(3)
+			.setFineTuneHiddenLayouts(new int[]{16, 8})
+			.setFineTuneIterateCount(50000)
+			.setFineTuneLearnRate(0.1)
+			.setFineTuneLossType(LossFunction.MSE);
 		dbn.trainBatch(new DoubleMatrix(trainX), new DoubleMatrix(labels));
 		
 		double[][] testX = {

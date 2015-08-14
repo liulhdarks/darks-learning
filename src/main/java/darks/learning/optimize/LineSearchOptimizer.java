@@ -66,18 +66,24 @@ public class LineSearchOptimizer extends AbstractNeuronNetworkOptimizer
 			double loss = network.getLossValue();
 			if (numIterate > 1)
 			{
-				if (2.0 * Math.abs(loss - lastLoss) <= TOLERANCE * (Math.abs(loss) + Math.abs(lastLoss) + EPS)) 
+				if (Math.abs(loss - lastLoss) <= EPS) 
 				{
 	                log.info ("LineSearch optimize: Value difference " + Math.abs(loss - lastLoss) +" below " +
 	                        "tolerance; arriving converged.");
 	                break;
 	            }
+//				if (2.0 * Math.abs(loss - lastLoss) <= TOLERANCE * (Math.abs(loss) + Math.abs(lastLoss) + EPS)) 
+//				{
+//	                log.info ("LineSearch optimize: Value difference " + Math.abs(loss - lastLoss) +" below " +
+//	                        "tolerance; arriving converged.");
+//	                break;
+//	            }
 			}
-			lastLoss = loss;
 			if (log.isDebugEnabled())
 			{
-				log.debug("Iteration number " + numIterate + " loss:" + loss);
+				log.debug("Iteration number " + numIterate + " loss:" + loss + " tolerance:" + Math.abs(loss - lastLoss));
 			}
+			lastLoss = loss;
 			if (!checkIterateTime())
 			{
 				break;

@@ -69,6 +69,26 @@ public class LogisticRegression extends Regression
 		}
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public double train(int iterateNumber, DoubleMatrix input, DoubleMatrix output)
+	{
+		if (!output.isScalar())
+		{
+			output = scalarMatrix(output);
+		}
+		initWeight(input, output);
+		if (!config.useAdaGrad)
+		{
+			double startLearnRate = config.learnRate;
+			learnRate = startLearnRate + (1 / (double)(iterateNumber + 3));
+		}
+		iterator(input, output);
+		return calcuateLossValue(input, output);
+	}
+
 	private DoubleMatrix scalarMatrix(DoubleMatrix output)
 	{
 		DoubleMatrix result = new DoubleMatrix(output.rows);
@@ -81,8 +101,11 @@ public class LogisticRegression extends Regression
 	
 	private void initWeight(DoubleMatrix input, DoubleMatrix output)
 	{
-		weights = DoubleMatrix.ones(input.columns, 1);
-		bias = DoubleMatrix.ones(1, 1);
+		if (weights == null && bias == null)
+		{
+			weights = DoubleMatrix.ones(input.columns, 1);
+			bias = DoubleMatrix.ones(1, 1);
+		}
 	}
 	
 	private void iterator(DoubleMatrix input, DoubleMatrix output)

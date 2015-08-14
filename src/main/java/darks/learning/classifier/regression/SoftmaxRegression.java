@@ -73,7 +73,17 @@ public class SoftmaxRegression extends Regression
 			lastLoss = costValue;
 		}
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public double train(int iterateNumber, DoubleMatrix input, DoubleMatrix output)
+	{
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 	private void initWeight(DoubleMatrix input, DoubleMatrix output)
 	{
 		weights = DoubleMatrix.rand(input.columns, output.columns);

@@ -86,9 +86,9 @@ public class MultiLayerNeuronNetwork implements SupervisedLearning,ReConstructon
 			double loss = train(iterateNumber, input, output);
 	        if (log.isDebugEnabled())
 	        {
-	            log.debug("MLP iterate number " + iterateNumber + " loss:" + loss);
+	            log.debug("MLP iterate number " + iterateNumber + " loss:" + Math.abs(loss) + " tolerance:" + Math.abs(loss - lastLoss));
 	        }
-            if (loss - lastLoss < 1.0e-10) 
+            if (Math.abs(loss - lastLoss) < 1.0e-10) 
             {
                 log.info ("Gradient Ascent: Value difference " + Math.abs(loss - lastLoss) +" below " +
                         "tolerance; arriving converged.");
@@ -138,7 +138,6 @@ public class MultiLayerNeuronNetwork implements SupervisedLearning,ReConstructon
         }
         outputLayer.setNumIterate(iterateNumber);
         outputLayer.propForward(input);
-//		print();
         
         DoubleMatrix error = outputLayer.propBackward(output);
         outputLayer.update(initInput);
@@ -147,7 +146,6 @@ public class MultiLayerNeuronNetwork implements SupervisedLearning,ReConstructon
             error = hiddenLayers[i].propBackward(error);
             hiddenLayers[i].update(initInput);
         }
-//		print();
 	}
 
     @Override
