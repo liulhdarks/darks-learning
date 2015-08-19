@@ -37,7 +37,7 @@ public class DBNConfig extends LearningConfig
 
 	public enum FinetuneType
 	{
-		SOFTMAX, LOGISTIC, MLP
+		SOFTMAX, LOGISTIC, MLP, MLP_CONCAT
 	}
 	
 	double fineTuneLearnRate = 1e-3;
@@ -320,6 +320,11 @@ public class DBNConfig extends LearningConfig
 	public int getHiddenLayouts(int layer)
 	{
 		return hiddenLayouts.length <= layer ? hiddenLayouts[0] : hiddenLayouts[layer];
+	}
+
+	public int[] getHiddenLayouts()
+	{
+		return hiddenLayouts;
 	}
 
 	public int getHiddenLossTypes(int layer)

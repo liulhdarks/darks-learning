@@ -162,6 +162,10 @@ public class RBMConfig extends NNConfig
 		this.useRegularization = useRegularization;
 		return this;
 	}
-	
+
+	public int getVisibleSize()
+	{
+		return visibleSize;
+	}
 	
 }

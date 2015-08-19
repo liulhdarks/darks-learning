@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import darks.learning.SupervisedLearning;
 import darks.learning.lossfunc.LossFunction;
+import darks.learning.neuron.AbstractNeuronNetwork;
 import darks.learning.neuron.ReConstructon;
 
 /**
@@ -30,7 +31,7 @@ import darks.learning.neuron.ReConstructon;
  * @author Darks.Liu
  *
  */
-public class MultiLayerNeuronNetwork implements SupervisedLearning,ReConstructon
+public class MultiLayerNeuronNetwork implements SupervisedLearning, ReConstructon
 {
     
     private static Logger log = LoggerFactory.getLogger(MultiLayerNeuronNetwork.class);
@@ -68,7 +69,32 @@ public class MultiLayerNeuronNetwork implements SupervisedLearning,ReConstructon
 			outputLayer.prevLayer = hiddenLayers[hiddenCount - 1];
 		}
 	}
-
+	
+	public boolean setHiddenLayerParams(int layer, AbstractNeuronNetwork network)
+	{
+		if (layer >= hiddenLayers.length)
+			return false;
+		for (int i = 0; i < network.getWeights().length; i++)
+		{
+			double v = network.getWeights().get(i);
+			if (Double.isNaN(v))
+				network.getWeights().put(i, 0.);
+			else if (Double.isInfinite(v))
+				network.getWeights().put(i, 1.0);
+		}
+		for (int i = 0; i < network.gethBias().length; i++)
+		{
+			double v = network.gethBias().get(i);
+			if (Double.isNaN(v))
+				network.gethBias().put(i, 0.);
+			else if (Double.isInfinite(v))
+				network.gethBias().put(i, 1.0);
+		}
+		hiddenLayers[layer].setWeights(network.getWeights());
+		hiddenLayers[layer].sethBias(network.gethBias());
+		return true;
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */

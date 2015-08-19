@@ -61,7 +61,10 @@ public class DBN extends PretrainFinetuneLearning
 		DoubleMatrix preInput = pretrain(input);
 		if (preInput != null)
 		{
-			finetune(preInput, output);
+			if (config.finetuneType != FinetuneType.MLP)
+				finetune(preInput, output);
+			else
+				finetune(input, output);
 		}
 	}
 
@@ -102,6 +105,7 @@ public class DBN extends PretrainFinetuneLearning
 		{
 			log.debug("Start to train finetune layout." + outputLayer);
 		}
+		buildFinetuneAfterPretrain();
 		outputLayer.trainBatch(input, output);
 	}
 	
@@ -111,18 +115,24 @@ public class DBN extends PretrainFinetuneLearning
 	@Override
 	public DoubleMatrix predict(DoubleMatrix initInput)
 	{
-		buildConfig();
-		DoubleMatrix input = initInput;
-		for (int i = 0; i < rbmLayers.length; i++)
+		if (rbmLayers == null || outputLayer == null)
 		{
-			RBM rbmLayer = rbmLayers[i];
-			if (config.useSample)
+			return null;
+		}
+		DoubleMatrix input = initInput;
+		if (config.finetuneType != FinetuneType.MLP)
+		{
+			for (int i = 0; i < rbmLayers.length; i++)
 			{
-				input = rbmLayer.sampleHiddenByVisible(input).getSample();
-			}
-			else
-			{
-				input = rbmLayer.propForward(input);
+				RBM rbmLayer = rbmLayers[i];
+				if (config.useSample)
+				{
+					input = rbmLayer.sampleHiddenByVisible(input).getSample();
+				}
+				else
+				{
+					input = rbmLayer.propForward(input);
+				}
 			}
 		}
 		return outputLayer.predict(input);
@@ -143,7 +153,37 @@ public class DBN extends PretrainFinetuneLearning
 			RBM rbm = buildRBMLayer(i);
 			rbmLayers[i] = rbm;
 		}
-		outputLayer = buildOutputLayer();
+		if (config.finetuneType != FinetuneType.MLP)
+		{
+			outputLayer = buildOutputLayer();
+		}
+	}
+	
+	private void buildFinetuneAfterPretrain()
+	{
+		if (outputLayer == null && config.finetuneType != FinetuneType.MLP)
+			return;
+		int inputLayerSize = rbmLayers[0].config.getVisibleSize();
+		MultiLayerNeuronNetwork mlp = new MultiLayerNeuronNetwork();
+        mlp.config.setUseAdaGrad(config.isFineTuneUseAdaGrads())
+                    .setLearnRate(config.getFineTuneLearnRate())
+                    .setMomentum(0.7)
+                    .setMaxIterateCount(config.fineTuneIterateCount)
+					.setLossType(config.getFineTuneLossType())
+					.setInputLayerSize(inputLayerSize)
+                    .setOutputLayerSize(config.fineTuneOutputLayerSize)
+                    .setRandomFunction(config.randomFunction)
+                    .setUseRegularization(false)
+                    .setHiddenLayouts(config.getHiddenLayouts());
+//                    .setUseRegularization(true)
+//                    .setL2(0.1);
+        mlp.initialize();
+        for (int i = 0; i < rbmLayers.length; i++)
+		{
+			RBM rbmLayer = rbmLayers[i];
+			mlp.setHiddenLayerParams(i, rbmLayer);
+		}
+		outputLayer = mlp;
 	}
 	
 	private RBM buildRBMLayer(int layer)
@@ -193,7 +233,7 @@ public class DBN extends PretrainFinetuneLearning
 						.setUseAdaGrad(config.isFineTuneUseAdaGrads());
 			result = regress;
 		}
-		else if (config.finetuneType == FinetuneType.MLP)
+		else if (config.finetuneType == FinetuneType.MLP_CONCAT)
 		{
 			MultiLayerNeuronNetwork mlp = new MultiLayerNeuronNetwork();
 	        mlp.config.setUseAdaGrad(config.isFineTuneUseAdaGrads())

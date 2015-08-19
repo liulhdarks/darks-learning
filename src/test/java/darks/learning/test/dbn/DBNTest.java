@@ -117,10 +117,10 @@ public class DBNTest
 			.setUseSample(false)
 			.setHiddenLayoutType(LayoutType.BINARY)
 //			.setOptimizeTypes(OptimizeType.LINE_SEARCH)
-//			.setHiddensIterateCount(1000)
+			.setHiddensIterateCount(5000)
 			.setFinetuneType(FinetuneType.MLP)
 			.setFineTuneOutputLayerSize(3)
-			.setFineTuneHiddenLayouts(new int[]{16, 8})
+//			.setFineTuneHiddenLayouts(new int[]{16, 8})
 			.setFineTuneIterateCount(50000)
 			.setFineTuneLearnRate(0.1)
 			.setFineTuneLossType(LossFunction.MSE);
