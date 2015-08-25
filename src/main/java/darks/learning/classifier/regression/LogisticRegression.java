@@ -110,25 +110,7 @@ public class LogisticRegression extends Regression
 	
 	private void iterator(DoubleMatrix input, DoubleMatrix output)
 	{
-		if (config.randomGradient)
-		{
-			randomGradientDescent(input, output);
-		}
-		else
-		{
-			gradientDescent(input, output);
-		}
-	}
-	
-	private void randomGradientDescent(DoubleMatrix input, DoubleMatrix output)
-	{
-		int rows = input.rows;
-		for (int i = 0; i < rows; i++)
-		{
-			int index = config.randomFunction.randInt(rows);
-			DoubleMatrix rowMatrix = input.getRow(index);
-			gradientDescent(rowMatrix, output.getRow(index));
-		}
+		gradientDescent(input, output);
 	}
 	
 	private double calcuateLossValue(DoubleMatrix input, DoubleMatrix output)

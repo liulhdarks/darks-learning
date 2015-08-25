@@ -90,7 +90,6 @@ public class RBMRegTest
 		Regression reg = new SoftmaxRegression();
 		reg.config.setLearnRate(0.001)
 					.setMaxIteratorCount(10000)
-					.setRandomGradient(false)
 					.setNormalized(true);
 		reg.trainBatch(input3, new DoubleMatrix(labels));
 		

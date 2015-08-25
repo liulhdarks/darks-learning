@@ -183,7 +183,6 @@ public class StackedDenosingAutoEncoder extends PretrainFinetuneLearning
 			}
 			regress.config.setLearnRate(config.getFineTuneLearnRate())
 						.setMaxIteratorCount(config.getFineTuneIterateCount())
-						.setRandomGradient(false)
 						.setNormalized(config.normalized)
 						.setActivateFunction(config.getFineTuneActivation())
 						.setLossType(config.getFineTuneLossType())

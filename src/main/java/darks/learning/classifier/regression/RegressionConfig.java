@@ -38,8 +38,6 @@ public class RegressionConfig extends LearningConfig
 	
 	double minError = 0.00001;
 	
-	boolean randomGradient = false;
-	
 	ActivateFunction activateFunction = Activations.sigmoid();
 	
 	boolean useAdaGrad = false;
@@ -70,12 +68,6 @@ public class RegressionConfig extends LearningConfig
 	public RegressionConfig setMinError(double minError)
 	{
 		this.minError = minError;
-		return this;
-	}
-
-	public RegressionConfig setRandomGradient(boolean randomGradient)
-	{
-		this.randomGradient = randomGradient;
 		return this;
 	}
 	

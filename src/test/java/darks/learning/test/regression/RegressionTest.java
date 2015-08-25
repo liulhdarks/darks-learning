@@ -24,7 +24,6 @@ import darks.learning.classifier.regression.Regression;
 import darks.learning.classifier.regression.SoftmaxRegression;
 import darks.learning.model.ModelLoader;
 import darks.learning.model.ModelSet;
-import darks.learning.neuron.activate.ActivateFunction;
 import darks.learning.neuron.activate.Activations;
 
 public class RegressionTest
@@ -59,7 +58,6 @@ public class RegressionTest
 		Regression reg = new LogisticRegression();
 		reg.config.setLearnRate(0.001)
 					.setMaxIteratorCount(100000)
-					.setRandomGradient(false)
 					.setNormalized(true)
 					.setUseAdaGrad(false);
 		reg.trainBatch(modelSet);
@@ -115,7 +113,6 @@ public class RegressionTest
 		Regression reg = new SoftmaxRegression();
 		reg.config.setLearnRate(0.001)
 					.setMaxIteratorCount(500000)
-					.setRandomGradient(false)
 					.setNormalized(true)
 					.setUseAdaGrad(true)
 					.setActivateFunction(Activations.sigmoid());

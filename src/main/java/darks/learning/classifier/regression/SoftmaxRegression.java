@@ -80,44 +80,35 @@ public class SoftmaxRegression extends Regression
 	@Override
 	public double train(int iterateNumber, DoubleMatrix input, DoubleMatrix output)
 	{
-		// TODO Auto-generated method stub
-		return 0;
+		initWeight(input, output);
+		if (!config.useAdaGrad)
+		{
+			double startLearnRate = config.learnRate;
+			learnRate = startLearnRate + (1 / (double)(iterateNumber + 3));
+		}
+		iterator(input, output);
+		return calcuateLossValue(input, output);
 	}
 
 	private void initWeight(DoubleMatrix input, DoubleMatrix output)
 	{
-		weights = DoubleMatrix.rand(input.columns, output.columns);
-		bias = DoubleMatrix.zeros(1, output.columns);
-		if (log.isDebugEnabled())
+		if (weights == null && bias == null)
 		{
-			log.debug("Softmax input:[" + input.rows + "," + input.columns 
-					+ "] output:[" + output.rows + "," + output.columns + "]");
-			log.debug("Softmax weights:[" + weights.rows + "," + weights.columns 
-						+ "] bias:[" + bias.rows + "," + bias.columns + "]");
+			weights = DoubleMatrix.rand(input.columns, output.columns);
+			bias = DoubleMatrix.zeros(1, output.columns);
+			if (log.isDebugEnabled())
+			{
+				log.debug("Softmax input:[" + input.rows + "," + input.columns 
+						+ "] output:[" + output.rows + "," + output.columns + "]");
+				log.debug("Softmax weights:[" + weights.rows + "," + weights.columns 
+							+ "] bias:[" + bias.rows + "," + bias.columns + "]");
+			}
 		}
 	}
 	
 	private void iterator(DoubleMatrix input, DoubleMatrix output)
 	{
-		if (config.randomGradient)
-		{
-			randomGradientDescent(input, output);
-		}
-		else
-		{
-			gradientDescent(input, output);
-		}
-	}
-	
-	private void randomGradientDescent(DoubleMatrix input, DoubleMatrix output)
-	{
-		int rows = input.rows;
-		for (int i = 0; i < rows; i++)
-		{
-			int index = config.randomFunction.randInt(rows);
-			DoubleMatrix rowMatrix = input.getRow(index);
-			gradientDescent(rowMatrix, output.getRow(index));
-		}
+		gradientDescent(input, output);
 	}
 	
 	private double calcuateLossValue(DoubleMatrix input, DoubleMatrix output)
