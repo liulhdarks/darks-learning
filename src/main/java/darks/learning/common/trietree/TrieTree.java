@@ -48,7 +48,10 @@ public class TrieTree<T>
         for (int i = 0; i < len; i++)
         {
             char ch = val.charAt(i);
-            node = insertChar(node, ch);
+            if (i < len - 1)
+            	node = insertChar(node, ch, TrieNodeType.BRANCH);
+            else
+            	node = insertChar(node, ch, TrieNodeType.LEAF);
         }
         if (node != null && node != root)
         {
@@ -57,20 +60,21 @@ public class TrieTree<T>
         }
     }
     
-    private TrieNode<T> insertChar(TrieNode<T> parent, char ch)
+    private TrieNode<T> insertChar(TrieNode<T> parent, char ch, TrieNodeType type)
     {
     	Map<Character, TrieNode<T>> nodes = parent.getNodes();
         TrieNode<T> node = nodes.get(ch);
         if (node == null)
         {
-            node = new TrieNode<T>(TrieNodeType.LEAF);
+            node = new TrieNode<T>(type);
+            node.setValue(ch);
             nodes.put(ch, node);
         }
-        if (node.getTrieNodeType() == TrieNodeType.LEAF)
-        {
-            node.setValue(ch);
-            node.setTrieNodeType(TrieNodeType.BRANCH);
-        }
+//        if (node.getTrieNodeType() == TrieNodeType.LEAF)
+//        {
+//            node.setValue(ch);
+//            node.setTrieNodeType(TrieNodeType.BRANCH);
+//        }
         if (node.getValue() != ch)
         {
             throw new RuntimeException("Fail to insert char." + node.getValue()
@@ -147,7 +151,6 @@ public class TrieTree<T>
             char ch = s.charAt(index++);
             node = node.getChildNode(ch);
             if (node == null 
-                || node.getTrieNodeType() != TrieNodeType.BRANCH
                 || node.getValue() != ch)
             {
                 return result;
@@ -170,14 +173,11 @@ public class TrieTree<T>
     	for (Entry<Character, TrieNode<T>> entry : parent.getNodes().entrySet())
     	{
     		TrieNode<T> node = entry.getValue();
-    		if (node.isStringTail())
-    		{
-    			result.add(node.getObject());
-    		}
-    		else
-    		{
-    			findTailString(result, node);
-    		}
+        	if (node.isStringTail())
+        	{
+        		result.add(node.getObject());
+        	}
+    		findTailString(result, node);
     	}
     }
     
@@ -190,16 +190,16 @@ public class TrieTree<T>
     
     public String toString()
     {
-        return toStringNode(root);
+        return toStringNode(root, "");
     }
     
-    private String toStringNode(TrieNode<T> parent)
+    private String toStringNode(TrieNode<T> parent, String tag)
     {
         if (parent == null)
         {
             return "";
         }
-        StringBuffer buf = new StringBuffer();
+        StringBuffer buf = new StringBuffer('\n' + tag);
         buf.append('[');
         buf.append(parent.getValue());
         if (isHasChildren(parent))
@@ -208,7 +208,7 @@ public class TrieTree<T>
         }
         for (TrieNode<T> node : parent.getNodes().values())
         {
-            buf.append(toStringNode(node));
+            buf.append(toStringNode(node, tag + "\t"));
         }
         buf.append(']');
         return buf.toString();

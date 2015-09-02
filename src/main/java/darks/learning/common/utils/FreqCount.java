@@ -17,7 +17,11 @@
 package darks.learning.common.utils;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -81,6 +85,25 @@ public class FreqCount<K> implements Serializable
 		return count;
 	}
 	
+	public List<Entry<K, Long>> getSortList()
+	{
+		return getSortList(new Comparator<Map.Entry<K, Long>>()
+        {
+            @Override
+            public int compare(Map.Entry<K, Long> o1, Map.Entry<K, Long> o2)
+            {
+                return o2.getValue().compareTo(o1.getValue());
+            }
+        });
+	}
+	
+	public List<Entry<K, Long>> getSortList(Comparator<Map.Entry<K, Long>> comparator)
+	{
+		List<Map.Entry<K, Long>> sortIndexList = new ArrayList<Map.Entry<K, Long>>(countMap.entrySet());
+        Collections.sort(sortIndexList, comparator);
+        return sortIndexList;
+	}
+	
 	public Iterator<Entry<K, Long>> entrySetIterator()
 	{
 		return countMap.entrySet().iterator();
@@ -95,4 +118,17 @@ public class FreqCount<K> implements Serializable
 	{
 	    return countMap.size();
 	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuilder buf = new StringBuilder();
+		for (Entry<K, Long> entry : countMap.entrySet())
+		{
+			buf.append(entry.getKey()).append('\t').append(entry.getValue()).append('\n');
+		}
+		return buf.toString();
+	}
+	
+	
 }
