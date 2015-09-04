@@ -59,4 +59,33 @@ String classify = bayes.predict(sentence);
 String classify = bayes.predict(new String[]{...});
 ```
 
+# Maxent
+
+Maxent only supports GIS algorithm.
+
+## Exmple
+### How to train
+```Java
+Documents docs = Documents.loadFromFile(corpusFile, "UTF-8");
+Maxent maxent = new GISMaxent();
+MaxentModel model = maxent.train(docs, 1000); //Train model with 1000 iterations.
+model.saveModel(...);
+```
+
+### How to load
+```Java
+GISModel model = GISModel.readModel(...);
+GISMaxent maxent = new GISMaxent(model);
+...
+```
+
+### How to classify
+```Java
+String[] terms = ...;
+int labelIndex = maxent.predict(terms);
+String classify = maxent.getLabel(labelIndex);
+```
+
+
+
 
