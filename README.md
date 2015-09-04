@@ -15,6 +15,7 @@ CorpusLoader loader = new CorpusLoader();
 loader.addFilter(...);
 loader.addStopwords(...);
 Corpus corpus = loader.loadFromFile(new File(...));
+<br>
 
 # Documents
 It can be used for Maxent, bayes, etc. which are used to documents and words related to 
@@ -26,12 +27,14 @@ Documents docs = Documents.loadFromFile(input, labels, "UTF-8");
 File corpusFile = new File(...); 
 //The corpusFile both contains labels and features, which's labels and features of each line must be separated by Tab(\t).
 Documents docs = Documents.loadFromFile(corpusFile, "UTF-8");
+<br>
 
 # ModelSet
 It can be used for regression, MLP, DBN, RBM, SDA, SOFTMAX, etc. which are used to classification based on double matrix.
 ```Java
 ModelSet modelSet = ModelLoader.loadFromFile(...);
 ModelSet modelSet = ModelLoader.loadFromStream(...);
+<br>
 
 Naive Bayes
 ---------------------
@@ -48,11 +51,13 @@ NaiveBayes bayes = new NaiveBayes();
 bayes.config.setLogLikelihood(true)
 			.setModelType(NaiveBayes.BINAMIAL);
 bayes.train(docs);
+<br>
 
 ## How to classify
 ```Java
 String sentence = ...; //Sentence string must be separated by spaces.
 String classify = bayes.predict(sentence);
 String classify = bayes.predict(new String[]{...});
+<br>
 
 
