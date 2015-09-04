@@ -42,7 +42,7 @@ Navie bayes contains the BINAMIAL and BERNOULLI modes.
 * BINAMIAL is fine-grained to words by default.
 * BERNOULLI is coarse-grained to documents.
 
-## Exmple
+## Example
 ### How to train
 ```Java
 Documents docs = Documents.loadFromFile(corpusFile, "UTF-8");
@@ -63,7 +63,7 @@ String classify = bayes.predict(new String[]{...});
 
 Maxent only supports GIS algorithm.
 
-## Exmple
+## Example
 ### How to train
 ```Java
 Documents docs = Documents.loadFromFile(corpusFile, "UTF-8");
@@ -85,7 +85,24 @@ String[] terms = ...;
 int labelIndex = maxent.predict(terms);
 String classify = maxent.getLabel(labelIndex);
 ```
+# LSA (Latent Semantic Analysis)
+## Example
+### How to train
+```Java
+CorpusLoader loader = new CorpusLoader(Corpus.TYPE_TF_IDF);
+File file = ...;
+Corpus corpus = loader.loadFromFile(file, "UTF-8");
+LatentSemanticAnalysis lsa = new LatentSemanticAnalysis();
+lsa.train(corpus);
+lsa.saveModel(...);
+lsa.loadModel(...);
+```
 
+### How to predict
+```Java
+String result = lsa.predict(new String[]{...});
+int index = lsa.predictIndex(new String[]{...});
+```
 
 
 
