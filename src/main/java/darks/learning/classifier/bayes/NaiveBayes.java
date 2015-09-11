@@ -68,6 +68,10 @@ public class NaiveBayes
 		
 	}
 
+	/**
+	 * Train naive bayes
+	 * @param docs Documents
+	 */
 	public void train(Documents docs)
 	{
 		labelsMap = docs.getLabelsMap();
