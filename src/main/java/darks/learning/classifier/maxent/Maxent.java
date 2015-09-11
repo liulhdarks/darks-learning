@@ -22,6 +22,7 @@ import java.util.List;
 import org.jblas.DoubleMatrix;
 import org.jblas.SimpleBlas;
 
+import darks.learning.ProgressReporter;
 import darks.learning.corpus.Documents;
 
 /**
@@ -33,6 +34,8 @@ public abstract class Maxent
 {
     
     protected List<String> labels = new ArrayList<String>();
+    
+    protected ProgressReporter progressReporter;
     
     /**
      * Train maxent model
@@ -61,5 +64,11 @@ public abstract class Maxent
     {
         return labels.get(index);
     }
+
+	public void setProgressReporter(ProgressReporter progressReporter)
+	{
+		this.progressReporter = progressReporter;
+	}
+    
     
 }

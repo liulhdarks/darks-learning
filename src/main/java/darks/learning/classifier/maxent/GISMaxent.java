@@ -38,6 +38,12 @@ import darks.learning.corpus.Documents.Document;
  */
 public class GISMaxent extends Maxent
 {
+	
+	public static final String REPORT_EPOCH_NUM = "epuchNum";
+	
+	public static final String REPORT_LIKELIDHOOD = "likelihood";
+	
+	public static final String REPORT_ERROR = "error";
     
     private static final Logger log = LoggerFactory.getLogger(GISMaxent.class);
     
@@ -309,6 +315,14 @@ public class GISMaxent extends Maxent
         if (mean.get(maxIndex) >= minError)
         {
             log.debug("GIS iteration " + epuchNum + " error:" + mean.get(maxIndex) + " likelihood:" + loglikelihood);
+			if (progressReporter != null)
+			{
+				Map<String, Object> params = new HashMap<String, Object>();
+				params.put(REPORT_EPOCH_NUM, epuchNum);
+				params.put(REPORT_LIKELIDHOOD, loglikelihood);
+				params.put(REPORT_ERROR, mean.get(maxIndex));
+				progressReporter.progress(params);
+			}
             return false;
         }
         log.info("GIS converge on " + mean.get(maxIndex) + " likelihood:" + loglikelihood);

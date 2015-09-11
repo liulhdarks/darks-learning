@@ -39,6 +39,7 @@ import org.jblas.DoubleMatrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import darks.learning.ProgressReporter;
 import darks.learning.common.basic.Haffman;
 import darks.learning.common.utils.IOUtils;
 import darks.learning.corpus.Corpus;
@@ -52,6 +53,10 @@ import darks.learning.corpus.Corpus;
 public class Word2Vec
 {
 
+	public static final String REPORT_PERCENT = "percent";
+
+	public static final String REPORT_LEARN_RATE = "learnRate";
+	
 	private static Logger log = LoggerFactory.getLogger(Word2Vec.class);
 
 	/**
@@ -90,6 +95,8 @@ public class Word2Vec
 	double learnRate;
 
 	WordHandler wordHandler = null;
+	
+	ProgressReporter progressReporter;
 	
 	public Word2Vec()
 	{
@@ -301,6 +308,13 @@ public class Word2Vec
 				learnRate = startLearnRate * 1e-4;
 			}
 			lastTrainCount = actualVocabCount;
+			if (progressReporter != null)
+			{
+				Map<String, Object> params = new HashMap<String, Object>();
+				params.put(REPORT_PERCENT, (double)actualVocabCount / (double) (totalVocabCount + 1));
+				params.put(REPORT_LEARN_RATE, learnRate);
+				progressReporter.progress(params);
+			}
 		}
 		wordHandler.setLearnRate(learnRate);
 		return lastTrainCount;
@@ -849,4 +863,10 @@ public class Word2Vec
 		}
 	}
 
+	public void setProgressReporter(ProgressReporter progressReporter)
+	{
+		this.progressReporter = progressReporter;
+	}
+
+	
 }
