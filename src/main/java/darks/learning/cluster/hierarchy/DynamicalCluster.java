@@ -25,18 +25,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.learning.cluster.Cluster;
-import darks.learning.cluster.ClusterConfig;
+import darks.learning.cluster.ClusterExecutor;
 import darks.learning.cluster.ClusterPoint;
 import darks.learning.distance.Distance;
 
-public class DynamicalCluster<T>
+public class DynamicalCluster<T> extends ClusterExecutor<T>
 {
 	
 	static Logger log = LoggerFactory.getLogger(DynamicalCluster.class);
-	
-	public ClusterConfig config = new ClusterConfig();
-
-	Distance<T> distance;
 	
 	Set<Cluster<T>> clusters = new HashSet<Cluster<T>>();
 	
@@ -49,14 +45,22 @@ public class DynamicalCluster<T>
 	
 	public DynamicalCluster(Distance<T> distance)
 	{
-		this.distance = distance;
+		super(distance);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void clusterIncrement(T record)
 	{
 		addPoint(new ClusterPoint<T>(record));
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void cluster(List<T> records)
 	{
 		for (T point : records)
