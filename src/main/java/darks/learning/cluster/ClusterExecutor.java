@@ -16,11 +16,17 @@
  */
 package darks.learning.cluster;
 
+import java.util.Collection;
 import java.util.List;
 
 import darks.learning.distance.Distance;
 import darks.learning.exceptions.NotSupportedMethodException;
 
+/**
+ * Cluster executor
+ * @author lihua.llh
+ *
+ */
 public abstract class ClusterExecutor<T>
 {
 	
@@ -45,4 +51,7 @@ public abstract class ClusterExecutor<T>
 	}
 	
 	public abstract void cluster(List<T> records);
+	
+
+	public abstract Collection<Cluster<T>> getClusters();
 }

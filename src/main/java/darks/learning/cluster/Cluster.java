@@ -16,7 +16,9 @@
  */
 package darks.learning.cluster;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class Cluster<T>
@@ -25,6 +27,12 @@ public class Cluster<T>
 	ClusterPoint<T> center;
 	
 	Set<ClusterPoint<T>> points = new HashSet<ClusterPoint<T>>();
+	
+	Map<Cluster<T>, Double> clusterMap = new HashMap<Cluster<T>, Double>();
+	
+	Cluster<T> lowCluster = null;
+	
+	double lowDistance = 0;
 	
 	public Cluster()
 	{
@@ -35,7 +43,10 @@ public class Cluster<T>
 		center = new ClusterPoint<T>(t, 1.D);
 	}
 	
-	
+	public Cluster(ClusterPoint<T> center)
+	{
+		this.center = center;
+	}
 
 	public ClusterPoint<T> getCenter()
 	{
@@ -55,6 +66,32 @@ public class Cluster<T>
 	public void setPoints(Set<ClusterPoint<T>> points)
 	{
 		this.points = points;
+	}
+	
+	public Map<Cluster<T>, Double> getClusterMap()
+	{
+		return clusterMap;
+	}
+	
+
+	public Cluster<T> getLowCluster()
+	{
+		return lowCluster;
+	}
+
+	public void setLowCluster(Cluster<T> lowCluster)
+	{
+		this.lowCluster = lowCluster;
+	}
+
+	public double getLowDistance()
+	{
+		return lowDistance;
+	}
+
+	public void setLowDistance(double lowDistance)
+	{
+		this.lowDistance = lowDistance;
 	}
 
 	@Override
@@ -85,6 +122,13 @@ public class Cluster<T>
 		else if (!center.equals(other.center))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "Cluster [center=" + center + ", lowCluster=" + lowCluster + ", lowDistance="
+				+ lowDistance + "]";
 	}
 	
 	

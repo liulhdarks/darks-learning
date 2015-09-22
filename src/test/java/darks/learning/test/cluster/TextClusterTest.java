@@ -34,7 +34,7 @@ import darks.learning.distance.Distance;
 import darks.learning.topic.plsa.ProbabilityLSA;
 import darks.learning.word2vec.Word2Vec;
 
-public class ClusterTest
+public class TextClusterTest
 {
 
 	@Test
@@ -169,9 +169,9 @@ public class ClusterTest
 			return true;
 		}
 
-		private ClusterTest getOuterType()
+		private TextClusterTest getOuterType()
 		{
-			return ClusterTest.this;
+			return TextClusterTest.this;
 		}
 
 		@Override

@@ -23,6 +23,8 @@ public class ClusterPoint<T>
 	
 	double similar;
 	
+	boolean centerPoint;
+	
 	public ClusterPoint()
 	{
 		
@@ -40,7 +42,16 @@ public class ClusterPoint<T>
 	}
 
 	
-	
+	public boolean isCenterPoint()
+	{
+		return centerPoint;
+	}
+
+	public void setCenterPoint(boolean centerPoint)
+	{
+		this.centerPoint = centerPoint;
+	}
+
 	public T getObject()
 	{
 		return object;
@@ -89,6 +100,12 @@ public class ClusterPoint<T>
 		else if (!object.equals(other.object))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "ClusterPoint [object=" + object + "]";
 	}
 	
 	

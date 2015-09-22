@@ -19,11 +19,20 @@ package darks.learning.cluster;
 public class ClusterConfig
 {
 
+	public enum OptimizeType
+	{
+		NONE, TRIANGLE_INEQUALITY
+	}
+	
 	double minSimilar = 0.8;
 	
 	double mergeSimilar = 0.75;
 	
 	int iterateCount = 5;
+	
+	int clusterCount = 10;
+	
+	OptimizeType optimizeType = OptimizeType.NONE;
 
 	public double getMinSimilar()
 	{
@@ -57,6 +66,29 @@ public class ClusterConfig
 		this.iterateCount = iterateCount;
 		return this;
 	}
+
+	public ClusterConfig setClusterCount(int clusterCount)
+	{
+		this.clusterCount = clusterCount;
+		return this;
+	}
+
+	public int getClusterCount()
+	{
+		return clusterCount;
+	}
+
+	public OptimizeType getOptimizeType()
+	{
+		return optimizeType;
+	}
+
+	public ClusterConfig setOptimizeType(OptimizeType optimizeType)
+	{
+		this.optimizeType = optimizeType;
+		return this;
+	}
+	
 	
 	
 }

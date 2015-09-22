@@ -16,6 +16,7 @@
  */
 package darks.learning.cluster.hierarchy;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -157,6 +158,7 @@ public class DynamicalCluster<T> extends ClusterExecutor<T>
 			if (maxCluster != null && matchRate >= config.getMergeSimilar())
 			{
 				point.setSimilar(matchRate);
+				point.setCenterPoint(false);
 				maxCluster.getPoints().add(point);
 			}
 			else
@@ -186,6 +188,7 @@ public class DynamicalCluster<T> extends ClusterExecutor<T>
 		}
 		if (maxCluster != null && matchRate >= config.getMinSimilar())
 		{
+			point.setCenterPoint(false);
 			point.setSimilar(matchRate);
 			maxCluster.getPoints().add(point);
 		}
@@ -193,6 +196,7 @@ public class DynamicalCluster<T> extends ClusterExecutor<T>
 		{
 			Cluster<T> newCluster = new Cluster<T>();
 			newCluster.setCenter(point);
+			point.setCenterPoint(true);
 			clusters.add(newCluster);
 		}
 	}
@@ -218,9 +222,11 @@ public class DynamicalCluster<T> extends ClusterExecutor<T>
 		}
 		if (!maxPoint.equals(cluster.getCenter()))
 		{
+			cluster.getCenter().setCenterPoint(false);
 			cluster.getPoints().add(cluster.getCenter());
 			cluster.getPoints().remove(maxPoint);
 			cluster.setCenter(maxPoint);
+			maxPoint.setCenterPoint(true);
 		}
 		return cluster;
 	}
@@ -230,7 +236,8 @@ public class DynamicalCluster<T> extends ClusterExecutor<T>
 		return distance.distance(point.getObject(), target.getObject()); 
 	}
 
-	public Set<Cluster<T>> getClusters()
+	@Override
+	public Collection<Cluster<T>> getClusters()
 	{
 		return clusters;
 	}
