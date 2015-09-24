@@ -16,9 +16,31 @@
  */
 package darks.learning.distance;
 
-public interface Distance<T>
+public abstract class Distance<T>
 {
-
-	public double distance(T a, T b);
+	public static final int TYPE_DISTANCE = 1;
 	
+	public static final int TYPE_SIMILAR = 2;
+	
+	protected int type;
+	
+	public Distance(int type)
+	{
+		this.type = type;
+	}
+
+	public abstract double distance(T a, T b);
+	
+	public boolean compare(double src, double similar)
+	{
+		switch(type)
+		{
+		case TYPE_SIMILAR:
+			return src >= similar;
+		case TYPE_DISTANCE:
+			return src <= similar;
+		default:
+			return src <= similar;
+		}
+	}
 }

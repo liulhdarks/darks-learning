@@ -22,7 +22,6 @@ import java.io.FileReader;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import darks.learning.cluster.Cluster;
@@ -79,13 +78,14 @@ public class TextClusterTest
 	
 	
 	
-	class RecordDistance implements Distance<TestRecord>
+	class RecordDistance extends Distance<TestRecord>
 	{
 		
 		Word2Vec word2Vec;
 		
 		public RecordDistance(String modelPath)
 		{
+			super(TYPE_SIMILAR);
 			word2Vec = new Word2Vec();
 			word2Vec.loadModel(new File(modelPath));
 		}
@@ -100,13 +100,14 @@ public class TextClusterTest
 	
 	
 	
-	class RecordLsaDistance implements Distance<TestRecord>
+	class RecordLsaDistance extends Distance<TestRecord>
 	{
 		
 		ProbabilityLSA plsa;
 		
 		public RecordLsaDistance(String modelPath)
 		{
+			super(TYPE_SIMILAR);
 			CorpusLoader loader = new CorpusLoader(Corpus.TYPE_TF_IDF);
 	        File file = new File(modelPath);
 	        Corpus corpus = loader.loadFromFile(file, "UTF-8");

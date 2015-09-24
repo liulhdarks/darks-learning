@@ -21,13 +21,14 @@ import java.util.List;
 
 import darks.learning.word2vec.Word2Vec;
 
-public class Word2vecListDistance implements Distance<List<String>>
+public class Word2vecListDistance extends Distance<List<String>>
 {
 	
 	Word2Vec word2Vec;
 	
 	public Word2vecListDistance(String modelPath)
 	{
+		super(TYPE_SIMILAR);
 		word2Vec = new Word2Vec();
 		word2Vec.loadModel(new File(modelPath));
 	}

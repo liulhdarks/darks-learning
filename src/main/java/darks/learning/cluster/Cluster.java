@@ -16,10 +16,14 @@
  */
 package darks.learning.cluster;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
+
+import darks.learning.common.basic.KeyValue;
 
 public class Cluster<T>
 {
@@ -29,6 +33,15 @@ public class Cluster<T>
 	Set<ClusterPoint<T>> points = new HashSet<ClusterPoint<T>>();
 	
 	Map<Cluster<T>, Double> clusterMap = new HashMap<Cluster<T>, Double>();
+	
+	TreeSet<KeyValue<Cluster<T>, Double>> clusterSet = new TreeSet<KeyValue<Cluster<T>, Double>>(new Comparator<KeyValue<Cluster<T>, Double>>()
+	{
+		@Override
+		public int compare(KeyValue<Cluster<T>, Double> o1, KeyValue<Cluster<T>, Double> o2)
+		{
+			return Double.compare(o1.getValue(), o2.getValue());
+		}
+	});
 	
 	Cluster<T> lowCluster = null;
 	
@@ -68,11 +81,27 @@ public class Cluster<T>
 		this.points = points;
 	}
 	
+	public void putCloestCluster(Cluster<T> cluster, double d)
+	{
+//		clusterMap.put(cluster, d);
+		clusterSet.add(new KeyValue<Cluster<T>, Double>(cluster, d));
+	}
+	
 	public Map<Cluster<T>, Double> getClusterMap()
 	{
 		return clusterMap;
 	}
 	
+
+	public TreeSet<KeyValue<Cluster<T>, Double>> getClusterSet()
+	{
+		return clusterSet;
+	}
+
+	public void setClusterSet(TreeSet<KeyValue<Cluster<T>, Double>> clusterSet)
+	{
+		this.clusterSet = clusterSet;
+	}
 
 	public Cluster<T> getLowCluster()
 	{
