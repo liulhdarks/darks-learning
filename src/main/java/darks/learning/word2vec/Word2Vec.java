@@ -372,7 +372,9 @@ public class Word2Vec
 		{
 			return 0.001;
 		}
-		return node1.feature.dot(node2.feature);
+		double sim = node1.feature.dot(node2.feature);
+		sim = sim / (node1.feature.norm2() * node2.feature.norm2());
+		return sim;
 	}
 	
 	/**
