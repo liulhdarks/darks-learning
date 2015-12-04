@@ -34,7 +34,7 @@ public class PointClusterTest
 		});
 		cluster.config.setIterateCount(100);
 		cluster.config.setClusterCount(5000);
-		cluster.config.setOptimizeType(OptimizeType.TRIANGLE_INEQUALITY);
+		cluster.config.setOptimizeType(OptimizeType.NONE);
 		cluster.config.setMinSimilar(10);
 		cluster.config.setMergeSimilar(15);
 		
@@ -52,7 +52,7 @@ public class PointClusterTest
 		Random rand = new Random(111111111111l);
 		List<Point> data = new ArrayList<Point>();
 		Set<Integer> pointSet = new HashSet<Integer>();
-		for (int i = 0; i < 100000; i++)
+		for (int i = 0; i < 100; i++)
 		{
 			int key = 0;
 			int x = 0;

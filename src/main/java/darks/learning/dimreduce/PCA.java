@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package darks.learning.dimreduce.pca;
+package darks.learning.dimreduce;
 
 import java.util.ArrayList;
 import java.util.Collections;

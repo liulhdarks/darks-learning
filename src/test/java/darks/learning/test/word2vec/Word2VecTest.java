@@ -74,31 +74,15 @@ public class Word2VecTest
 	public void testDistance()
 	{
 		Word2Vec vec = new Word2Vec();
-		vec.loadModel(new File("test/train_data.model"));
-		System.out.println(vec.distance("版本"));
-		System.out.println(vec.distance("分流"));
+		vec.loadModel(new File("D:\\searcher\\test\\data\\dw_aps_word2vec_model_result_ch_test.txt"));
+		System.out.println(vec.distance("阿里"));
+		System.out.println(vec.distance("sengt"));
 		double sim = vec.distance("计算机", "电脑");
 		System.out.println(sim);
 		List<String> sources = Arrays.asList("系统 拨打 手机".split(" "));
 		List<String> targets = Arrays.asList("锁屏 系统 咨询 选择 点击 不能 安卓 淘宝 苹果 电话号码 客户 不稳定 声音 卖家 拨打 手机".split(" "));
 		sim = vec.distance(sources, targets, DistanceType.STATISTIC);
 		System.out.println(sim);
-		
-		DoubleMatrix srcMatrix = vec.getSentenceFeature(sources);
-		DoubleMatrix matrix = DoubleMatrix.zeros(100, 3);
-		for (int i = 0; i < matrix.columns; i++)
-		{
-			DoubleMatrix wordMatrix = vec.getSentenceFeature(targets);
-			matrix.putColumn(i, wordMatrix);
-		}
-		DoubleMatrix preNorm = MatrixHelper.sqrt(matrix.mul(matrix).columnSums());
-		
-		DoubleMatrix tmatrix = srcMatrix.transpose();
-		DoubleMatrix dotVector = tmatrix.mmul(matrix);
-        double norm = srcMatrix.norm2();
-        DoubleMatrix cosMt = dotVector.div(preNorm.mul(norm));
-        System.out.println(cosMt);
-        System.out.println(SimpleBlas.iamax(cosMt));
 	}
 	
 }

@@ -77,10 +77,19 @@ public class DynamicalCluster<T> extends ClusterExecutor<T>
 	{
 		initialize();
 		log.info("Start to cluster " + records.size() + " records.");
+		long st = System.currentTimeMillis();
 		long costTime = 0;
+		int finishCount = 0;
 		for (T point : records)
 		{
 			costTime += clusterScanner.scanCluster(clusters, new ClusterPoint<T>(point));
+			finishCount++;
+			if (System.currentTimeMillis() - st >= 10000)
+			{
+				st = System.currentTimeMillis();
+				float avgTime = (float)costTime / (float)finishCount;
+				log.info("cluster has finish " + finishCount + "/" + records.size() + " clusters:" + clusters.size() + " avgTime:" + avgTime);
+			}
 		}
 		log.info("cluster first cost time " + costTime + "ms");
 //		costTime += optimizeCluster();

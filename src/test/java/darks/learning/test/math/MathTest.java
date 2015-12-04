@@ -13,7 +13,7 @@ import org.jblas.Singular;
 import org.jblas.Solve;
 import org.junit.Test;
 
-import darks.learning.dimreduce.pca.PCA;
+import darks.learning.dimreduce.PCA;
 
 public class MathTest
 {
