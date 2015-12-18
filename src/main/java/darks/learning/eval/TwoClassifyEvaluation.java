@@ -71,4 +71,35 @@ public class TwoClassifyEvaluation
 	{
 		return (double) (TN + FN);
 	}
+
+
+	public long TP()
+	{
+		return TP;
+	}
+
+	public long TN()
+	{
+		return TN;
+	}
+
+
+	public long FP()
+	{
+		return FP;
+	}
+
+	public long FN()
+	{
+		return FN;
+	}
+
+
+	@Override
+	public String toString()
+	{
+		return "TwoClassifyEvaluation [posLabel=" + posLabel + ", negLabel=" + negLabel + ", TP="
+				+ TP + ", TN=" + TN + ", FP=" + FP + ", FN=" + FN + "]";
+	}
+	
 }
